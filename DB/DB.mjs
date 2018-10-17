@@ -1,0 +1,41 @@
+'use strict'
+
+/**
+* This module abstracts the whole DB with functions (a DAO).
+*/
+import fs from 'fs'
+import Database from 'arangojs'
+import getStudiesDB from './studiesDB'
+
+export default async function (logger) {
+  var config = {}
+  try {
+    const configfile = await fs.promises.readFile('config.json', 'utf8')
+    config = JSON.parse(configfile)
+  } catch (err) {
+    config.db = {
+      host: (process.env.DBHOST || 'localhost'),
+      port: parseInt(process.env.DBPORT || '8529'),
+      name: process.env.DBNAME,
+      user: process.env.DBUSER,
+      password: process.env.DBPASSWORD
+    }
+    config.logs = {
+      folder: (process.env.LOGSFOLDER || 'logs'),
+      rotationsize: (process.env.LOGSROTATIONSIZE || '1M')
+    }
+  }
+
+  const db = new Database({ url: 'http://' + config.db.host + ':' + config.db.port })
+
+  db.useDatabase(config.db.name)
+  db.useBasicAuth(config.db.user, config.db.password)
+
+  var dao = {}
+
+  let studies = await getStudiesDB(db)
+  dao = Object.assign(studies, dao)
+
+  // TODO: add new collections here
+  return dao
+}
