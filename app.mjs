@@ -11,6 +11,7 @@ import getLoggers from './logger'
 
 import indexRouter from './routes/index'
 import studiesRouter from './routes/studies'
+import formsRouter from './routes/forms'
 
 export default async function () {
   var app = express()
@@ -29,6 +30,7 @@ export default async function () {
 
   app.use('/', await indexRouter())
   app.use('/api', await studiesRouter())
+  app.use('/api/formsapi', await formsRouter())
 
   // error handler
   app.use(function (err, req, res, next) {
