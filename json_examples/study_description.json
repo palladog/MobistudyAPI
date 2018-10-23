@@ -1,0 +1,74 @@
+{
+   "generalities":{
+      "title":"My amazing study",
+      "description":"This is a study about amazing people",
+      "startDate":"2018-09-11",
+      "endDate":"2020-10-12",
+      "principalInvestigators":[
+         {
+            "name":"Arvin Goburhdun",
+            "contact":"arvin@something.com",
+            "institution":"University of Oxford"
+         }
+      ],
+      "institutions":[
+         {
+            "name":"University of Oxford",
+            "contact":"asdasd",
+            "dataAccess":"yes"
+         }
+      ]
+   },
+   "inclusionCriteria":{
+      "minAge":18,
+      "maxAge":100,
+      "gender":[
+         "male",
+         "female",
+         "other"
+      ],
+      "lifestyle":{
+         "active":false,
+         "smoker":false
+      },
+      "criteriaQuestions":[
+         {
+            "title":"Are you pregnant?",
+            "answer":"yes"
+         }
+      ],
+      "diseases":{
+         "COPD":"123123123"
+      },
+      "medications":{
+         "Aspirin":"13123123"
+      }
+   },
+   "tasks": [
+		{
+		  "type": "dataQuery",
+		  "scheduling": {
+               "recurring":"ICS string"
+            },
+		  "dataType": "steps",
+          "aggregated": false
+		},
+		{
+			"type": "form",
+		  "scheduling": {
+               "recurring":"ICS string"
+            },
+		  "formKey":"12121212"
+		}
+   ],
+   "consent":{
+      "invitation":"We would like to invite you to take part in our research study.",
+      "privacyPolicy":"This is a semi-automatically generated text.",
+      "items":[
+         {
+            "description":"I agree to do some analysis",
+            "optional":false
+         }
+      ]
+   }
+}
