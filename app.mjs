@@ -30,7 +30,7 @@ export default async function () {
 
   app.use('/', await indexRouter())
   app.use('/api', await studiesRouter())
-  app.use('/api/formsapi', await formsRouter())
+  app.use('/api', await formsRouter())
 
   // error handler
   app.use(function (err, req, res, next) {

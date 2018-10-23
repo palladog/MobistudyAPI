@@ -9,8 +9,11 @@ import fs from 'fs'
 import getApp from '../app'
 import http from 'http'
 import https from 'https'
+import cluster from 'cluster'
+import os from 'os'
 
 (async () => {
+  const numCPUs = os.cpus().length
   const app = await getApp()
 
   var config = {}
@@ -33,25 +36,40 @@ import https from 'https'
   // pass parameters down the application
   app.set('port', config.web.port)
 
-  var server
+  if (cluster.isMaster) {
+    console.log(`Master ${process.pid} is running`)
 
-  if (config.cert) {
-    // HTTPS case
+    // Fork workers.
+    for (let i = 0; i < numCPUs; i++) {
+      cluster.fork()
+    }
 
-    // Private Key and Public Certificate
-    var privateKey = fs.readFileSync(config.cert.key, 'utf8')
-    var certificate = fs.readFileSync(config.cert.file, 'utf8')
-
-    server = https.createServer({ key: privateKey, cert: certificate }, app)
+    cluster.on('exit', (worker, code, signal) => {
+      console.log(`worker ${worker.process.pid} died`)
+    })
   } else {
-    // HTTP case
-    server = http.createServer(app)
-  }
+    var server
 
-  // Listen on provided port, on all network interfaces.
-  server.listen(config.web.port)
-  server.on('error', onError)
-  server.on('listening', onListening)
+    if (config.cert) {
+      // HTTPS case
+
+      // Private Key and Public Certificate
+      var privateKey = fs.readFileSync(config.cert.key, 'utf8')
+      var certificate = fs.readFileSync(config.cert.file, 'utf8')
+
+      server = https.createServer({ key: privateKey, cert: certificate }, app)
+    } else {
+      // HTTP case
+      server = http.createServer(app)
+    }
+
+    // Listen on provided port, on all network interfaces.
+    server.listen(config.web.port)
+    server.on('error', onError)
+    server.on('listening', onListening)
+
+    console.log(`Worker ${process.pid} started`)
+  }
 
   /**
   * Event listener for HTTP server "error" event.
