@@ -1,4 +1,7 @@
 {
+   "created": "ISO date string",
+   "lastUpdated": "ISO date string",
+   "published": "ISO date string",
    "generalities":{
       "title":"My amazing study",
       "description":"This is a study about amazing people",
@@ -15,7 +18,7 @@
          {
             "name":"University of Oxford",
             "contact":"asdasd",
-            "dataAccess":"yes"
+            "dataAccess":"full"
          }
       ]
    },
@@ -28,8 +31,8 @@
          "other"
       ],
       "lifestyle":{
-         "active":false,
-         "smoker":false
+         "active":"yes",
+         "smoker":"notrequired"
       },
       "criteriaQuestions":[
          {
@@ -44,22 +47,47 @@
          "Aspirin":"13123123"
       }
    },
-   "tasks": [
-		{
-		  "type": "dataQuery",
-		  "scheduling": {
-               "recurring":"ICS string"
-            },
-		  "dataType": "steps",
-          "aggregated": false
-		},
-		{
-			"type": "form",
-		  "scheduling": {
-               "recurring":"ICS string"
-            },
-		  "formKey":"12121212"
-		}
+   "tasks":[
+      {
+         "id":1,
+         "type":"dataQuery",
+         "scheduling":{
+            "startEvent":"consent",
+            "startDelaySecs":1000,
+            "untilSecs":100000000,
+            "occurrences":100,
+            "intervalType":"d",
+            "interval":12,
+            "months":[
+               1,
+               2
+            ],
+            "monthDays":[
+               1,
+               12,
+               24
+            ],
+            "weekDays":[
+               1,
+               4,
+               7
+            ]
+         },
+         "dataType":"steps",
+         "aggregated":false
+      },
+      {
+         "id":2,
+         "type":"form",
+         "scheduling":{
+            "startEvent":"consent",
+            "startDelaySecs":0,
+            "occurrences":2,
+            "intervalType":"d",
+            "interval":12
+         },
+         "formKey":"12121212"
+      }
    ],
    "consent":{
       "invitation":"We would like to invite you to take part in our research study.",

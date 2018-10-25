@@ -1,0 +1,37 @@
+{
+   "created": "2018-10-25T10:09:53.222Z",
+   "name": "My cool form",
+   "description": "a short form",
+   "questions": [ {
+		"id": "Q1",
+		"type": "singleChoice",
+		"text": "What do you prefer?",
+		"helper" "Some details here",
+		"nextDefaultId": "Q2",
+		"answerChoices": [{
+			"answerId": "1",
+			"text": "Red",
+			"nextQuestionId": "Q2"
+      },{
+			"answerId": "2",
+			"text": "Green",
+			"nextQuestionId": "Q2"
+      }]
+   }, {
+		"id": "Q2",
+		"type": "multipleChoice",
+		"text": "Best options",
+		"helper" "Some details here",
+		"nextDefaultId": -1,
+		"answerChoices": [{
+			"id": "Q2A1",
+			"text": "Money",
+			"nextQuestionId": -1
+      },{
+			"id": "Q2A2",
+			"text": "Sex",
+			"nextQuestionId": -1
+      }]
+   } ]
+	
+}
