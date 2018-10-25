@@ -12,6 +12,18 @@ export default async function (db, logger) {
   const loggers = await getLoggers()
 
   return {
+    async getFormsList () {
+      // TODO: use the filter for access control later
+      var filter = ''
+
+      // TODO: use LIMIT @offset, @count in the query for pagination
+
+      var query = 'FOR form in forms ' + filter + ' SORT form.created RETURN { name: form.name, _key: form._key, created: form.created }'
+      loggers.applogger.trace('Querying "' + query + '"')
+      let cursor = await db.query(query)
+      return cursor.all()
+    },
+
     async getAllForms () {
       // TODO: use the filter for access control later
       var filter = ''

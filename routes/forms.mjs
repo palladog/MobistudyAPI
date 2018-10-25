@@ -15,12 +15,20 @@ export default async function () {
   const loggers = await getLoggers()
   const logger = loggers.applogger
 
+  // query params:"
+  // "list" if set only provides a list
   router.get('/forms', async function (req, res) {
     try {
       // TODO: do some access control
-      let forms = await db.getAllForms()
+      let forms
+      if (req.query.list) {
+        forms = await db.getFormsList()
+      } else {
+        forms = await db.getAllForms()
+      }
       res.send(forms)
     } catch (err) {
+      console.error(err)
       logger.error({ error: err }, 'Cannot retrieve forms')
       res.sendStatus(500)
     }
@@ -40,6 +48,7 @@ export default async function () {
 
   router.post('/forms', async function (req, res) {
     let newform = req.body
+    newform.created = new Date()
     try {
       // TODO: do some access control
       newform = await db.createForm(newform)

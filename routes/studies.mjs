@@ -40,6 +40,7 @@ export default async function () {
 
   router.post('/studies', async function (req, res) {
     let newstudy = req.body
+    newstudy.created = new Date()
     try {
       // TODO: do some access control
       newstudy = await db.createStudy(newstudy)
@@ -53,6 +54,7 @@ export default async function () {
 
   router.put('/studies/:study_key', async function (req, res) {
     let newstudy = req.body
+    newstudy.updated = new Date()
     try {
       // TODO: do some access control
       newstudy = await db.updateStudy(req.params.study_key, newstudy)
@@ -66,6 +68,7 @@ export default async function () {
 
   router.patch('/studies/:study_key', async function (req, res) {
     let newstudy = req.body
+    newstudy.updated = new Date()
     try {
       // TODO: do some access control
       newstudy = await db.patchStudy(req.params.study_key, newstudy)
