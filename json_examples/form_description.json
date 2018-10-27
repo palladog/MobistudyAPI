@@ -6,7 +6,7 @@
 		"id": "Q1",
 		"type": "singleChoice",
 		"text": "What do you prefer?",
-		"helper" "Some details here",
+		"helper": "Some details here",
 		"nextDefaultId": "Q2",
 		"answerChoices": [{
 			"answerId": "1",
@@ -21,7 +21,7 @@
 		"id": "Q2",
 		"type": "multipleChoice",
 		"text": "Best options",
-		"helper" "Some details here",
+		"helper": "Some details here",
 		"nextDefaultId": -1,
 		"answerChoices": [{
 			"id": "Q2A1",
@@ -32,6 +32,5 @@
 			"text": "Sex",
 			"nextQuestionId": -1
       }]
-   } ]
-	
+   } ]	
 }
