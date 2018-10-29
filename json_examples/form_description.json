@@ -6,10 +6,10 @@
 		"id": "Q1",
 		"type": "singleChoice",
 		"text": "What do you prefer?",
-		"helper" "Some details here",
+		"helper": "Some details here",
 		"nextDefaultId": "Q2",
 		"answerChoices": [{
-			"answerId": "1",
+			"id": "1",
 			"text": "Red",
 			"nextQuestionId": "Q2"
       },{
@@ -22,15 +22,13 @@
 		"type": "multipleChoice",
 		"text": "Best options",
 		"helper" "Some details here",
-		"nextDefaultId": -1,
+		"nextDefaultId": "ENDFORM",
 		"answerChoices": [{
 			"id": "Q2A1",
-			"text": "Money",
-			"nextQuestionId": -1
+			"text": "Money"
       },{
 			"id": "Q2A2",
-			"text": "Sex",
-			"nextQuestionId": -1
+			"text": "Sex"
       }]
    } ]
 	

@@ -92,8 +92,23 @@
    "consent":{
       "invitation":"We would like to invite you to take part in our research study.",
       "privacyPolicy":"This is a semi-automatically generated text.",
-      "items":[
+      "taskItems":[
          {
+            "description":"I agree to send my data related to steps every week.",
+			"taskId":1
+         },
+		 {
+            "description":"I agree to answer the QoL form every day.",
+			"taskId":2
+         }
+      ],
+	  "extraItems":[
+		 {
+            "description":"I agree to answer the QoL form every day.",
+            "optional":true,
+			"taskId":2
+         },
+		 {
             "description":"I agree to do some analysis",
             "optional":false
          }
