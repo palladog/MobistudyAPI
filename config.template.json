@@ -16,5 +16,10 @@
   "logs": {
     "folder": "path to logs",
     "rotationsize": "5M"
+  },
+  "auth": {
+    "secret": "mysecret",
+    "issuer": "mobistudy.org",
+    "audience": "mobistudy.org"
   }
 }
