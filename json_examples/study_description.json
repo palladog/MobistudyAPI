@@ -1,6 +1,6 @@
 {
    "created": "ISO date string",
-   "lastUpdated": "ISO date string",
+   "updated": "ISO date string",
    "published": "ISO date string",
    "generalities":{
       "title":"My amazing study",
