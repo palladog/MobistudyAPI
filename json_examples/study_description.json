@@ -74,7 +74,8 @@
             ]
          },
          "dataType":"steps",
-         "aggregated":false
+         "aggregated": true,
+         "bucket": "week"
       },
       {
          "id":2,
