@@ -1,0 +1,23 @@
+"answers": [
+{
+	"questionId": "Q1",
+	"questionText": "How are you?",
+	"answer" : {
+		"answerText": "Very well",
+		"answerId": "Q1A2"
+	}
+	"timeStamp": "ISO STRING"
+},
+{
+	"questionId": "Q2",
+	"questionText": "What colors do you like?",
+	"answers" : [{
+		"answerText": "Red",
+		"answerId": "Q1A1"
+	},{
+		"answerText": "Green",
+		"answerId": "Q1A4"
+	}]
+	"timeStamp": "ISO STRING"
+}
+]
