@@ -7,6 +7,7 @@ import fs from 'fs'
 import Database from 'arangojs'
 import getStudiesDB from './studiesDB'
 import getFormsDB from './formsDB'
+import getAnswersDB from './answersDB'
 
 export default async function (logger) {
   var config = {}
@@ -38,6 +39,8 @@ export default async function (logger) {
   dao = Object.assign(studies, dao)
   let forms = await getFormsDB(db)
   dao = Object.assign(forms, dao)
+  let answers = await getAnswersDB(db)
+  dao = Object.assign(answers, dao)
 
   // TODO: add new collections here
   return dao
