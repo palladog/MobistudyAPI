@@ -12,17 +12,16 @@
 */
 
 import utils from './utils'
-import getLoggers from '../logger'
+import { applogger } from '../logger'
 
 export default async function (db, logger) {
   let usersCollection = await utils.getCollection(db, 'users')
   await utils.getCollection(db, 'teams')
-  const loggers = await getLoggers()
 
   return {
     async findUser (email) {
       var query = 'FOR user in users FILTER user.email == \'' + email + '\' RETURN user'
-      loggers.applogger.trace('Querying "' + query + '"')
+      applogger.trace('Querying "' + query + '"')
       let cursor = await db.query(query)
       let users = await cursor.all()
       if (users.length) return users[0]

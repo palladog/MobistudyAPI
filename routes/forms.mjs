@@ -6,14 +6,12 @@
 
 import express from 'express'
 import getDB from '../DB/DB'
-import getLoggers from '../logger'
+import { applogger } from '../logger'
 
 const router = express.Router()
 
 export default async function () {
   var db = await getDB()
-  const loggers = await getLoggers()
-  const logger = loggers.applogger
 
   // query params:"
   // "list" if set only provides a list
@@ -28,8 +26,7 @@ export default async function () {
       }
       res.send(forms)
     } catch (err) {
-      console.error(err)
-      logger.error({ error: err }, 'Cannot retrieve forms')
+      applogger.error({ error: err }, 'Cannot retrieve forms')
       res.sendStatus(500)
     }
   })
@@ -40,8 +37,7 @@ export default async function () {
       let form = await db.getOneForm(req.params.form_key)
       res.send(form)
     } catch (err) {
-      console.error(err)
-      logger.error({ error: err }, 'Cannot retrieve form with _key ' + req.params.form_key)
+      applogger.error({ error: err }, 'Cannot retrieve form with _key ' + req.params.form_key)
       res.sendStatus(500)
     }
   })
@@ -54,8 +50,7 @@ export default async function () {
       newform = await db.createForm(newform)
       res.send(newform)
     } catch (err) {
-      console.error(err)
-      logger.error({ error: err }, 'Cannot store new form')
+      applogger.error({ error: err }, 'Cannot store new form')
       res.sendStatus(500)
     }
   })
@@ -67,8 +62,7 @@ export default async function () {
       newform = await db.updateForm(req.params.form_key, newform)
       res.send(newform)
     } catch (err) {
-      console.error(err)
-      logger.error({ error: err }, 'Cannot update form with _key ' + req.params.form_key)
+      applogger.error({ error: err }, 'Cannot update form with _key ' + req.params.form_key)
       res.sendStatus(500)
     }
   })
@@ -80,8 +74,7 @@ export default async function () {
       newform = await db.patchForm(req.params.form_key, newform)
       res.send(newform)
     } catch (err) {
-      console.error(err)
-      logger.error({ error: err }, 'Cannot patch form with _key ' + req.params.form_key)
+      applogger.error({ error: err }, 'Cannot patch form with _key ' + req.params.form_key)
       res.sendStatus(500)
     }
   })
@@ -92,8 +85,7 @@ export default async function () {
       await db.deleteForm(req.params.form_key)
       res.sendStatus(200)
     } catch (err) {
-      console.error(err)
-      logger.error({ error: err }, 'Cannot delete form with _key ' + req.params.form_key)
+      applogger.error({ error: err }, 'Cannot delete form with _key ' + req.params.form_key)
       res.sendStatus(500)
     }
   })

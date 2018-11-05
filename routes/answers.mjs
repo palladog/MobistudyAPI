@@ -6,14 +6,12 @@
 
 import express from 'express'
 import getDB from '../DB/DB'
-import getLoggers from '../logger'
+import { applogger } from '../logger'
 
 const router = express.Router()
 
 export default async function () {
   var db = await getDB()
-  const loggers = await getLoggers()
-  const logger = loggers.applogger
 
   router.get('/answers', async function (req, res) {
     try {
@@ -21,7 +19,7 @@ export default async function () {
       let answers = await db.getAllAnswers()
       res.send(answers)
     } catch (err) {
-      logger.error({ error: err }, 'Cannot retrieve answers')
+      applogger.error({ error: err }, 'Cannot retrieve answers')
       res.sendStatus(500)
     }
   })
@@ -33,7 +31,7 @@ export default async function () {
       res.send(answer)
     } catch (err) {
       console.error(err)
-      logger.error({ error: err }, 'Cannot retrieve answer with _key ' + req.params.answer_key)
+      applogger.error({ error: err }, 'Cannot retrieve answer with _key ' + req.params.answer_key)
       res.sendStatus(500)
     }
   })
@@ -47,7 +45,7 @@ export default async function () {
       res.send(newanswer)
     } catch (err) {
       console.error(err)
-      logger.error({ error: err }, 'Cannot store new answer')
+      applogger.error({ error: err }, 'Cannot store new answer')
       res.sendStatus(500)
     }
   })
@@ -61,7 +59,7 @@ export default async function () {
       res.send(newanswer)
     } catch (err) {
       console.error(err)
-      logger.error({ error: err }, 'Cannot update answer with _key ' + req.params.answer_key)
+      applogger.error({ error: err }, 'Cannot update answer with _key ' + req.params.answer_key)
       res.sendStatus(500)
     }
   })
@@ -75,7 +73,7 @@ export default async function () {
       res.send(newanswer)
     } catch (err) {
       console.error(err)
-      logger.error({ error: err }, 'Cannot patch answer with _key ' + req.params.answer_key)
+      applogger.error({ error: err }, 'Cannot patch answer with _key ' + req.params.answer_key)
       res.sendStatus(500)
     }
   })
@@ -87,7 +85,7 @@ export default async function () {
       res.sendStatus(200)
     } catch (err) {
       console.error(err)
-      logger.error({ error: err }, 'Cannot delete answer with _key ' + req.params.answer_key)
+      applogger.error({ error: err }, 'Cannot delete answer with _key ' + req.params.answer_key)
       res.sendStatus(500)
     }
   })

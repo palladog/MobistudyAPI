@@ -8,7 +8,6 @@ import express from 'express'
 const router = express.Router()
 
 export default async function () {
-
   /* Just a health cehcker */
   router.get('/', async function (req, res, next) {
     res.send('<p>Working!!!!!</p>')

@@ -6,14 +6,12 @@
 
 import express from 'express'
 import getDB from '../DB/DB'
-import getLoggers from '../logger'
+import { applogger } from '../logger'
 
 const router = express.Router()
 
 export default async function () {
   var db = await getDB()
-  const loggers = await getLoggers()
-  const logger = loggers.applogger
 
   router.get('/studies', async function (req, res) {
     try {
@@ -21,7 +19,7 @@ export default async function () {
       let studies = await db.getAllStudies()
       res.send(studies)
     } catch (err) {
-      logger.error({ error: err }, 'Cannot retrieve studies')
+      applogger.error({ error: err }, 'Cannot retrieve studies')
       res.sendStatus(500)
     }
   })
@@ -32,8 +30,7 @@ export default async function () {
       let study = await db.getOneStudy(req.params.study_key)
       res.send(study)
     } catch (err) {
-      console.error(err)
-      logger.error({ error: err }, 'Cannot retrieve study with _key ' + req.params.study_key)
+      applogger.error({ error: err }, 'Cannot retrieve study with _key ' + req.params.study_key)
       res.sendStatus(500)
     }
   })
@@ -46,8 +43,7 @@ export default async function () {
       newstudy = await db.createStudy(newstudy)
       res.send(newstudy)
     } catch (err) {
-      console.error(err)
-      logger.error({ error: err }, 'Cannot store new study')
+      applogger.error({ error: err }, 'Cannot store new study')
       res.sendStatus(500)
     }
   })
@@ -60,8 +56,7 @@ export default async function () {
       newstudy = await db.updateStudy(req.params.study_key, newstudy)
       res.send(newstudy)
     } catch (err) {
-      console.error(err)
-      logger.error({ error: err }, 'Cannot update study with _key ' + req.params.study_key)
+      applogger.error({ error: err }, 'Cannot update study with _key ' + req.params.study_key)
       res.sendStatus(500)
     }
   })
@@ -74,8 +69,7 @@ export default async function () {
       newstudy = await db.patchStudy(req.params.study_key, newstudy)
       res.send(newstudy)
     } catch (err) {
-      console.error(err)
-      logger.error({ error: err }, 'Cannot patch study with _key ' + req.params.study_key)
+      applogger.error({ error: err }, 'Cannot patch study with _key ' + req.params.study_key)
       res.sendStatus(500)
     }
   })
@@ -86,8 +80,7 @@ export default async function () {
       await db.deleteStudy(req.params.study_key)
       res.sendStatus(200)
     } catch (err) {
-      console.error(err)
-      logger.error({ error: err }, 'Cannot delete study with _key ' + req.params.study_key)
+      applogger.error({ error: err }, 'Cannot delete study with _key ' + req.params.study_key)
       res.sendStatus(500)
     }
   })

@@ -9,7 +9,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import passport from 'passport'
 
-import getLoggers from './logger'
+import { applogger, httplogger } from './logger'
 import authConfig from './authConfig'
 
 import indexRouter from './routes/index'
@@ -19,13 +19,11 @@ import usersRouter from './routes/users'
 import answersRouter from './routes/answers'
 
 export default async function () {
-  const loggers = await getLoggers()
-
   authConfig()
 
   var app = express()
 
-  app.use(loggers.httplogger)
+  app.use(httplogger)
   // setup body parser
   // default limit is 100kb, so we need to extend the limit
   // see http://stackoverflow.com/questions/19917401/node-js-express-request-entity-too-large
@@ -46,7 +44,7 @@ export default async function () {
   // error handler
   app.use(function (err, req, res, next) {
     console.error(err)
-    loggers.applogger.error(err, 'General error')
+    applogger.error(err, 'General error')
 
     // set locals, only providing error in development
     res.locals.message = err.message

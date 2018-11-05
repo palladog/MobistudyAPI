@@ -8,14 +8,12 @@ import passport from 'passport'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import getDB from '../DB/DB'
-import getLoggers from '../logger'
+import { applogger } from '../logger'
 
 const router = express.Router()
 
 export default async function () {
   var db = await getDB()
-  const loggers = await getLoggers()
-  const logger = loggers.applogger
 
   router.post('/login', passport.authenticate('local', { session: false }), function (req, res, next) {
     // generate a signed json web token with the contents of user object and return it in the response
@@ -36,7 +34,7 @@ export default async function () {
       if (user.role === 'researcher' && user.invitationCode !== '827363423') return res.status(400).send('Bad invitation code')
       await db.createUser(user)
     } catch (err) {
-      logger.error({ error: err }, 'Cannot store new user')
+      applogger.error({ error: err }, 'Cannot store new user')
       res.sendStatus(500)
     }
   })

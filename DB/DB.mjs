@@ -3,34 +3,18 @@
 /**
 * This module abstracts the whole DB with functions (a DAO).
 */
-import fs from 'fs'
+
 import Database from 'arangojs'
 import getStudiesDB from './studiesDB'
 import getFormsDB from './formsDB'
 import getUsersDB from './usersDB'
 import getAnswersDB from './answersDB'
+import getConfig from '../config'
 
 export default async function (logger) {
-  var config = {}
-  try {
-    const configfile = await fs.promises.readFile('config.json', 'utf8')
-    config = JSON.parse(configfile)
-  } catch (err) {
-    config.db = {
-      host: (process.env.DBHOST || 'localhost'),
-      port: parseInt(process.env.DBPORT || '8529'),
-      name: process.env.DBNAME,
-      user: process.env.DBUSER,
-      password: process.env.DBPASSWORD
-    }
-    config.logs = {
-      folder: (process.env.LOGSFOLDER || 'logs'),
-      rotationsize: (process.env.LOGSROTATIONSIZE || '1M')
-    }
-  }
+  var config = getConfig()
 
   try {
-    console.log(config)
     const db = new Database({ url: 'http://' + config.db.host + ':' + config.db.port })
 
     db.useDatabase(config.db.name)
@@ -43,6 +27,8 @@ export default async function (logger) {
     dao = Object.assign(forms, dao)
     let users = await getUsersDB(db)
     dao = Object.assign(users, dao)
+    let answers = await getAnswersDB(db)
+    dao = Object.assign(answers, dao)
 
     // TODO: add new collections here
     return dao
@@ -50,6 +36,4 @@ export default async function (logger) {
     console.error('----> CANNOT CONNECT TO DATABASE !!!!')
     throw err
   }
-  let answers = await getAnswersDB(db)
-  dao = Object.assign(answers, dao)
 }
