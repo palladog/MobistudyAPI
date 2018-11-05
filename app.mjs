@@ -7,16 +7,22 @@
 
 import express from 'express'
 import bodyParser from 'body-parser'
+import passport from 'passport'
+
 import getLoggers from './logger'
+import authConfig from './authConfig'
 
 import indexRouter from './routes/index'
 import studiesRouter from './routes/studies'
 import formsRouter from './routes/forms'
+import usersRouter from './routes/users'
 
 export default async function () {
-  var app = express()
-
   const loggers = await getLoggers()
+
+  authConfig()
+
+  var app = express()
 
   app.use(loggers.httplogger)
   // setup body parser
@@ -28,19 +34,25 @@ export default async function () {
 
   app.use(express.static('./public'))
 
+  app.use(passport.initialize())
+
   app.use('/', await indexRouter())
   app.use('/api', await studiesRouter())
   app.use('/api', await formsRouter())
+  app.use('/api', await usersRouter())
 
   // error handler
   app.use(function (err, req, res, next) {
+    console.error(err)
+    loggers.applogger.error(err, 'General error')
+
     // set locals, only providing error in development
     res.locals.message = err.message
     res.locals.error = req.app.get('env') === 'development' ? err : {}
 
     // render the error page
     res.status(err.status || 500)
-    res.render('error')
+    res.send('<p>INTERNAL ERROR</p>')
   })
 
   return app
