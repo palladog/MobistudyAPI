@@ -7,7 +7,7 @@
 *   email: 'aas@as.com',
 *   hashedPassword: 'asdasdasdasdads',
 *   role: 'participant', (or 'admin', 'researcher')
-*   teamKey: 'asdasdaasd' (only if the role is researcher)
+*   teamKeys: ['asdasdaasd', 'asdasdasd'] (only if the role is researcher)
 * }
 */
 
