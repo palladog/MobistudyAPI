@@ -7,6 +7,7 @@
 import passport from 'passport'
 import PassportLocal from 'passport-local'
 import PassportJWT from 'passport-jwt'
+import jwt from 'jsonwebtoken'
 import { applogger } from './logger'
 import getDB from './DB/DB'
 import bcrypt from 'bcrypt'
@@ -29,6 +30,13 @@ export default async function () {
       if (bcrypt.compareSync(password, dbHashedPwd)) {
         // OK!
         applogger.info(email + ' logged in')
+        delete user.hashedPassword
+        delete user._rev
+        delete user._id
+        const token = jwt.sign(user, config.auth.secret, {
+          expiresIn: config.auth.tokenExpires
+        })
+        user.token = token
         return done(null, user, { message: 'Logged In Successfully' })
       } else {
         // wrong password!
@@ -42,11 +50,8 @@ export default async function () {
   var opts = {}
   opts.jwtFromRequest = PassportJWT.ExtractJwt.fromAuthHeaderAsBearerToken()
   opts.secretOrKey = config.auth.secret
-  opts.issuer = config.auth.issuer
-  opts.audience = config.auth.audience
   passport.use(new PassportJWT.Strategy(opts, function (jwtPayload, cb) {
-    console.log(jwtPayload)
-    let user = { role: 'admin' }
+    let user = jwtPayload
     return cb(null, user)
   }))
 }

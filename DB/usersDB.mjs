@@ -32,6 +32,40 @@ export default async function (db, logger) {
       let meta = await usersCollection.save(newuser)
       newuser._key = meta._key
       return newuser
+    },
+
+    async getOneUsers (key) {
+      let bindings = { key: key }
+      var query = 'FOR user in users FILTER user._key == @key RETURN user'
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
+    },
+
+    async getAllUsers (role, studyKey, studyKeys) {
+      let join = ''
+      let filter = ''
+      let bindings = {}
+      if (studyKey) {
+        join = ' FOR study in studies '
+        filter = ' FILTER studies._key == @studyKey '
+        bindings.studyKey = studyKey
+      }
+      if (studyKeys) {
+        join = ' FOR study in studies '
+        filter = ' FILTER studies._key IN @studyKey '
+        bindings.studyKeys = studyKeys
+      }
+      if (role) {
+        if (studyKey) filter += ' AND user.role == @role'
+        else filter = ' FILTER user.role == @role'
+        bindings.role = role
+      }
+
+      var query = 'FOR user in users ' + join + filter + ' RETURN user'
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
     }
   }
 }

@@ -6,20 +6,16 @@
 import express from 'express'
 import passport from 'passport'
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
 import getDB from '../DB/DB'
 import { applogger } from '../logger'
 
 const router = express.Router()
 
 export default async function () {
-  var db = await getDB()
+  const db = await getDB()
 
   router.post('/login', passport.authenticate('local', { session: false }), function (req, res, next) {
-    // generate a signed json web token with the contents of user object and return it in the response
-    delete req.user.hashedPassword
-    const token = jwt.sign(req.user, 'your_jwt_secret')
-    return res.json({ user: req.user, token })
+    res.send(req.user)
   })
 
   router.post('/users', async (req, res) => {
@@ -33,6 +29,31 @@ export default async function () {
       if (user.role !== 'researcher' || user.role !== 'participant') return res.send(403)
       if (user.role === 'researcher' && user.invitationCode !== '827363423') return res.status(400).send('Bad invitation code')
       await db.createUser(user)
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot store new user')
+      res.sendStatus(500)
+    }
+  })
+
+  // possible query parameters:
+  // studyKey: the key of the study
+  router.get('/users', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    try {
+      let val
+      if (req.user.role === 'admin') {
+        val = await db.getAllUsers(null, req.query.studyKey)
+      } else if (req.user.role === 'researcher') {
+        // TODO: make sure the study Key is among the ones the researcher is allowed
+        if (req.query.studyKey) val = await db.getAllUsers('participant', req.query.studyKey)
+        else {
+          // TODO: retrieve studies where this participant is involved in
+          let studyKeys = undefined
+          val = await db.getAllUsers('participant', undefined, studyKeys)
+        }
+      } else { // a participant
+        val = await db.getOneUsers(req.user._key)
+      }
+      res.sendStatus(val)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new user')
       res.sendStatus(500)

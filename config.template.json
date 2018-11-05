@@ -19,7 +19,6 @@
   },
   "auth": {
     "secret": "mysecret",
-    "issuer": "mobistudy.org",
-    "audience": "mobistudy.org"
+    "tokenExpires": "30 days"
   }
 }
