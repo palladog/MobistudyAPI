@@ -16,6 +16,7 @@ import indexRouter from './routes/index'
 import studiesRouter from './routes/studies'
 import formsRouter from './routes/forms'
 import usersRouter from './routes/users'
+import answersRouter from './routes/answers'
 
 export default async function () {
   const loggers = await getLoggers()
@@ -40,6 +41,7 @@ export default async function () {
   app.use('/api', await studiesRouter())
   app.use('/api', await formsRouter())
   app.use('/api', await usersRouter())
+  app.use('/api', await answersRouter())
 
   // error handler
   app.use(function (err, req, res, next) {

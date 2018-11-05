@@ -8,6 +8,7 @@ import Database from 'arangojs'
 import getStudiesDB from './studiesDB'
 import getFormsDB from './formsDB'
 import getUsersDB from './usersDB'
+import getAnswersDB from './answersDB'
 
 export default async function (logger) {
   var config = {}
@@ -49,4 +50,6 @@ export default async function (logger) {
     console.error('----> CANNOT CONNECT TO DATABASE !!!!')
     throw err
   }
+  let answers = await getAnswersDB(db)
+  dao = Object.assign(answers, dao)
 }

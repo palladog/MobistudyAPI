@@ -2,7 +2,7 @@
 
 /**
 * Mobistudy REST API. This is the main application file.
-* This laods the actual application and initalises the environment.
+* This loads the actual application and initalises the environment.
 */
 
 import fs from 'fs'
