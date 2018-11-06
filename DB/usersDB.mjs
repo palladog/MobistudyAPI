@@ -7,7 +7,6 @@
 *   email: 'aas@as.com',
 *   hashedPassword: 'asdasdasdasdads',
 *   role: 'participant', (or 'admin', 'researcher')
-*   teamKeys: ['asdasdaasd', 'asdasdasd'] (only if the role is researcher)
 * }
 */
 
@@ -16,7 +15,6 @@ import { applogger } from '../logger'
 
 export default async function (db, logger) {
   let usersCollection = await utils.getCollection(db, 'users')
-  await utils.getCollection(db, 'teams')
 
   return {
     async findUser (email) {
