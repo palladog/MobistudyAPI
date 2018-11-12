@@ -5,6 +5,7 @@
 */
 
 import express from 'express'
+import passport from 'passport'
 import getDB from '../DB/DB'
 import { applogger } from '../logger'
 
@@ -15,7 +16,7 @@ export default async function () {
 
   // query params:"
   // "list" if set only provides a list
-  router.get('/forms', async function (req, res) {
+  router.get('/forms', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
       let forms
@@ -31,7 +32,7 @@ export default async function () {
     }
   })
 
-  router.get('/forms/:form_key', async function (req, res) {
+  router.get('/forms/:form_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
       let form = await db.getOneForm(req.params.form_key)
@@ -42,7 +43,7 @@ export default async function () {
     }
   })
 
-  router.post('/forms', async function (req, res) {
+  router.post('/forms', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newform = req.body
     newform.created = new Date()
     try {
@@ -55,7 +56,7 @@ export default async function () {
     }
   })
 
-  router.put('/forms/:form_key', async function (req, res) {
+  router.put('/forms/:form_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newform = req.body
     try {
       // TODO: do some access control
@@ -67,7 +68,7 @@ export default async function () {
     }
   })
 
-  router.patch('/forms/:form_key', async function (req, res) {
+  router.patch('/forms/:form_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newform = req.body
     try {
       // TODO: do some access control
@@ -79,7 +80,7 @@ export default async function () {
     }
   })
 
-  router.delete('/forms/:form_key', async function (req, res) {
+  router.delete('/forms/:form_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
       await db.deleteForm(req.params.form_key)

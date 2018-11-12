@@ -5,6 +5,7 @@
 */
 
 import express from 'express'
+import passport from 'passport'
 import getDB from '../DB/DB'
 import { applogger } from '../logger'
 
@@ -13,7 +14,7 @@ const router = express.Router()
 export default async function () {
   var db = await getDB()
 
-  router.get('/answers', async function (req, res) {
+  router.get('/answers', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
       let answers = await db.getAllAnswers()
@@ -24,7 +25,7 @@ export default async function () {
     }
   })
 
-  router.get('/answers/:answer_key', async function (req, res) {
+  router.get('/answers/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
       let answer = await db.getOneAnswer(req.params.answer_key)
@@ -36,7 +37,7 @@ export default async function () {
     }
   })
 
-  router.post('/answers', async function (req, res) {
+  router.post('/answers', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newanswer = req.body
     newanswer.created = new Date()
     try {
@@ -50,7 +51,7 @@ export default async function () {
     }
   })
 
-  router.put('/answers/:answer_key', async function (req, res) {
+  router.put('/answers/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newanswer = req.body
     newanswer.updated = new Date()
     try {
@@ -64,7 +65,7 @@ export default async function () {
     }
   })
 
-  router.patch('/answers/:answer_key', async function (req, res) {
+  router.patch('/answers/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newanswer = req.body
     newanswer.updated = new Date()
     try {
@@ -78,7 +79,7 @@ export default async function () {
     }
   })
 
-  router.delete('/answers/:answer_key', async function (req, res) {
+  router.delete('/answers/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
       await db.deleteAnswer(req.params.answer_key)

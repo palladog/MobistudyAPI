@@ -26,9 +26,10 @@ export default async function () {
     try {
       let existing = await db.findUser(user.email)
       if (existing) return res.status(409).send('This email is already registered')
-      if (user.role !== 'researcher' || user.role !== 'participant') return res.send(403)
-      if (user.role === 'researcher' && user.invitationCode !== '827363423') return res.status(400).send('Bad invitation code')
+      if (user.role !== 'researcher') return res.sendStatus(403)
+      // if (user.role === 'researcher' && user.invitationCode !== '827363423') return res.status(400).send('Bad invitation code')
       await db.createUser(user)
+      res.sendStatus(200)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new user')
       res.sendStatus(500)

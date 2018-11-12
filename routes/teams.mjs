@@ -5,15 +5,20 @@
 */
 
 import express from 'express'
+import passport from 'passport'
 import getDB from '../DB/DB'
+import jwt from 'jsonwebtoken'
+
+import getConfig from '../config'
 import { applogger } from '../logger'
 
 const router = express.Router()
 
 export default async function () {
   var db = await getDB()
+  var config = getConfig()
 
-  router.get('/teams', async function (req, res) {
+  router.get('/teams', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       let teams
       if (req.user.role === 'admin') {
@@ -28,7 +33,7 @@ export default async function () {
     }
   })
 
-  router.get('/teams/:team_key', async function (req, res) {
+  router.get('/teams/:team_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       let team
       if (req.user.role === 'admin') {
@@ -45,21 +50,49 @@ export default async function () {
     }
   })
 
-  router.post('/teams', async function (req, res) {
-    let newteam = req.body
-    newteam.createdTS = new Date()
-    try {
-      if (req.user.role === 'admin') {
+  router.post('/teams', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role === 'admin') {
+      let newteam = req.body
+      newteam.createdTS = new Date()
+      newteam.researchersKeys = []
+      try {
+        let existingTeam = await db.findTeam(newteam.name)
+        if (existingTeam) return res.sendStatus(409)
         newteam = await db.createTeam(newteam)
         res.send(newteam)
-      } else res.sendStatus(403)
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot store new study')
-      res.sendStatus(500)
-    }
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot store new study')
+        res.sendStatus(500)
+      }
+    } else res.sendStatus(403)
   })
 
-  router.post('/teams/addResearcher', async function (req, res) {
+  router.get('/teams/invitationCode/:teamKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role === 'admin') {
+      try {
+        let teamkey = req.params.teamKey
+
+        let team = await db.getOneTeam(teamkey)
+        if (!team) return res.sendStatus(400)
+
+        let weeksecs = 7 * 24 * 60 * 60
+        const token = jwt.sign({
+          teamKey: teamkey
+        }, config.auth.secret, {
+          expiresIn: weeksecs
+        })
+        team.invitationCode = token
+        team.invitationExpiry = new Date(new Date().getTime() + (weeksecs * 1000))
+        await db.updateTeam(teamkey, team)
+        res.send(token)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot generate invitation code for team ' + req.params.teamKey)
+        res.sendStatus(500)
+      }
+    } else res.sendStatus(403)
+  })
+
+  router.post('/teams/addResearcher', passport.authenticate('jwt', { session: false }), async function (req, res) {
     // TODO: to be completed, use the JWT token
     // {
     //   researcherKey: '12132',

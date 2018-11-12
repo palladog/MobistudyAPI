@@ -5,6 +5,7 @@
 */
 
 import express from 'express'
+import passport from 'passport'
 import getDB from '../DB/DB'
 import { applogger } from '../logger'
 
@@ -13,7 +14,7 @@ const router = express.Router()
 export default async function () {
   var db = await getDB()
 
-  router.get('/studies', async function (req, res) {
+  router.get('/studies', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
       let studies = await db.getAllStudies()
@@ -24,7 +25,7 @@ export default async function () {
     }
   })
 
-  router.get('/studies/:study_key', async function (req, res) {
+  router.get('/studies/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
       let study = await db.getOneStudy(req.params.study_key)
@@ -35,7 +36,7 @@ export default async function () {
     }
   })
 
-  router.post('/studies', async function (req, res) {
+  router.post('/studies', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newstudy = req.body
     newstudy.created = new Date()
     try {
@@ -48,7 +49,7 @@ export default async function () {
     }
   })
 
-  router.put('/studies/:study_key', async function (req, res) {
+  router.put('/studies/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newstudy = req.body
     newstudy.updated = new Date()
     try {
@@ -61,7 +62,7 @@ export default async function () {
     }
   })
 
-  router.patch('/studies/:study_key', async function (req, res) {
+  router.patch('/studies/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newstudy = req.body
     newstudy.updated = new Date()
     try {
@@ -74,7 +75,7 @@ export default async function () {
     }
   })
 
-  router.delete('/studies/:study_key', async function (req, res) {
+  router.delete('/studies/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
       await db.deleteStudy(req.params.study_key)
