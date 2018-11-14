@@ -16,7 +16,8 @@ export default async function () {
 
   router.get('/studies', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
-      // TODO: do some access control
+      // TODO: do some access control ---> studies per user
+      // query parameter (teamKey)  --> Studies of specific team req.query
       let studies = await db.getAllStudies()
       res.send(studies)
     } catch (err) {

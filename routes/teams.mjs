@@ -93,19 +93,19 @@ export default async function () {
   })
 
   router.post('/teams/addResearcher', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    // TODO: to be completed, use the JWT token
-    // {
-    //   researcherKey: '12132',
-    //   invitationCode: 'asadsd'
-    // }
-    let newstudy = req.body
-    newstudy.updated = new Date()
+    let researcherKeyUpdt = req.user._key
+    let JToken = Object.keys(req.body)[0]
+    // Verify the JWT
     try {
-      // TODO: do some access control
-      newstudy = await db.updateStudy(req.params.study_key, newstudy)
-      res.send(newstudy)
+      var decoded = jwt.verify(JToken, config.auth.secret)
+      let decodedTeamKey = decoded.teamKey
+      let selTeam = await db.getOneTeam(decodedTeamKey)
+      selTeam.researchersKeys.push(researcherKeyUpdt)
+      await db.updateTeam(decodedTeamKey, selTeam)
+      res.sendStatus(200)
     } catch (err) {
-      applogger.error({ error: err }, 'Cannot update study with _key ' + req.params.study_key)
+      // respond to request with error
+      applogger.error({ error: err }, 'The JWT is invalid')
       res.sendStatus(500)
     }
   })
