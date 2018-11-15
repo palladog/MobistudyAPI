@@ -49,7 +49,7 @@ export default async function (db, logger) {
       let filter = ''
       let bindings = {}
       if (userKey) {
-        filter = ' FILTER @userKey IN teams.researcherKeys  '
+        filter = ' FILTER @userKey IN team.researchersKeys  '
         bindings.userKey = userKey
       }
 
