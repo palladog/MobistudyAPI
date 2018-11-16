@@ -8,6 +8,7 @@ import express from 'express'
 import passport from 'passport'
 import getDB from '../DB/DB'
 import { applogger } from '../logger'
+import jwt from 'jsonwebtoken'
 
 const router = express.Router()
 

@@ -8,6 +8,7 @@ import express from 'express'
 import passport from 'passport'
 import getDB from '../DB/DB'
 import { applogger } from '../logger'
+import jwt from 'jsonwebtoken'
 
 const router = express.Router()
 
@@ -19,6 +20,18 @@ export default async function () {
       // TODO: do some access control ---> studies per user
       // query parameter (teamKey)  --> Studies of specific team req.query
       let studies = await db.getAllStudies()
+      res.send(studies)
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot retrieve studies')
+      res.sendStatus(500)
+    }
+  })
+
+  router.get('/studies/:team_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    try {
+      // TODO: do some access control ---> studies per user
+      // query parameter (teamKey)  --> Studies of specific team req.query
+      let studies = await db.getAllTeamStudies(req.params.team_key)
       res.send(studies)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve studies')
@@ -40,6 +53,11 @@ export default async function () {
   router.post('/studies', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newstudy = req.body
     newstudy.created = new Date()
+    let user = req.user
+    let JToken = req.headers.authorization.replace('Bearer ','')
+    let decoded = jwt.decode(JToken, {complete: true})
+    // console.log('USER: ', req.user)
+    // console.log('Decodede Ky: ', decoded)
     try {
       // TODO: do some access control
       newstudy = await db.createStudy(newstudy)

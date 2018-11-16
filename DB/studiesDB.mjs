@@ -23,6 +23,18 @@ export default async function (db, logger) {
       return cursor.all()
     },
 
+    async getAllTeamStudies (teamkey) {
+      // TODO: use the filter for access control later
+      var filter = ''
+
+      // TODO: use LIMIT @offset, @count in the query for pagination
+
+      var query = 'FOR study in studies FILTER study.studyTeamKey == "' + teamkey + '" RETURN study'
+      applogger.trace('Querying "' + query + '"')
+      let cursor = await db.query(query)
+      return cursor.all()
+    },
+
     async createStudy (newstudy) {
       // TODO: use the filter for access control later
       let meta = await collection.save(newstudy)
