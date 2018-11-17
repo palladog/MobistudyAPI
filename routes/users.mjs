@@ -52,11 +52,27 @@ export default async function () {
           val = await db.getAllUsers('participant', undefined, studyKeys)
         }
       } else { // a participant
-        val = await db.getOneUsers(req.user._key)
+        val = await db.getOneUser(req.user._key)
       }
-      res.sendStatus(val)
+      res.send(val)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new user')
+      res.sendStatus(500)
+    }
+  })
+
+  router.get('/users/:user_key', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    try {
+      let val
+      if (req.user.role === 'admin') {
+        val = await db.getOneUser(req.params.user_key)
+      } else if (req.user.role === 'researcher') {
+        // TODO: make sure the user Key is among the ones the researcher is allowed. i.e is part of the team key
+        val = await db.getOneUser(req.params.user_key)
+        }
+      res.send(val)
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot retrieve user details')
       res.sendStatus(500)
     }
   })

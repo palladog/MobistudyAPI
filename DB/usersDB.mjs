@@ -32,12 +32,10 @@ export default async function (db, logger) {
       return newuser
     },
 
-    async getOneUsers (key) {
-      let bindings = { key: key }
-      var query = 'FOR user in users FILTER user._key == @key RETURN user'
-      applogger.trace(bindings, 'Querying "' + query + '"')
-      let cursor = await db.query(query, bindings)
-      return cursor.all()
+    async getOneUser (userkey) {
+      let user = await usersCollection.document(userkey)
+      applogger.trace('Searching for user "' + user._key)
+      return user
     },
 
     async getAllUsers (role, studyKey, studyKeys) {

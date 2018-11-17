@@ -26,7 +26,7 @@ export default async function (db, logger) {
     },
 
     async getOneTeam (key) {
-      let bindings = { key: key }
+      let bindings = { 'key' : key }
       var query = 'FOR team in teams FILTER team._key == @key RETURN team'
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
@@ -36,7 +36,7 @@ export default async function (db, logger) {
     },
 
     async findTeam (teamName) {
-      let bindings = { name: teamName }
+      let bindings = { 'name' : teamName }
       var query = 'FOR team in teams FILTER team.name == @name RETURN team'
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
