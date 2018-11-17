@@ -39,7 +39,7 @@ export default async function () {
     }
   })
 
-  router.get('/studies/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
+  router.get('/studies/:team_key/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
       let study = await db.getOneStudy(req.params.study_key)
