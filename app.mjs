@@ -7,19 +7,24 @@
 
 import express from 'express'
 import bodyParser from 'body-parser'
-import getLoggers from './logger'
+import passport from 'passport'
+
+import { applogger, httplogger } from './logger'
+import authConfig from './authConfig'
 
 import indexRouter from './routes/index'
 import studiesRouter from './routes/studies'
 import formsRouter from './routes/forms'
+import usersRouter from './routes/users'
+import teamsRouter from './routes/teams'
 import answersRouter from './routes/answers'
 
 export default async function () {
+  authConfig()
+
   var app = express()
 
-  const loggers = await getLoggers()
-
-  app.use(loggers.httplogger)
+  app.use(httplogger)
   // setup body parser
   // default limit is 100kb, so we need to extend the limit
   // see http://stackoverflow.com/questions/19917401/node-js-express-request-entity-too-large
@@ -29,20 +34,27 @@ export default async function () {
 
   app.use(express.static('./public'))
 
-  app.use('/', await indexRouter())
+  app.use(passport.initialize())
+
+  app.use('/api', await indexRouter())
   app.use('/api', await studiesRouter())
   app.use('/api', await formsRouter())
+  app.use('/api', await usersRouter())
+  app.use('/api', await teamsRouter())
   app.use('/api', await answersRouter())
 
   // error handler
   app.use(function (err, req, res, next) {
+    console.error(err)
+    applogger.error(err, 'General error')
+
     // set locals, only providing error in development
     res.locals.message = err.message
     res.locals.error = req.app.get('env') === 'development' ? err : {}
 
     // render the error page
     res.status(err.status || 500)
-    res.render('error')
+    res.send('<p>INTERNAL ERROR</p>')
   })
 
   return app

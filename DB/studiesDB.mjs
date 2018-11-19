@@ -5,11 +5,10 @@
 */
 
 import utils from './utils'
-import getLoggers from '../logger'
+import { applogger } from '../logger'
 
 export default async function (db, logger) {
   let collection = await utils.getCollection(db, 'studies')
-  const loggers = await getLoggers()
 
   return {
     async getAllStudies () {
@@ -19,7 +18,19 @@ export default async function (db, logger) {
       // TODO: use LIMIT @offset, @count in the query for pagination
 
       var query = 'FOR study in studies ' + filter + ' RETURN study'
-      loggers.applogger.trace('Querying "' + query + '"')
+      applogger.trace('Querying "' + query + '"')
+      let cursor = await db.query(query)
+      return cursor.all()
+    },
+
+    async getAllTeamStudies (teamkey) {
+      // TODO: use the filter for access control later
+      var filter = ''
+
+      // TODO: use LIMIT @offset, @count in the query for pagination
+
+      var query = 'FOR study in studies FILTER study.studyTeamKey == "' + teamkey + '" RETURN study'
+      applogger.trace('Querying "' + query + '"')
       let cursor = await db.query(query)
       return cursor.all()
     },

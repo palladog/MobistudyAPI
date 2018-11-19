@@ -5,11 +5,10 @@
 */
 
 import utils from './utils'
-import getLoggers from '../logger'
+import { applogger } from '../logger'
 
 export default async function (db, logger) {
   let collection = await utils.getCollection(db, 'answers')
-  const loggers = await getLoggers()
 
   return {
     async getAllAnswers () {
@@ -19,7 +18,7 @@ export default async function (db, logger) {
       // TODO: use LIMIT @offset, @count in the query for pagination
 
       var query = 'FOR answer in answers ' + filter + ' RETURN answer'
-      loggers.applogger.trace('Querying "' + query + '"')
+      applogger.trace('Querying "' + query + '"')
       let cursor = await db.query(query)
       return cursor.all()
     },

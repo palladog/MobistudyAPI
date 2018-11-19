@@ -8,9 +8,8 @@ import express from 'express'
 const router = express.Router()
 
 export default async function () {
-
   /* Just a health cehcker */
-  router.get('/', async function (req, res, next) {
+  router.get('/', async function (req, res) {
     res.send('<p>Working!!!!!</p>')
   })
 

@@ -16,5 +16,16 @@
   "logs": {
     "folder": "path to logs",
     "rotationsize": "5M"
+  },
+  "auth": {
+    "secret": "mysecret",
+    "tokenExpires": "30 days"
+  },
+  "gmail": {
+    "email": "xxx@gmail.com",
+    "client_id":"LONG STRING",
+    "project_id":"project ID",
+    "client_secret":"LONG STRING",
+    "refresh_token": "LONG STRING"
   }
 }

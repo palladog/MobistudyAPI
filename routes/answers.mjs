@@ -5,40 +5,40 @@
 */
 
 import express from 'express'
+import passport from 'passport'
 import getDB from '../DB/DB'
-import getLoggers from '../logger'
+import { applogger } from '../logger'
+import jwt from 'jsonwebtoken'
 
 const router = express.Router()
 
 export default async function () {
   var db = await getDB()
-  const loggers = await getLoggers()
-  const logger = loggers.applogger
 
-  router.get('/answers', async function (req, res) {
+  router.get('/answers', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
       let answers = await db.getAllAnswers()
       res.send(answers)
     } catch (err) {
-      logger.error({ error: err }, 'Cannot retrieve answers')
+      applogger.error({ error: err }, 'Cannot retrieve answers')
       res.sendStatus(500)
     }
   })
 
-  router.get('/answers/:answer_key', async function (req, res) {
+  router.get('/answers/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
       let answer = await db.getOneAnswer(req.params.answer_key)
       res.send(answer)
     } catch (err) {
       console.error(err)
-      logger.error({ error: err }, 'Cannot retrieve answer with _key ' + req.params.answer_key)
+      applogger.error({ error: err }, 'Cannot retrieve answer with _key ' + req.params.answer_key)
       res.sendStatus(500)
     }
   })
 
-  router.post('/answers', async function (req, res) {
+  router.post('/answers', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newanswer = req.body
     newanswer.created = new Date()
     try {
@@ -47,12 +47,12 @@ export default async function () {
       res.send(newanswer)
     } catch (err) {
       console.error(err)
-      logger.error({ error: err }, 'Cannot store new answer')
+      applogger.error({ error: err }, 'Cannot store new answer')
       res.sendStatus(500)
     }
   })
 
-  router.put('/answers/:answer_key', async function (req, res) {
+  router.put('/answers/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newanswer = req.body
     newanswer.updated = new Date()
     try {
@@ -61,12 +61,12 @@ export default async function () {
       res.send(newanswer)
     } catch (err) {
       console.error(err)
-      logger.error({ error: err }, 'Cannot update answer with _key ' + req.params.answer_key)
+      applogger.error({ error: err }, 'Cannot update answer with _key ' + req.params.answer_key)
       res.sendStatus(500)
     }
   })
 
-  router.patch('/answers/:answer_key', async function (req, res) {
+  router.patch('/answers/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newanswer = req.body
     newanswer.updated = new Date()
     try {
@@ -75,19 +75,19 @@ export default async function () {
       res.send(newanswer)
     } catch (err) {
       console.error(err)
-      logger.error({ error: err }, 'Cannot patch answer with _key ' + req.params.answer_key)
+      applogger.error({ error: err }, 'Cannot patch answer with _key ' + req.params.answer_key)
       res.sendStatus(500)
     }
   })
 
-  router.delete('/answers/:answer_key', async function (req, res) {
+  router.delete('/answers/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
       await db.deleteAnswer(req.params.answer_key)
       res.sendStatus(200)
     } catch (err) {
       console.error(err)
-      logger.error({ error: err }, 'Cannot delete answer with _key ' + req.params.answer_key)
+      applogger.error({ error: err }, 'Cannot delete answer with _key ' + req.params.answer_key)
       res.sendStatus(500)
     }
   })

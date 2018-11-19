@@ -3,45 +3,41 @@
 /**
 * This module abstracts the whole DB with functions (a DAO).
 */
-import fs from 'fs'
+
 import Database from 'arangojs'
 import getStudiesDB from './studiesDB'
 import getFormsDB from './formsDB'
+import getUsersDB from './usersDB'
 import getAnswersDB from './answersDB'
+import getTeamsDB from './teamsDB'
+
+import getConfig from '../config'
 
 export default async function (logger) {
-  var config = {}
+  var config = getConfig()
+
   try {
-    const configfile = await fs.promises.readFile('config.json', 'utf8')
-    config = JSON.parse(configfile)
+    const db = new Database({ url: 'http://' + config.db.host + ':' + config.db.port })
+
+    db.useDatabase(config.db.name)
+    db.useBasicAuth(config.db.user, config.db.password)
+    var dao = {}
+
+    let studies = await getStudiesDB(db)
+    dao = Object.assign(studies, dao)
+    let forms = await getFormsDB(db)
+    dao = Object.assign(forms, dao)
+    let users = await getUsersDB(db)
+    dao = Object.assign(users, dao)
+    let answers = await getAnswersDB(db)
+    dao = Object.assign(answers, dao)
+    let teams = await getTeamsDB(db)
+    dao = Object.assign(teams, dao)
+
+    // TODO: add new collections here
+    return dao
   } catch (err) {
-    config.db = {
-      host: (process.env.DBHOST || 'localhost'),
-      port: parseInt(process.env.DBPORT || '8529'),
-      name: process.env.DBNAME,
-      user: process.env.DBUSER,
-      password: process.env.DBPASSWORD
-    }
-    config.logs = {
-      folder: (process.env.LOGSFOLDER || 'logs'),
-      rotationsize: (process.env.LOGSROTATIONSIZE || '1M')
-    }
+    console.error('----> CANNOT CONNECT TO DATABASE !!!!')
+    throw err
   }
-
-  const db = new Database({ url: 'http://' + config.db.host + ':' + config.db.port })
-
-  db.useDatabase(config.db.name)
-  db.useBasicAuth(config.db.user, config.db.password)
-
-  var dao = {}
-
-  let studies = await getStudiesDB(db)
-  dao = Object.assign(studies, dao)
-  let forms = await getFormsDB(db)
-  dao = Object.assign(forms, dao)
-  let answers = await getAnswersDB(db)
-  dao = Object.assign(answers, dao)
-
-  // TODO: add new collections here
-  return dao
 }
