@@ -94,18 +94,33 @@ export default async function () {
 
   router.post('/teams/addResearcher', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let researcherKeyUpdt = req.user._key
-    let JToken = Object.keys(req.body)[0]
+    let JToken = req.body.invitationCode
     // Verify the JWT
     try {
       var decoded = jwt.verify(JToken, config.auth.secret)
-      let decodedTeamKey = decoded.teamKey
-      let selTeam = await db.getOneTeam(decodedTeamKey)
-      selTeam.researchersKeys.push(researcherKeyUpdt)
-      await db.updateTeam(decodedTeamKey, selTeam)
-      res.sendStatus(200)
+      if (new Date().getTime() >= (decoded.exp * 1000)) {
+        applogger.error('Adding researcher to team, token has expired')
+        res.sendStatus(400)
+      } else {
+        let decodedTeamKey = decoded.teamKey
+        let selTeam = await db.getOneTeam(decodedTeamKey)
+        if (selTeam) {
+          if (selTeam.researchersKeys.includes(researcherKeyUpdt)) {
+            applogger.error('Adding researcher to team, researcher already added')
+            res.sendStatus(409)
+          } else {
+            selTeam.researchersKeys.push(researcherKeyUpdt)
+            await db.updateTeam(decodedTeamKey, selTeam)
+            return res.sendStatus(200)
+          }
+        } else {
+          applogger.error('Adding researcher to team, team with key ' + decodedTeamKey + ' does not exist')
+          res.sendStatus(400)
+        }
+      }
     } catch (err) {
       // respond to request with error
-      applogger.error({ error: err }, 'The JWT is invalid')
+      applogger.error({ error: err }, 'Cannot add researcher to team')
       res.sendStatus(500)
     }
   })
