@@ -29,6 +29,11 @@ export default function () {
       user: process.env.DBUSER,
       password: process.env.DBPASSWORD
     }
+    config.gmail = {
+      client_id: process.env.GMAIL_CLIENTID,
+      project_id: process.env.GMAIL_PROJECTID,
+      client_secret: process.env.GMAIL_SECRET
+    }
   }
 
   return config

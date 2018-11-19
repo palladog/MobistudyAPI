@@ -36,7 +36,7 @@ export default async function () {
 
   app.use(passport.initialize())
 
-  app.use('/', await indexRouter())
+  app.use('/api', await indexRouter())
   app.use('/api', await studiesRouter())
   app.use('/api', await formsRouter())
   app.use('/api', await usersRouter())

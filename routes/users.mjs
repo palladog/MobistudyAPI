@@ -6,16 +6,68 @@
 import express from 'express'
 import passport from 'passport'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 import getDB from '../DB/DB'
+import getConfig from '../config'
 import { applogger } from '../logger'
+import { sendEmail } from '../mailSender'
 
 const router = express.Router()
+
+const config = getConfig()
 
 export default async function () {
   const db = await getDB()
 
   router.post('/login', passport.authenticate('local', { session: false }), function (req, res, next) {
     res.send(req.user)
+  })
+
+  router.post('/sendResetPasswordEmail', async function (req, res) {
+    if (req.body.email) {
+      let email = req.body.email
+      let existing = await db.findUser(email)
+      if (!existing) return res.sendStatus(200)
+
+      let daysecs = 24 * 60 * 60
+      const token = jwt.sign({
+        email: email
+      }, config.auth.secret, {
+        expiresIn: daysecs
+      })
+      let serverlink = req.protocol + '://' + req.headers.host + '/resetPassword?email=' + email + '&token=' + token
+      sendEmail(email, 'Mobistudy Password recovery', `<p>You have requested to reset your password on Mobistudy.</p>
+      <p>Please go to <a href="${serverlink}">this webpage</a> to set another password.</p>
+      <p>Or use the following code if required: ${token}</p>
+      <p>This code will expire after 24 hours.</p>`)
+      res.sendStatus(200)
+    } else res.sendStatus(200)
+  })
+
+  router.post('/resetPassword', async function (req, res) {
+    if (req.body.token && req.body.password) {
+      try {
+        var decoded = jwt.verify(req.body.token, config.auth.secret)
+      } catch (err) {
+        applogger.error(err, 'Resetting password, cannot parse token')
+        console.error(err)
+        return res.sendStatus(500)
+      }
+      if (new Date().getTime() >= (decoded.exp * 1000)) {
+        applogger.error('Resetting password, token has expired')
+        res.sendStatus(400)
+      } else {
+        let email = decoded.email
+        let newpasssword = req.body.password
+        let hashedPassword = bcrypt.hashSync(newpasssword, 8)
+        let existing = await db.findUser(email)
+        if (!existing) return res.status(409).send('This email is not registered')
+        await db.patchUser(existing._key, {
+          hashedPassword: hashedPassword
+        })
+        res.sendStatus(200)
+      }
+    } else res.sendStatus(400)
   })
 
   router.post('/users', async (req, res) => {
@@ -26,7 +78,7 @@ export default async function () {
     try {
       let existing = await db.findUser(user.email)
       if (existing) return res.status(409).send('This email is already registered')
-      if (user.role !== 'researcher') return res.sendStatus(403)
+      if (user.role === 'admin') return res.sendStatus(403)
       // if (user.role === 'researcher' && user.invitationCode !== '827363423') return res.status(400).send('Bad invitation code')
       await db.createUser(user)
       res.sendStatus(200)

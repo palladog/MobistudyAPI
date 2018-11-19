@@ -62,6 +62,12 @@ export default async function (db, logger) {
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       return cursor.all()
+    },
+
+    // udpates a user, we assume the _key is the correct one
+    async patchUser (_key, newuser) {
+      let newval = await usersCollection.update(_key, newuser, { keepNull: false, mergeObjects: true, returnNew: true })
+      return newval
     }
   }
 }
