@@ -1,7 +1,7 @@
 {
   "name": "MobistudyAPI",
   "author": "Arvin G <arvin.goo@>, Dario Salvi <dario.salvi@eng.ox.ac.uk>",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "The REST API of Mobistudy",
   "main": "bin/www.js",
   "scripts": {
