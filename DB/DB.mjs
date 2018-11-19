@@ -10,6 +10,7 @@ import getFormsDB from './formsDB'
 import getUsersDB from './usersDB'
 import getAnswersDB from './answersDB'
 import getTeamsDB from './teamsDB'
+import getParticipantsDB from './participantsDB'
 
 import getConfig from '../config'
 
@@ -33,6 +34,8 @@ export default async function (logger) {
     dao = Object.assign(answers, dao)
     let teams = await getTeamsDB(db)
     dao = Object.assign(teams, dao)
+    let participants = await getParticipantsDB(db)
+    dao = Object.assign(participants, dao)
 
     // TODO: add new collections here
     return dao

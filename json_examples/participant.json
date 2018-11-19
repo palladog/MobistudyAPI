@@ -1,0 +1,17 @@
+{
+  "userKey": "UUID",
+  "createdTS": "ISO STRING",
+  "acceptedstudies": [
+    {
+      "studyDescriptionKey": "UUID",
+      "acceptedTS": "ISO string"
+    }
+  ],
+  "rejectedStudies": [
+    {
+      "studyDescriptionKey": "UUID",
+      "rejectedTS": "ISO string",
+      "criteriaAnswers": ["Yes", "No"]
+    }
+  ]
+}

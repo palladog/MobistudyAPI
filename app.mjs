@@ -16,6 +16,7 @@ import indexRouter from './routes/index'
 import studiesRouter from './routes/studies'
 import formsRouter from './routes/forms'
 import usersRouter from './routes/users'
+import participantsRouter from './routes/participants'
 import teamsRouter from './routes/teams'
 import answersRouter from './routes/answers'
 
@@ -40,6 +41,7 @@ export default async function () {
   app.use('/api', await studiesRouter())
   app.use('/api', await formsRouter())
   app.use('/api', await usersRouter())
+  app.use('/api', await participantsRouter())
   app.use('/api', await teamsRouter())
   app.use('/api', await answersRouter())
 
