@@ -94,14 +94,14 @@ export default async function () {
     try {
       let val
       if (req.user.role === 'admin') {
-        val = await db.getAllUsers(null, req.query.studyKey)
+        val = await db.getAllUsersByCriteria(null, req.query.studyKey)
       } else if (req.user.role === 'researcher') {
         // TODO: make sure the study Key is among the ones the researcher is allowed
-        if (req.query.studyKey) val = await db.getAllUsers('participant', req.query.studyKey)
+        if (req.query.studyKey) val = await db.getAllUsersByCriteria('participant', req.query.studyKey)
         else {
           // TODO: retrieve studies where this participant is involved in
           let studyKeys = undefined
-          val = await db.getAllUsers('participant', undefined, studyKeys)
+          val = await db.getAllUsersByCriteria('participant', undefined, studyKeys)
         }
       } else { // a participant
         val = await db.getOneUser(req.user._key)
@@ -109,6 +109,23 @@ export default async function () {
       res.send(val)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new user')
+      res.sendStatus(500)
+    }
+  })
+
+  // Get All Users in Db
+  router.get('/users/all', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    try {
+      let val
+      // Only Admin can get a list of all users
+      if (req.user.role === 'admin') {
+        val = await db.getAllUsersInDb()
+      } else if (req.user.role === 'researcher') {
+        // See all Users associated to teams to which this researcher belongs
+      }
+      res.send(val)
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot get all users')
       res.sendStatus(500)
     }
   })
@@ -128,6 +145,30 @@ export default async function () {
       res.sendStatus(500)
     }
   })
+
+  // Remove Specified User
+  router.delete('/users/:user_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    try {
+      // Only admin can remove a team
+      if (req.user.role === 'admin') {
+        // Remove user from all teams
+        let teamsOfUser = await db.getAllTeams(req.params.user_key)
+        // TO DO: Loop through array
+        // For each team, find the researcher keys and replace with '' 
+        let i = 0
+        for (i = 0; i < teamsOfUser.length; i++) {
+          console.log('teamsUsr: ', teamsOfUser[i]._key)
+        }
+        // Then FINALLY, remove user from db
+        // await db.removeUser(req.params.user_key)
+        res.sendStatus(200)
+      } else res.sendStatus(403)
+    } catch (err) {
+      // respond to request with error
+      applogger.error({ error: err }, 'Cannot delete team ')
+      res.sendStatus(500)
+    }
+  }) 
 
   return router
 }

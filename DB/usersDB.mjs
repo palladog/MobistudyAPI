@@ -37,8 +37,8 @@ export default async function (db, logger) {
       applogger.trace('Searching for user "' + user._key)
       return user
     },
-
-    async getAllUsers (role, studyKey, studyKeys) {
+    
+    async getAllUsersByCriteria (role, studyKey, studyKeys) {
       let join = ''
       let filter = ''
       let bindings = {}
@@ -64,10 +64,28 @@ export default async function (db, logger) {
       return cursor.all()
     },
 
+    // Get all users in DB
+    async getAllUsersInDb () {
+      var query = 'FOR user in users RETURN user'
+      applogger.trace('Querying "' + query + '"')
+      let cursor = await db.query(query)
+      return cursor.all()
+    },
+
     // udpates a user, we assume the _key is the correct one
     async patchUser (_key, newuser) {
       let newval = await usersCollection.update(_key, newuser, { keepNull: false, mergeObjects: true, returnNew: true })
       return newval
+    },
+
+    //remove a user (Assumption: userKey is the correct one)
+    async removeUser (userKey) {
+      let bindings = { 'usrKey' : userKey}
+      let query = 'REMOVE { _key:@usrKey } IN users'
+      console.log('+++++')
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
     }
   }
 }

@@ -125,5 +125,20 @@ export default async function () {
     }
   })
 
+  // Remove Specified Team
+  router.delete('/teams/:team_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    try {
+      // Only admin can remove a team
+      if (req.user.role === 'admin') {
+        await db.removeTeam(req.params.team_key)
+        res.sendStatus(200)
+      } else res.sendStatus(403)
+    } catch (err) {
+      // respond to request with error
+      applogger.error({ error: err }, 'Cannot delete team ')
+      res.sendStatus(500)
+    }
+  }) 
+
   return router
 }

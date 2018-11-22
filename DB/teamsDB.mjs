@@ -47,10 +47,9 @@ export default async function (db, logger) {
 
     async getAllTeams (userKey) {
       let filter = ''
-      let bindings = {}
+      let bindings = {'usrKey': userKey}
       if (userKey) {
-        filter = ' FILTER @userKey IN team.researchersKeys  '
-        bindings.userKey = userKey
+        filter = ' FILTER @usrKey IN team.researchersKeys  '
       }
 
       var query = 'FOR team in teams ' + filter + ' RETURN team'
@@ -59,11 +58,20 @@ export default async function (db, logger) {
       return cursor.all()
     },
 
-    // udpates a team, we assume the _key is the correct one
+    // udpates a team (Assumption: _key is the correct one)
     async updateTeam (_key, team) {
       let meta = await teamsCollection.replace(_key, team)
       team._key = meta._key
       return team
+    },
+
+    //remove a team (Assumption: teamKey is the correct one)
+    async removeTeam (teamKey) {
+      let bindings = { 'tKey' : teamKey}
+      let query = 'REMOVE { _key:@tKey } IN teams'
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
     }
   }
 }
