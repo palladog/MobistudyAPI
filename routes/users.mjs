@@ -149,18 +149,24 @@ export default async function () {
   // Remove Specified User
   router.delete('/users/:user_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
+      let userKey = req.params.user_key
       // Only admin can remove a team
       if (req.user.role === 'admin') {
         // Remove user from all teams
-        let teamsOfUser = await db.getAllTeams(req.params.user_key)
-        // TO DO: Loop through array
-        // For each team, find the researcher keys and replace with '' 
+        let teamsOfUser = await db.getAllTeams(userKey)
+        // For each team, find the user key in the researcher keys and remove 
         let i = 0
         for (i = 0; i < teamsOfUser.length; i++) {
-          console.log('teamsUsr: ', teamsOfUser[i]._key)
+          let teamKeyOfUser = teamsOfUser[i]._key
+          let selTeam = await db.getOneTeam(teamKeyOfUser)
+          let index = selTeam.researchersKeys.indexOf(userKey)
+          if (index !== null) {
+            selTeam.researchersKeys.splice(index, 1)
+          }
+          await db.updateTeam(teamKeyOfUser, selTeam)
         }
-        // Then FINALLY, remove user from db
-        // await db.removeUser(req.params.user_key)
+        // Then, FINALLY, remove user from db
+        await db.removeUser(userKey)
         res.sendStatus(200)
       } else res.sendStatus(403)
     } catch (err) {

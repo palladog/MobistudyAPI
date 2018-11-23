@@ -82,7 +82,6 @@ export default async function (db, logger) {
     async removeUser (userKey) {
       let bindings = { 'usrKey' : userKey}
       let query = 'REMOVE { _key:@usrKey } IN users'
-      console.log('+++++')
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       return cursor.all()
