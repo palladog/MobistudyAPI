@@ -92,7 +92,7 @@ export default async function () {
     } else res.sendStatus(403)
   })
 
-  router.post('/teams/addResearcher', passport.authenticate('jwt', { session: false }), async function (req, res) {
+  router.post('/teams/researcher/add', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let researcherKeyUpdt = req.user._key
     let JToken = req.body.invitationCode
     // Verify the JWT
@@ -123,6 +123,26 @@ export default async function () {
       applogger.error({ error: err }, 'Cannot add researcher to team')
       res.sendStatus(500)
     }
+  })
+
+  // Remove Researcher from Team
+  router.post('/teams/researcher/remove', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    let teamKey = req.body.userRemoved.teamKey
+    let userKey = req.body.userRemoved.userKey
+    if (req.user.role === 'admin') {
+      try {
+        let selTeam = await db.getOneTeam(teamKey)
+        let index = selTeam.researchersKeys.indexOf(userKey)
+        if (index !== null) {
+          selTeam.researchersKeys.splice(index, 1)
+        }
+        await db.updateTeam(teamKey, selTeam)
+        res.sendStatus(200)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot remove user from study')
+        res.sendStatus(400)
+      }
+    } else res.sendStatus(403)
   })
 
   // Remove Specified Team
