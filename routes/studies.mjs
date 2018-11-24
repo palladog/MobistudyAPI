@@ -95,14 +95,15 @@ export default async function () {
   })
 
   router.delete('/studies/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    try {
-      // TODO: do some access control
-      await db.deleteStudy(req.params.study_key)
-      res.sendStatus(200)
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot delete study with _key ' + req.params.study_key)
-      res.sendStatus(500)
-    }
+    if (req.user.role === 'admin') {
+      try {
+        await db.deleteStudy(req.params.study_key)
+        res.sendStatus(200)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot delete study with _key ' + req.params.study_key)
+        res.sendStatus(500)
+      }
+    } else res.sendStatus(403)
   })
 
   return router
