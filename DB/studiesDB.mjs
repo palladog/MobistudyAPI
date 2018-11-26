@@ -65,7 +65,7 @@ export default async function (db, logger) {
 
     // deletes a study
     async deleteStudy (_key) {
-      // TODO: use the filter for access control later
+      // TODO: delete study design and all the associated data
       await collection.remove(_key)
       return true
     }

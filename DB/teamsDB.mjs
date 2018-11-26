@@ -47,7 +47,7 @@ export default async function (db, logger) {
 
     async getAllTeams (userKey) {
       let filter = ''
-      let bindings = {'usrKey': userKey}
+      let bindings = { 'usrKey': userKey }
       if (userKey) {
         filter = ' FILTER @usrKey IN team.researchersKeys  '
       }
@@ -69,6 +69,7 @@ export default async function (db, logger) {
     async removeTeam (teamKey) {
       let bindings = { 'tKey' : teamKey}
       let query = 'REMOVE { _key:@tKey } IN teams'
+      // TODO: delete also study edsigns and study data
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       return cursor.all()
