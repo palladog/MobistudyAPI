@@ -13,5 +13,14 @@
       "rejectedTS": "ISO string",
       "criteriaAnswers": ["Yes", "No"]
     }
+  ],
+  "withdrawnStudies": [
+    {
+      "studyDescriptionKey": "UUID",
+      "withdrawalTS": "ISO string",
+      "acceptedTS": "ISO string",
+      "withdrwalReason": "string"
+    }
   ]
+
 }
