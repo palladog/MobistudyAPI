@@ -36,6 +36,45 @@ export default async function (db, logger) {
       return participant
     },
 
+    async getAllAcceptedParticipants (studykey) {
+      let filter = ''
+      let bindings = { 'studyKey': studykey }
+      if (studykey) {
+        filter = ' FILTER @studyKey == accepted.studyDescriptionKey '
+      }
+      var query = 'FOR participant IN participants FOR accepted IN participant.acceptedStudies '
+       + filter + ' RETURN participant._key'
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
+    },
+
+    async getAllWithdrawnParticipants (studykey) {
+      let filter = ''
+      let bindings = { 'studyKey': studykey }
+      if (studykey) {
+        filter = ' FILTER @studyKey == withdrawn.studyDescriptionKey '
+      }
+      var query = 'FOR participant IN participants FOR withdrawn IN participant.withdrawnStudies '
+       + filter + ' RETURN { participant: participant._key, studyKey: withdrawn.studyDescriptionKey }'
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
+    },
+
+    async getAllRejectedStudyParticipants (studykey) {
+      let filter = ''
+      let bindings = { 'studyKey': studykey }
+      if (studykey) {
+        filter = ' FILTER @studyKey == rejected.studyDescriptionKey '
+      }
+      var query = 'FOR participant IN participants FOR rejected IN participant.rejectedStudies '
+       + filter + ' RETURN { participant: participant._key, studyKey: rejected.studyDescriptionKey }'
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
+    },
+
     // udpates an participant, we assume the _key is the correct one
     async updateParticipant (_key, participant) {
       // TODO: use the filter for access control later

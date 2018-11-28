@@ -111,7 +111,7 @@ export default async function () {
           } else {
             selTeam.researchersKeys.push(researcherKeyUpdt)
             await db.updateTeam(decodedTeamKey, selTeam)
-            return res.sendStatus(200)
+            return res.status(200).json({teamName:selTeam.name})
           }
         } else {
           applogger.error('Adding researcher to team, team with key ' + decodedTeamKey + ' does not exist')

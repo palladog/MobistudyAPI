@@ -1,7 +1,7 @@
 {
   "userKey": "UUID",
   "createdTS": "ISO STRING",
-  "acceptedstudies": [
+  "acceptedStudies": [
     {
       "studyDescriptionKey": "UUID",
       "acceptedTS": "ISO string"
