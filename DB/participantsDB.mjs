@@ -56,7 +56,7 @@ export default async function (db, logger) {
         filter = ' FILTER @studyKey == withdrawn.studyDescriptionKey '
       }
       var query = 'FOR participant IN participants FOR withdrawn IN participant.withdrawnStudies '
-       + filter + ' RETURN { participant: participant._key, studyKey: withdrawn.studyDescriptionKey }'
+       + filter + ' RETURN participant._key'
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       return cursor.all()

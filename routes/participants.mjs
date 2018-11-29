@@ -56,7 +56,6 @@ export default async function () {
                 })
               } 
             }
-            console.log('acceptedOnes: ', acceptedOnes)
             res.send(acceptedOnes)
           } else res.sendStatus(403)
       } else res.sendStatus(403)
@@ -93,30 +92,6 @@ export default async function () {
             res.send(withdrawnOnes)
           } else res.sendStatus(403)
       } else res.sendStatus(403)
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot retrieve withdrawn participants')
-      res.sendStatus(500)
-    }
-  })
-
-  router.get('/participants/withdrawn/:team_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    try {
-      if (req.user.role === 'researcher' || req.user.role === 'admin') {
-        // researchers can retrieve only those related to the studies of their teams
-        let studies, withdrawnOnes = []
-        // 1. Look in Studies for teams associated to team_key
-          studies = await db.getAllTeamStudies(req.params.team_key)
-          if (studies.length > 0)
-          {
-            // 2. Look in Participants for studies.
-            for (let i = 0; i < studies.length; i++) {
-              let arrP = []
-              let withdPar= await db.getAllWithdrawnParticipants (studies[i]._key)
-              if (result.length > 0) withdrawnOnes.push(result)
-            }
-            res.send(withdrawnOnes)
-            } else res.sendStatus(403)
-          } else res.sendStatus(403)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve withdrawn participants')
       res.sendStatus(500)
