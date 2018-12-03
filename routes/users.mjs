@@ -89,7 +89,7 @@ export default async function () {
   })
 
   // possible query parameters:
-  // studyKey: the key of the study
+  // studyKey: the key of the study (TO DELETE ?? DUPLICATED BY GET/ALL )
   router.get('/users', passport.authenticate('jwt', { session: false }), async (req, res) => {
     try {
       let val
@@ -113,7 +113,7 @@ export default async function () {
     }
   })
 
-  // Get All Users in Db
+  // Get All Users in Db (TO DELETE ?? DUPLICATED BY GET/ALL )
   router.get('/users/all', passport.authenticate('jwt', { session: false }), async (req, res) => {
     try {
       let val

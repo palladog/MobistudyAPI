@@ -19,7 +19,7 @@
       "studyDescriptionKey": "UUID",
       "withdrawalTS": "ISO string",
       "acceptedTS": "ISO string",
-      "withdrwalReason": "string"
+      "withdrawalReason": "string"
     }
   ]
 

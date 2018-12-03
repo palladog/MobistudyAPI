@@ -126,22 +126,65 @@ export default async function () {
     let newparticipant = req.body
     try {
       // TODO: do some access control, only allowed to participant and admin
-      newparticipant = await db.updateParticipant(req.params.participant_key, newparticipant)
+      newparticipant = await db.replaceParticipant(req.params.participant_key, newparticipant)
       res.send(newparticipant)
     } catch (err) {
-      applogger.error({ error: err }, 'Cannot update participant with _key ' + req.params.participant_key)
+      applogger.error({ error: err }, 'Cannot replace participant with _key ' + req.params.participant_key)
       res.sendStatus(500)
     }
   })
 
-  router.patch('/participants/:participant_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    let newparticipant = req.body
+  router.put('/participants/action/withdraw', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    let participantKey = req.body.withdrawnOne.partKey
+    let studyKey = req.body.withdrawnOne.studyKey
     try {
-      // TODO: do some access control, only allowed to participant and admin
-      newparticipant = await db.patchParticipant(req.params.participant_key, newparticipant)
-      res.send(newparticipant)
+      if (req.user.role === 'admin' || req.user.role === 'participant') {
+        // Get participant obj
+        if (participantKey !== null && studyKey !== null) {
+          let participant = await db.getOneParticipant(participantKey)
+          let accStudies = participant.acceptedStudies
+          // remove studykey from accepted study
+          for (let i = 0; i < accStudies.length; i++) {
+            if (accStudies[i].studyDescriptionKey === studyKey) {
+              let acceptedTimeStamp = accStudies[i].acceptedTS
+              accStudies.splice(i, 1)
+              // Add studyKey to withdrawn studies with current TS
+              participant.withdrawnStudies.push({
+                studyDescriptionKey: studyKey,
+                withdrawalTS: new Date().toISOString(),
+                acceptedTS: acceptedTimeStamp,
+                withdrawalReason: ''
+              })
+            }
+          }
+          // Update the DB
+          await db.replaceParticipant(participantKey, participant)
+          res.sendStatus(200)
+        } else res.sendStatus(403)
+      } else res.sendStatus(403)
     } catch (err) {
-      applogger.error({ error: err }, 'Cannot patch participant with _key ' + req.params.participant_key)
+      applogger.error({ error: err }, 'Cannot update participant with _key ' + req.body.withdrawnOne.partKey)
+      res.sendStatus(500)
+    }
+  })
+
+   // Delete Specified participant
+   router.delete('/participant/:participant_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    try {
+      // Only Participant can remove participant from Participant and Users DB
+      if (req.user.role === 'participant') {
+        let participant = await db.getOneParticipant(participantKey)
+        let user_Key = participant.userKey
+        if (participantKey !== null && user_Key !== null && req.user._key === participant_key) {
+          // Get User Key of participant first. Then remove participant and then user.
+          await db.removeParticipant(participant_key)
+          await db.removeUser(user_Key)
+          res.sendStatus(200)
+        } else res.sendStatus(403)
+      } else res.sendStatus(403)
+    } catch (err) {
+      // respond to request with error
+      applogger.error({ error: err }, 'Cannot delete participant')
       res.sendStatus(500)
     }
   })

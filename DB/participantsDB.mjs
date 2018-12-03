@@ -75,23 +75,22 @@ export default async function (db, logger) {
       return cursor.all()
     },
 
-    // udpates an participant, we assume the _key is the correct one
-    async updateParticipant (_key, participant) {
-      // TODO: use the filter for access control later
+    // udpates a participant, we assume the _key is the correct one
+    async replaceParticipant (_key, participant) {
       let meta = await collection.replace(_key, participant)
       participant._key = meta._key
       return participant
     },
 
-    // udpates an participant, we assume the _key is the correct one
-    async patchParticipant (_key, participant) {
+    // udpates a participant, we assume the _key is the correct one
+    async updateParticipant (_key, participant) {
       // TODO: use the filter for access control later
       let newval = await collection.update(_key, participant, { keepNull: false, mergeObjects: true, returnNew: true })
       return newval
     },
 
     // deletes an participant
-    async deleteParticipant (_key) {
+    async removeParticipant (_key) {
       // TODO: use the filter for access control later
       await collection.remove(_key)
       return true
