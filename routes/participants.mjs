@@ -32,6 +32,18 @@ export default async function () {
     }
   })
 
+  router.get('/participants/:user_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    try {
+      if (req.user.role === 'admin') {
+        let participant = await db.getParticipantByUserKey(req.params.user_key)
+        res.send(participant[0])
+      } else res.sendStatus(403)
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot retrieve participant')
+      res.sendStatus(500)
+    }
+  })
+
   router.get('/participants/accepted/:team_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       if (req.user.role === 'researcher' || req.user.role === 'admin') {
@@ -169,19 +181,30 @@ export default async function () {
   })
 
    // Delete Specified participant
-   router.delete('/participant/:participant_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
+   router.delete('/participants/:participant_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
-      // Only Participant can remove participant from Participant and Users DB
-      if (req.user.role === 'participant') {
-        let participant = await db.getOneParticipant(participantKey)
-        let user_Key = participant.userKey
-        if (participantKey !== null && user_Key !== null && req.user._key === participant_key) {
-          // Get User Key of participant first. Then remove participant and then user.
-          await db.removeParticipant(participant_key)
-          await db.removeUser(user_Key)
-          res.sendStatus(200)
+      let partKey = req.params.participant_key
+        // Participant can remove only itself from Participant and Users DB
+        if (partKey !== null) {
+          let participant = await db.getOneParticipant(partKey)
+          if (participant !== null) {
+            let user_Key = participant.userKey
+            if (req.user.role === 'admin') {
+              if (user_Key !== null) {
+                // Get User Key of participant first. Then remove participant and then user.
+                await db.removeParticipant(partKey)
+                await db.removeUser(user_Key)
+                res.sendStatus(200)
+              } else res.sendStatus(403)
+            } else if (req.user.role === 'participant') {
+              if (user_Key !== null && req.user._key === user_Key) {
+                await db.removeParticipant(partKey)
+                await db.removeUser(user_Key)
+                res.sendStatus(200)
+              } else res.sendStatus(403)
+            } else res.sendStatus(403)
+          } else res.sendStatus(403)
         } else res.sendStatus(403)
-      } else res.sendStatus(403)
     } catch (err) {
       // respond to request with error
       applogger.error({ error: err }, 'Cannot delete participant')

@@ -36,6 +36,19 @@ export default async function (db, logger) {
       return participant
     },
 
+    async getParticipantByUserKey (user_key) {
+      let filter = ''
+      let bindings = { 'userkey': user_key }
+      if (user_key) {
+        filter = ' FILTER @userkey ==  participant.userKey '
+      }
+      var query = 'FOR participant IN participants '
+       + filter + ' RETURN participant._key'
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
+    },
+
     async getAllAcceptedParticipants (studykey) {
       let filter = ''
       let bindings = { 'studyKey': studykey }
