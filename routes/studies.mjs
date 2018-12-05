@@ -97,8 +97,50 @@ export default async function () {
   router.delete('/studies/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     if (req.user.role === 'admin') {
       try {
-        await db.deleteStudy(req.params.study_key)
-        res.sendStatus(200)
+        let studykey = req.params.study_key
+        if (studykey !== null) {
+          await db.deleteStudy(studykey)
+          // Search participants for study
+          let pKeyAcc = await db.getAllAcceptedParticipants(studykey)
+          let pKeyWith = await db.getAllWithdrawnParticipants(studykey)
+          let pKeyRej = await db.getAllRejectedStudyParticipants (studykey)
+          if (pKeyAcc !== null) {
+            for (let i = 0; i < pKeyAcc.length; i++) {
+              let accParKey = pKeyAcc[i]
+              // For Each participant, delete the study key from accepted studies
+              let participant = await db.getOneParticipant(accParKey)
+              let studyArray = participant.acceptedStudies
+              studyArray = studyArray.filter(study => study.studyDescriptionKey !== studykey)
+              participant.acceptedStudies = studyArray
+              await db.replaceParticipant(accParKey, participant)
+            }
+            res.sendStatus(200)
+          } else res.sendStatus(403)
+          if (pKeyWith !== null) {
+            for (let i = 0; i < pKeyWith.length; i++) {
+              let withParKey = pKeyWith[i]
+              // For Each participant, delete the study key from withdrawn studies
+              let participant = await db.getOneParticipant(withParKey)
+              let studyArray = participant.withdrawnStudies
+              studyArray = studyArray.filter(study => study.studyDescriptionKey !== studykey)
+              participant.withdrawnStudies = studyArray
+              await db.replaceParticipant(withParKey, participant)
+            }
+            res.sendStatus(200)
+          } else res.sendStatus(403)
+          if (pKeyRej !== null) {
+            for (let i = 0; i < pKeyRej.length; i++) {
+              let rejParKey = pKeyRej[i]
+              // For Each participant, delete the study key from rejected studies
+              let participant = await db.getOneParticipant(rejParKey)
+              let studyArray = participant.rejectedStudies
+              studyArray = studyArray.filter(study => study.studyDescriptionKey !== studykey)
+              participant.rejectedStudies = studyArray
+              await db.replaceParticipant(withParKey, participant)
+            }
+            res.sendStatus(200)
+          } else res.sendStatus(403)
+        } else res.sendStatus(403)
       } catch (err) {
         applogger.error({ error: err }, 'Cannot delete study with _key ' + req.params.study_key)
         res.sendStatus(500)
