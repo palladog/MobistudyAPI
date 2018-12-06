@@ -70,7 +70,7 @@ export default async function (db, logger) {
     },
 
     // udpates a team (Assumption: _key is the correct one)
-    async updateTeam (_key, team) {
+    async replaceTeam (_key, team) {
       let meta = await teamsCollection.replace(_key, team)
       team._key = meta._key
       return team

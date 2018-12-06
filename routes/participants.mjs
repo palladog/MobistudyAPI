@@ -108,7 +108,7 @@ export default async function () {
       newparticipant = await db.updateParticipant(req.params.participant_key, newparticipant)
       res.send(newparticipant)
     } catch (err) {
-      applogger.error({ error: err }, 'Cannot replace participant with _key ' + req.params.participant_key)
+      applogger.error({ error: err }, 'Cannot update participant with _key ' + req.params.participant_key)
       res.sendStatus(500)
     }
   })

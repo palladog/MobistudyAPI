@@ -32,7 +32,6 @@ export default async function () {
       let answer = await db.getOneAnswer(req.params.answer_key)
       res.send(answer)
     } catch (err) {
-      console.error(err)
       applogger.error({ error: err }, 'Cannot retrieve answer with _key ' + req.params.answer_key)
       res.sendStatus(500)
     }
@@ -46,7 +45,6 @@ export default async function () {
       newanswer = await db.createAnswer(newanswer)
       res.send(newanswer)
     } catch (err) {
-      console.error(err)
       applogger.error({ error: err }, 'Cannot store new answer')
       res.sendStatus(500)
     }
@@ -57,10 +55,9 @@ export default async function () {
     newanswer.updated = new Date()
     try {
       // TODO: do some access control
-      newanswer = await db.updateAnswer(req.params.answer_key, newanswer)
+      newanswer = await db.replaceAnswer(req.params.answer_key, newanswer)
       res.send(newanswer)
     } catch (err) {
-      console.error(err)
       applogger.error({ error: err }, 'Cannot update answer with _key ' + req.params.answer_key)
       res.sendStatus(500)
     }
@@ -71,10 +68,9 @@ export default async function () {
     newanswer.updated = new Date()
     try {
       // TODO: do some access control
-      newanswer = await db.patchAnswer(req.params.answer_key, newanswer)
+      newanswer = await db.updateAnswer(req.params.answer_key, newanswer)
       res.send(newanswer)
     } catch (err) {
-      console.error(err)
       applogger.error({ error: err }, 'Cannot patch answer with _key ' + req.params.answer_key)
       res.sendStatus(500)
     }

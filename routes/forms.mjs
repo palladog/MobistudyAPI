@@ -61,7 +61,7 @@ export default async function () {
     let newform = req.body
     try {
       // TODO: do some access control
-      newform = await db.updateForm(req.params.form_key, newform)
+      newform = await db.replaceForm(req.params.form_key, newform)
       res.send(newform)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot update form with _key ' + req.params.form_key)
@@ -73,7 +73,7 @@ export default async function () {
     let newform = req.body
     try {
       // TODO: do some access control
-      newform = await db.patchForm(req.params.form_key, newform)
+      newform = await db.updateForm(req.params.form_key, newform)
       res.send(newform)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot patch form with _key ' + req.params.form_key)

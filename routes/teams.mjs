@@ -83,7 +83,7 @@ export default async function () {
         })
         team.invitationCode = token
         team.invitationExpiry = new Date(new Date().getTime() + (weeksecs * 1000))
-        await db.updateTeam(teamkey, team)
+        await db.replaceTeam(teamkey, team)
         res.send(token)
       } catch (err) {
         applogger.error({ error: err }, 'Cannot generate invitation code for team ' + req.params.teamKey)
@@ -110,7 +110,7 @@ export default async function () {
             res.sendStatus(409)
           } else {
             selTeam.researchersKeys.push(researcherKeyUpdt)
-            await db.updateTeam(decodedTeamKey, selTeam)
+            await db.replaceTeam(decodedTeamKey, selTeam)
             return res.json({ teamName: selTeam.name })
           }
         } else {
@@ -136,7 +136,7 @@ export default async function () {
         if (index !== null) {
           selTeam.researchersKeys.splice(index, 1)
         }
-        await db.updateTeam(teamKey, selTeam)
+        await db.replaceTeam(teamKey, selTeam)
         res.sendStatus(200)
       } catch (err) {
         applogger.error({ error: err }, 'Cannot remove user from study')
