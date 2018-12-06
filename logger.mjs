@@ -6,6 +6,7 @@
 */
 
 import rfs from 'rotating-file-stream'
+import multiStream from 'multi-write-stream'
 import expresspino from 'express-pino-logger'
 import pino from 'pino'
 import getConfig from './config'
@@ -18,11 +19,24 @@ const httplogstream = rfs('http.log', {
   compress: true
 })
 
-const applogstream = rfs('app.log', {
-  path: config.logs.folder,
-  size: config.logs.rotationsize,
-  compress: true
-})
+let applogstream
+
+if (config.logs.console) {
+  applogstream = multiStream([
+    rfs('app.log', {
+      path: config.logs.folder,
+      size: config.logs.rotationsize,
+      compress: true
+    }),
+    pino.destination()
+  ])
+} else {
+  applogstream = rfs('app.log', {
+    path: config.logs.folder,
+    size: config.logs.rotationsize,
+    compress: true
+  })
+}
 
 httplogstream.on('error', console.error)
 httplogstream.on('warning', console.error)
