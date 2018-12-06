@@ -23,13 +23,22 @@ export default async function (db, logger) {
     },
 
     async getAllTeamStudies (teamkey) {
-      var filter = ''
+      var query = 'FOR study in studies FILTER study.teamKey == @teamkey RETURN study'
+      let bindings = { teamkey: teamkey }
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
+    },
 
-      // TODO: use LIMIT @offset, @count in the query for pagination
-
-      var query = 'FOR study in studies FILTER study.studyTeamKey == "' + teamkey + '" RETURN study'
-      applogger.trace('Querying "' + query + '"')
-      let cursor = await db.query(query)
+    async getAllParticipantStudies (participantKey) {
+      var query = `FOR participant IN participants
+      FILTER participant._key == @participantKey
+      FOR study IN studies
+      FILTER study._key IN participant.studies[*].studyKey
+      RETURN study`
+      let bindings = { participantKey: participantKey }
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
       return cursor.all()
     },
 
@@ -40,8 +49,12 @@ export default async function (db, logger) {
       return newstudy
     },
 
-    async getOneStudy (_key) {
-      const study = await collection.document(_key)
+    async getOneStudy (studyKey) {
+      var query = `FOR study IN studies FILTER study._key == @studyKey RETURN study`
+      let bindings = { studyKey: studyKey }
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      let study = await cursor.next()
       return study
     },
 

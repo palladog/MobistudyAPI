@@ -8,18 +8,41 @@ import express from 'express'
 import passport from 'passport'
 import getDB from '../DB/DB'
 import { applogger } from '../logger'
-import jwt from 'jsonwebtoken'
 
 const router = express.Router()
 
 export default async function () {
   var db = await getDB()
 
+  // query parameters:
+  // teamKey (optional)
   router.get('/studies', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
-      // TODO: do some access control ---> studies per user
-      // query parameter (teamKey)  --> Studies of specific team req.query
-      let studies = await db.getAllStudies()
+      let studies = []
+      if (req.user.role === 'researcher') {
+        if (req.query.teamKey) {
+          let team = await db.getOneTeam(req.query.teamKey)
+          if (!team.researchersKeys.includes(req.user._key)) return res.sendStatus(403)
+          studies = await db.getAllTeamStudies(req.query.teamKey)
+        } else {
+          // limit the studies to the teams the user belongs to
+          let teams = await db.getAllTeams(req.user._key)
+          for (let i = 0; i < teams.lenght; i++) {
+            let studies = await db.getAllTeamStudies(teams[i]._key)
+            studies.push(studies)
+          }
+        }
+      } else if (req.user.role === 'admin') {
+        if (req.query.teamKey) {
+          studies = await db.getAllTeamStudies(req.query.teamKey)
+        } else {
+          studies = await db.getAllStudies()
+        }
+      } else if (req.user.role === 'participant') {
+        let part = await db.getParticipantByUserKey(req.user._key)
+        studies = await db.getAllParticipantStudies(part._key)
+      }
+
       res.send(studies)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve studies')
@@ -27,23 +50,12 @@ export default async function () {
     }
   })
 
-  router.get('/studies/:team_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    try {
-      // TODO: do some access control ---> studies per user
-      // query parameter (teamKey)  --> Studies of specific team req.query
-      let studies = await db.getAllTeamStudies(req.params.team_key)
-      res.send(studies)
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot retrieve studies')
-      res.sendStatus(500)
-    }
-  })
-
-  router.get('/studies/:team_key/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
+  router.get('/studies/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
       let study = await db.getOneStudy(req.params.study_key)
-      res.send(study)
+      if (!study) res.sendStatus(404)
+      else res.json(study)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve study with _key ' + req.params.study_key)
       res.sendStatus(500)
@@ -53,11 +65,6 @@ export default async function () {
   router.post('/studies', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newstudy = req.body
     newstudy.created = new Date()
-    let user = req.user
-    let JToken = req.headers.authorization.replace('Bearer ','')
-    let decoded = jwt.decode(JToken, {complete: true})
-    // console.log('USER: ', req.user)
-    // console.log('Decodede Ky: ', decoded)
     try {
       // TODO: do some access control
       newstudy = await db.createStudy(newstudy)
