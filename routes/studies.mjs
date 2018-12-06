@@ -73,7 +73,7 @@ export default async function () {
     newstudy.updated = new Date()
     try {
       // TODO: do some access control
-      newstudy = await db.updateStudy(req.params.study_key, newstudy)
+      newstudy = await db.replaceStudy(req.params.study_key, newstudy)
       res.send(newstudy)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot update study with _key ' + req.params.study_key)
@@ -86,7 +86,7 @@ export default async function () {
     newstudy.updated = new Date()
     try {
       // TODO: do some access control
-      newstudy = await db.patchStudy(req.params.study_key, newstudy)
+      newstudy = await db.updateStudy(req.params.study_key, newstudy)
       res.send(newstudy)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot patch study with _key ' + req.params.study_key)
@@ -103,7 +103,7 @@ export default async function () {
           // Search participants for study
           let pKeyAcc = await db.getAllAcceptedParticipants(studykey)
           let pKeyWith = await db.getAllWithdrawnParticipants(studykey)
-          let pKeyRej = await db.getAllRejectedStudyParticipants (studykey)
+          let pKeyRej = await db.getAllRejectedStudyParticipants(studykey)
           if (pKeyAcc !== null) {
             for (let i = 0; i < pKeyAcc.length; i++) {
               let accParKey = pKeyAcc[i]

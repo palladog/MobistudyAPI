@@ -36,7 +36,7 @@ export default async function (db, logger) {
     },
 
     async findTeam (teamName) {
-      let bindings = { 'name' : teamName }
+      let bindings = { 'name': teamName }
       var query = 'FOR team in teams FILTER team.name == @name RETURN team'
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
@@ -45,14 +45,25 @@ export default async function (db, logger) {
       else return undefined
     },
 
-    async getAllTeams (userKey) {
-      let filter = ''
-      let bindings = { 'usrKey': userKey }
-      if (userKey) {
-        filter = ' FILTER @usrKey IN team.researchersKeys  '
+    async getAllTeams (userKey, studyKey) {
+      let query = 'FOR team in teams '
+      let bindings = { }
+
+      if (studyKey) {
+        query += 'FOR study IN studies '
+        bindings.studyKey = studyKey
+        query += 'FILTER study.teamKey == team._key AND study._key == @studyKey '
+      }
+      if (userKey && !studyKey) {
+        query += 'FILTER @userKey IN team.researchersKeys  '
+        bindings.userKey = userKey
+      }
+      if (userKey && studyKey) {
+        query += 'AND @userKey IN team.researchersKeys '
+        bindings.userKey = userKey
       }
 
-      var query = 'FOR team in teams ' + filter + ' RETURN team'
+      query += ' RETURN team'
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       return cursor.all()

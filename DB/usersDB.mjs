@@ -37,7 +37,7 @@ export default async function (db, logger) {
       applogger.trace('Searching for user "' + user._key)
       return user
     },
-    
+
     async getAllUsersByCriteria (role, studyKey, studyKeys) {
       let join = ''
       let filter = ''

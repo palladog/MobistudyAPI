@@ -12,7 +12,6 @@ export default async function (db, logger) {
 
   return {
     async getAllStudies () {
-      // TODO: use the filter for access control later
       var filter = ''
 
       // TODO: use LIMIT @offset, @count in the query for pagination
@@ -24,7 +23,6 @@ export default async function (db, logger) {
     },
 
     async getAllTeamStudies (teamkey) {
-      // TODO: use the filter for access control later
       var filter = ''
 
       // TODO: use LIMIT @offset, @count in the query for pagination
@@ -43,22 +41,19 @@ export default async function (db, logger) {
     },
 
     async getOneStudy (_key) {
-      // TODO: use the filter for access control later
       const study = await collection.document(_key)
       return study
     },
 
     // udpates a study, we assume the _key is the correct one
-    async updateStudy (_key, study) {
-      // TODO: use the filter for access control later
+    async replaceStudy (_key, study) {
       let meta = await collection.replace(_key, study)
       study._key = meta._key
       return study
     },
 
     // udpates a study, we assume the _key is the correct one
-    async patchStudy (_key, study) {
-      // TODO: use the filter for access control later
+    async udpateStudy (_key, study) {
       let newval = await collection.update(_key, study, { keepNull: false, mergeObjects: true, returnNew: true })
       return newval
     },
