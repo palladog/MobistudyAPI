@@ -1,7 +1,7 @@
 {
   "userKey": "key",
   "createdTS": "ISO STRING",
-  "updatedTS": "ISO STRING";
+  "updatedTS": "ISO STRING",
   "dateOfBirth": "ISO STRING",
   "gender": "male",
   "diseases": { "ID": "name" },

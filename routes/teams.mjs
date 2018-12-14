@@ -150,7 +150,25 @@ export default async function () {
     try {
       // Only admin can remove a team
       if (req.user.role === 'admin') {
-        await db.removeTeam(req.params.team_key)
+        let teamkey = req.params.team_key
+        // look for studies of that team
+        let teamStudies = await db.getAllTeamStudies(teamkey)
+        let participantsByStudy = []
+          // Get list of participants per study. Then delete each study.
+          for (let i = 0; i < teamStudies.length; i++) {
+            participantsByStudy = await db.getParticipantsByStudy(teamStudies[i]._key, null)
+            await db.deleteStudy(teamStudies[i]._key)
+            for (let j = 0; j < participantsByStudy.length; j++) {
+              // Per participant, remove the study
+              let partKey = participantsByStudy[j]._key
+              let participant = await db.getOneParticipant(partKey)
+              let studyArray = participant.studies
+              studyArray = studyArray.filter(study => study.studyKey !== teamStudies[i]._key)
+              participant.studies = studyArray
+              await db.replaceParticipant(partKey, participant)
+            }
+          }
+        await db.removeTeam(teamkey)
         res.sendStatus(200)
       } else res.sendStatus(403)
     } catch (err) {

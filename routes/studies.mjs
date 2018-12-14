@@ -108,42 +108,16 @@ export default async function () {
         if (studykey !== null) {
           await db.deleteStudy(studykey)
           // Search participants for study
-          let pKeyAcc = await db.getAllAcceptedParticipants(studykey)
-          let pKeyWith = await db.getAllWithdrawnParticipants(studykey)
-          let pKeyRej = await db.getAllRejectedStudyParticipants(studykey)
-          if (pKeyAcc !== null) {
-            for (let i = 0; i < pKeyAcc.length; i++) {
-              let accParKey = pKeyAcc[i]
+          let parts = await db.getParticipantsByStudy(studykey)
+          if (parts !== null) {
+            for (let i = 0; i < parts.length; i++) {
+              let partKey = parts[i]
               // For Each participant, delete the study key from accepted studies
-              let participant = await db.getOneParticipant(accParKey)
-              let studyArray = participant.acceptedStudies
-              studyArray = studyArray.filter(study => study.studyDescriptionKey !== studykey)
-              participant.acceptedStudies = studyArray
-              await db.replaceParticipant(accParKey, participant)
-            }
-            res.sendStatus(200)
-          } else res.sendStatus(403)
-          if (pKeyWith !== null) {
-            for (let i = 0; i < pKeyWith.length; i++) {
-              let withParKey = pKeyWith[i]
-              // For Each participant, delete the study key from withdrawn studies
-              let participant = await db.getOneParticipant(withParKey)
-              let studyArray = participant.withdrawnStudies
-              studyArray = studyArray.filter(study => study.studyDescriptionKey !== studykey)
-              participant.withdrawnStudies = studyArray
-              await db.replaceParticipant(withParKey, participant)
-            }
-            res.sendStatus(200)
-          } else res.sendStatus(403)
-          if (pKeyRej !== null) {
-            for (let i = 0; i < pKeyRej.length; i++) {
-              let rejParKey = pKeyRej[i]
-              // For Each participant, delete the study key from rejected studies
-              let participant = await db.getOneParticipant(rejParKey)
-              let studyArray = participant.rejectedStudies
-              studyArray = studyArray.filter(study => study.studyDescriptionKey !== studykey)
-              participant.rejectedStudies = studyArray
-              await db.replaceParticipant(withParKey, participant)
+              let participant = await db.getOneParticipant(partKey)
+              let studyArray = participant.studies
+              studyArray = studyArray.filter(study => study.studyKey !== studykey)
+              participant.studies = studyArray
+              await db.replaceParticipant(partKey, participant)
             }
             res.sendStatus(200)
           } else res.sendStatus(403)
