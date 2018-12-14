@@ -1,12 +1,20 @@
 {
   "userKey": "key",
   "createdTS": "ISO STRING",
+  "name": "Dario",
+  "surname": "Salvi",
+  "gender": "male",
   "updatedTS": "ISO STRING",
   "dateOfBirth": "ISO STRING",
   "gender": "male",
   "diseases": { "ID": "name" },
   "medications": { "ID": "name" },
   "studies": [
+  {
+		"studyKey": "key",
+		"currentStatus": "accepted",
+		"acceptedTS": "ISO string"
+	},
 	{
 		"studyKey": "key",
 		"currentStatus": "withdrawn",
