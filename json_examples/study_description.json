@@ -1,9 +1,9 @@
 {
-   "created": "ISO date string",
-   "updated": "ISO date string",
-   "published": "ISO date string",
-   "keyOfStudy": "154235",
-   "studyTeamKey": "123456",
+   "_key": "121212",
+   "createdTS": "ISO date string",
+   "updatedTS": "ISO date string",
+   "publishedTS": "ISO date string",
+   "teamKey": "123456",
    "generalities":{
       "title":"My amazing study",
       "description":"This is a study about amazing people",

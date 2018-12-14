@@ -83,7 +83,7 @@ export default async function () {
         })
         team.invitationCode = token
         team.invitationExpiry = new Date(new Date().getTime() + (weeksecs * 1000))
-        await db.updateTeam(teamkey, team)
+        await db.replaceTeam(teamkey, team)
         res.send(token)
       } catch (err) {
         applogger.error({ error: err }, 'Cannot generate invitation code for team ' + req.params.teamKey)
@@ -92,7 +92,7 @@ export default async function () {
     } else res.sendStatus(403)
   })
 
-  router.post('/teams/addResearcher', passport.authenticate('jwt', { session: false }), async function (req, res) {
+  router.post('/teams/researcher/add', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let researcherKeyUpdt = req.user._key
     let JToken = req.body.invitationCode
     // Verify the JWT
@@ -110,8 +110,8 @@ export default async function () {
             res.sendStatus(409)
           } else {
             selTeam.researchersKeys.push(researcherKeyUpdt)
-            await db.updateTeam(decodedTeamKey, selTeam)
-            return res.sendStatus(200)
+            await db.replaceTeam(decodedTeamKey, selTeam)
+            return res.json({ teamName: selTeam.name })
           }
         } else {
           applogger.error('Adding researcher to team, team with key ' + decodedTeamKey + ' does not exist')
@@ -125,12 +125,50 @@ export default async function () {
     }
   })
 
+  // Remove Researcher from Team
+  router.post('/teams/researcher/remove', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    let teamKey = req.body.userRemoved.teamKey
+    let userKey = req.body.userRemoved.userKey
+    if (req.user.role === 'admin') {
+      try {
+        let selTeam = await db.getOneTeam(teamKey)
+        let index = selTeam.researchersKeys.indexOf(userKey)
+        if (index !== null) {
+          selTeam.researchersKeys.splice(index, 1)
+        }
+        await db.replaceTeam(teamKey, selTeam)
+        res.sendStatus(200)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot remove user from study')
+        res.sendStatus(400)
+      }
+    } else res.sendStatus(403)
+  })
+
   // Remove Specified Team
   router.delete('/teams/:team_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // Only admin can remove a team
       if (req.user.role === 'admin') {
-        await db.removeTeam(req.params.team_key)
+        let teamkey = req.params.team_key
+        // look for studies of that team
+        let teamStudies = await db.getAllTeamStudies(teamkey)
+        let participantsByStudy = []
+          // Get list of participants per study. Then delete each study.
+          for (let i = 0; i < teamStudies.length; i++) {
+            participantsByStudy = await db.getParticipantsByStudy(teamStudies[i]._key, null)
+            await db.deleteStudy(teamStudies[i]._key)
+            for (let j = 0; j < participantsByStudy.length; j++) {
+              // Per participant, remove the study
+              let partKey = participantsByStudy[j]._key
+              let participant = await db.getOneParticipant(partKey)
+              let studyArray = participant.studies
+              studyArray = studyArray.filter(study => study.studyKey !== teamStudies[i]._key)
+              participant.studies = studyArray
+              await db.replaceParticipant(partKey, participant)
+            }
+          }
+        await db.removeTeam(teamkey)
         res.sendStatus(200)
       } else res.sendStatus(403)
     } catch (err) {
@@ -138,7 +176,7 @@ export default async function () {
       applogger.error({ error: err }, 'Cannot delete team ')
       res.sendStatus(500)
     }
-  }) 
+  })
 
   return router
 }

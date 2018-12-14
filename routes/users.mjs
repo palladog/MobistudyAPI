@@ -62,7 +62,7 @@ export default async function () {
         let hashedPassword = bcrypt.hashSync(newpasssword, 8)
         let existing = await db.findUser(email)
         if (!existing) return res.status(409).send('This email is not registered')
-        await db.patchUser(existing._key, {
+        await db.updateUser(existing._key, {
           hashedPassword: hashedPassword
         })
         res.sendStatus(200)
@@ -89,7 +89,7 @@ export default async function () {
   })
 
   // possible query parameters:
-  // studyKey: the key of the study
+  // studyKey: the key of the study (TO DELETE ?? DUPLICATED BY GET/ALL )
   router.get('/users', passport.authenticate('jwt', { session: false }), async (req, res) => {
     try {
       let val
@@ -113,7 +113,7 @@ export default async function () {
     }
   })
 
-  // Get All Users in Db
+  // Get All Users in Db (TO DELETE ?? DUPLICATED BY GET/ALL )
   router.get('/users/all', passport.authenticate('jwt', { session: false }), async (req, res) => {
     try {
       let val
@@ -154,7 +154,7 @@ export default async function () {
       if (req.user.role === 'admin') {
         // Remove user from all teams
         let teamsOfUser = await db.getAllTeams(userKey)
-        // For each team, find the user key in the researcher keys and remove 
+        // For each team, find the user key in the researcher keys and remove
         let i = 0
         for (i = 0; i < teamsOfUser.length; i++) {
           let teamKeyOfUser = teamsOfUser[i]._key
@@ -174,7 +174,7 @@ export default async function () {
       applogger.error({ error: err }, 'Cannot delete team ')
       res.sendStatus(500)
     }
-  }) 
+  })
 
   return router
 }

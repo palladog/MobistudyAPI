@@ -15,7 +15,8 @@
   },
   "logs": {
     "folder": "path to logs",
-    "rotationsize": "5M"
+    "rotationsize": "5M",
+    "console": true
   },
   "auth": {
     "secret": "mysecret",

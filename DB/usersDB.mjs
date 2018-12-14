@@ -37,7 +37,7 @@ export default async function (db, logger) {
       applogger.trace('Searching for user "' + user._key)
       return user
     },
-    
+
     async getAllUsersByCriteria (role, studyKey, studyKeys) {
       let join = ''
       let filter = ''
@@ -73,7 +73,7 @@ export default async function (db, logger) {
     },
 
     // udpates a user, we assume the _key is the correct one
-    async patchUser (_key, newuser) {
+    async updateUser (_key, newuser) {
       let newval = await usersCollection.update(_key, newuser, { keepNull: false, mergeObjects: true, returnNew: true })
       return newval
     },

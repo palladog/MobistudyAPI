@@ -1,17 +1,45 @@
 {
-  "userKey": "UUID",
+  "userKey": "key",
   "createdTS": "ISO STRING",
-  "acceptedstudies": [
-    {
-      "studyDescriptionKey": "UUID",
-      "acceptedTS": "ISO string"
-    }
-  ],
-  "rejectedStudies": [
-    {
-      "studyDescriptionKey": "UUID",
-      "rejectedTS": "ISO string",
-      "criteriaAnswers": ["Yes", "No"]
-    }
+  "name": "Dario",
+  "surname": "Salvi",
+  "gender": "male",
+  "updatedTS": "ISO STRING",
+  "dateOfBirth": "ISO STRING",
+  "gender": "male",
+  "diseases": { "ID": "name" },
+  "medications": { "ID": "name" },
+  "studies": [
+  {
+		"studyKey": "key",
+		"currentStatus": "accepted",
+		"acceptedTS": "ISO string"
+	},
+	{
+		"studyKey": "key",
+		"currentStatus": "withdrawn",
+		"acceptedTS": "ISO string",
+		"criteriaAnswers": ["Yes", "No"],
+		"withdrawalTS": "ISO string",
+		"withdrawalReason": "string"
+	},
+	{
+		"studyKey": "key",
+		"currentStatus": "completed",
+		"acceptedTS": "ISO string",
+		"criteriaAnswers": ["No", "No"],
+		"completedTS": "ISO string"
+	},
+	{
+		"studyKey": "key",
+		"currentStatus": "excluded",
+		"criteriaAnswers": ["No", "No"],
+		"excludedTS": "ISO string"
+	},
+	{
+		"studyKey": "key",
+		"currentStatus": "rejected",
+		"rejectedTS": "ISO string"
+	}
   ]
 }
