@@ -1,0 +1,13 @@
+{
+	"userKey": "asdasd",
+	"studyKey": "asdasd",
+	"taskId": "qwqw",
+	"healthData": [
+		{
+          "startDate": "ISO STRING",
+          "endDate": "ISO STRING",
+          "unit": 'count',
+          "value": 150
+        }
+	]
+}

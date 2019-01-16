@@ -7,8 +7,8 @@
   "updatedTS": "ISO STRING",
   "dateOfBirth": "ISO STRING",
   "gender": "male",
-  "diseases": { "ID": "name" },
-  "medications": { "ID": "name" },
+  "diseases": { "name" : "ID" },
+  "medications": { "name": "ID" },
   "studies": [
   {
 		"studyKey": "key",
@@ -21,7 +21,10 @@
 		"acceptedTS": "ISO string",
 		"criteriaAnswers": ["Yes", "No"],
 		"withdrawalTS": "ISO string",
-		"withdrawalReason": "string"
+		"withdrawalReason": "string",
+		"tasksStatus": [
+			{ "taskId": 1, "consented": true, "lastExecuted": "ISO string" }
+		]
 	},
 	{
 		"studyKey": "key",
