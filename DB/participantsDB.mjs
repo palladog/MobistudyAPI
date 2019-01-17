@@ -36,10 +36,10 @@ export default async function (db, logger) {
       let filter = ''
       let bindings = { 'userkey': userKey }
       if (userKey) {
-        filter = ' FILTER @userkey ==  participant.userKey '
+        filter = ' FILTER participant.userKey == @userkey '
       }
       var query = 'FOR participant IN participants ' +
-      filter + ' RETURN participant._key'
+      filter + ' RETURN participant'
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       return cursor.all()
