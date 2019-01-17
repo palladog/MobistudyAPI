@@ -11,6 +11,7 @@ import getUsersDB from './usersDB'
 import getAnswersDB from './answersDB'
 import getTeamsDB from './teamsDB'
 import getParticipantsDB from './participantsDB'
+import getHealthStoreDataDB from './healthStoreDataDB'
 
 import getConfig from '../config'
 
@@ -36,6 +37,8 @@ export default async function (logger) {
     dao = Object.assign(teams, dao)
     let participants = await getParticipantsDB(db)
     dao = Object.assign(participants, dao)
+    let healthStoreData = await getHealthStoreDataDB(db)
+    dao = Object.assign(healthStoreData, dao)
 
     // TODO: add new collections here
     return dao
