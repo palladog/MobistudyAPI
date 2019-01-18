@@ -42,7 +42,8 @@ export default async function (db, logger) {
       filter + ' RETURN participant'
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
-      return cursor.all()
+      let parts = await cursor.all()
+      return parts[0]
     },
 
     // currentStatus is optional
