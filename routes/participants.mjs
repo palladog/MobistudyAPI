@@ -20,7 +20,8 @@ export default async function () {
     try {
       if (req.user.role === 'participant') {
         // participants can retrieve only themselves
-        let result = await db.getOneParticipant(req.user._key)
+        let result = await db.getParticipantByUserKey(req.user._key)
+        applogger.debug(result, 'Getting profile for participant ' + req.user._key)
         res.send(result)
       } else if (req.user.role === 'researcher' || req.user.role === 'admin') {
         if (req.user.role === 'researcher') {
@@ -74,6 +75,7 @@ export default async function () {
     try {
       if (req.user.role === 'participant') {
         newparticipant = await db.createParticipant(newparticipant)
+        applogger.debug(newparticipant, 'New participant profile created')
         res.send(newparticipant)
       } else res.sendStatus(403)
     } catch (err) {
@@ -86,6 +88,10 @@ export default async function () {
     let newparticipant = req.body
     try {
       if (req.user.role === 'participant' || req.user.role === 'admin') {
+        if (req.user.role === 'participant') {
+          let part = await db.getOneParticipant(req.params.participant_key)
+          if (part.userKey !== req.user._key) return res.status(403)
+        }
         newparticipant = await db.replaceParticipant(req.params.participant_key, newparticipant)
         res.send(newparticipant)
       } else res.sendStatus(403)
@@ -113,38 +119,6 @@ export default async function () {
     }
   })
 
-  // this endpoint is for the app to update the status of the participant regarding a study
-  router.post('/participants/:participant_key/studyUpdates/:studyKey/:status', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    let participantKey = req.params.participant_key
-    let studyKey = req.params.studyKey
-    let status = req.params.status
-    let payload = req.body
-    if (!participantKey || !studyKey || !status) return res.sendStatus(400)
-    try {
-      if (req.user.role === 'participant') {
-        let part = await db.getOneParticipant(req.params.participant_key)
-        if (part.userKey !== req.user._key) return res.status(403)
-        let studyIndex = part.studies.findIndex((s) => {
-          return s.studyKey === studyKey
-        })
-        if (studyIndex === -1) {
-          part.studies.push({
-            studyKey: studyKey
-          })
-          studyIndex = part.studies.lenght - 1
-        }
-        part.studies[studyIndex].currentStatus = status
-        part.studies[studyIndex] = Object.assign(payload, part.studies[studyIndex])
-        // Update the DB
-        await db.replaceParticipant(participantKey, part)
-        res.sendStatus(200)
-      } else res.sendStatus(403)
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot update participant with _key ' + req.body.withdrawnOne.partKey)
-      res.sendStatus(500)
-    }
-  })
-
   // Delete Specified participant
   router.delete('/participants/:participant_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
@@ -153,23 +127,24 @@ export default async function () {
       if (partKey !== null) {
         let participant = await db.getOneParticipant(partKey)
         if (participant !== null) {
-          let user_Key = participant.userKey
+          let userKey = participant.userKey
           if (req.user.role === 'admin') {
-            if (user_Key !== null) {
+            if (userKey !== null) {
               // Get User Key of participant first. Then remove participant and then user.
               await db.removeParticipant(partKey)
-              await db.removeUser(user_Key)
+              await db.removeUser(userKey)
+              // TODO: also remove answers and data query results
               res.sendStatus(200)
-            } else res.sendStatus(403)
+            } else res.sendStatus(400)
           } else if (req.user.role === 'participant') {
-            if (user_Key !== null && req.user._key === user_Key) {
+            if (userKey !== null && req.user._key === userKey) {
               await db.removeParticipant(partKey)
-              await db.removeUser(user_Key)
+              await db.removeUser(userKey)
               res.sendStatus(200)
             } else res.sendStatus(403)
           } else res.sendStatus(403)
-        } else res.sendStatus(403)
-      } else res.sendStatus(403)
+        } else res.sendStatus(404)
+      } else res.sendStatus(400)
     } catch (err) {
       // respond to request with error
       applogger.error({ error: err }, 'Cannot delete participant')
@@ -179,17 +154,53 @@ export default async function () {
 
   // Participant by userkey
   router.get('/participants/byuserkey/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
+    if (req.user.role === 'researcher') {
+      let allowedParts = await db.getParticipantsByResearcher(req.user._key)
+      if (!allowedParts.includes(req.params.user)) return res.sendStatus(403)
+    }
     try {
-      if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
-      if (req.user.role === 'researcher') {
-        let allowedParts = await db.getParticipantsByResearcher(req.user._key)
-        if (!allowedParts.includes(req.params.user)) return res.sendStatus(403)
-      }
       let participant = await db.getParticipantByUserKey(req.params.userKey)
       if (!participant) return res.status(404)
       res.send(participant)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve participant with userKey ' + req.params.userKey)
+      res.sendStatus(500)
+    }
+  })
+
+  // this endpoint is for the app to update the status of the participant regarding a study
+  router.post('/participants/byuserkey/:userKey/studyUpdates/:studyKey/:status', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    let userKey = req.params.userKey
+    let studyKey = req.params.studyKey
+    let status = req.params.status
+    let payload = req.body
+    if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
+    if (req.user.role === 'researcher') {
+      let allowedParts = await db.getParticipantsByResearcher(req.user._key)
+      if (!allowedParts.includes(req.params.user)) return res.sendStatus(403)
+    }
+    if (!userKey || !studyKey || !status) return res.sendStatus(400)
+    try {
+      let participant = await db.getParticipantByUserKey(req.params.userKey)
+      if (!participant) return res.status(404)
+
+      let studyIndex = participant.studies.findIndex((s) => {
+        return s.studyKey === studyKey
+      })
+      if (studyIndex === -1) {
+        participant.studies.push({
+          studyKey: studyKey
+        })
+        studyIndex = participant.studies.lenght - 1
+      }
+      participant.studies[studyIndex].currentStatus = status
+      participant.studies[studyIndex] = Object.assign(payload, participant.studies[studyIndex])
+      // Update the DB
+      await db.replaceParticipant(participant._key, participant)
+      res.sendStatus(200)
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot update participant with _key ' + req.body.withdrawnOne.partKey)
       res.sendStatus(500)
     }
   })
