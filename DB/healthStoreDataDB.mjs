@@ -12,38 +12,40 @@ export default async function (db, logger) {
 
   return {
     async getAllhealthStoreData () {
-      var filter = ''
+      let filter = ''
 
-      // TODO: use LIMIT @offset, @count in the query for pagination
-
-      var query = 'FOR data in healthStoreData ' + filter + ' RETURN data'
+      let query = 'FOR data in healthStoreData ' + filter + ' RETURN data'
       applogger.trace('Querying "' + query + '"')
       let cursor = await db.query(query)
       return cursor.all()
     },
 
-    async createHealthStoreData (newhealthStoreData) {
+    async getAllhealthStoreDataByUser (userKey) {
+     var query = 'FOR data in healthStoreData FILTER data.userKey == @userKey RETURN data'
+     let bindings = { userKey: userKey }
+     applogger.trace(bindings, 'Querying "' + query + '"')
+     let cursor = await db.query(query, bindings)
+     return cursor.all()
+    },
+
+    async getAllhealthStoreDataByUser (userKey, studyKey) {
+      var query = 'FOR data in healthStoreData FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
+      let bindings = { userKey: userKey,
+      studyKey: studyKey }
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
+     },
+
+    async createHealthStoreData (newHealthStoreData) {
       let meta = await collection.save(newhealthStoreData)
-      newhealthStoreData._key = meta._key
-      return newhealthStoreData
+      newHealthStoreData._key = meta._key
+      return newHealthStoreData
     },
 
     async getOneHealthStoreData (_key) {
       const healthStoreData = await collection.document(_key)
       return healthStoreData
-    },
-
-    // udpates the healthStoreData, we assume the _key is the correct one
-    async replaceHealthStoreData (_key, healthStoreData) {
-      let meta = await collection.replace(_key, healthStoreData)
-      healthStoreData._key = meta._key
-      return healthStoreData
-    },
-
-    // udpates the healthStoreData, we assume the _key is the correct one
-    async updateHealthStoreData (_key, healthStoreData) {
-      let newval = await collection.update(_key, healthStoreData, { keepNull: false, mergeObjects: true, returnNew: true })
-      return newval
     },
 
     // deletes healthStoreData
