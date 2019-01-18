@@ -42,15 +42,6 @@ if (config.logs.console) {
   applogger_ = {
     trace (object, message) {
       if (message) {
-        console.trace(message, object)
-        applogger.trace(object, message)
-      } else {
-        console.trace(object)
-        applogger.trace(object)
-      }
-    },
-    debug (object, message) {
-      if (message) {
         console.debug(message, object)
         applogger.trace(object, message)
       } else {
@@ -58,40 +49,49 @@ if (config.logs.console) {
         applogger.trace(object)
       }
     },
+    debug (object, message) {
+      if (message) {
+        console.debug(message, object)
+        applogger.debug(object, message)
+      } else {
+        console.debug(object)
+        applogger.debug(object)
+      }
+    },
     info (object, message) {
       if (message) {
         console.info(message, object)
-        applogger.trace(object, message)
+        applogger.info(object, message)
       } else {
         console.info(object)
-        applogger.trace(object)
+        applogger.info(object)
       }
     },
     warn (object, message) {
       if (message) {
         console.warn(message, object)
-        applogger.trace(object, message)
+        applogger.warn(object, message)
       } else {
         console.warn(object)
-        applogger.trace(object)
+        applogger.warn(object)
       }
     },
     error (object, message) {
       if (message) {
         console.error(message, object)
-        applogger.trace(object, message)
+        applogger.error(object, message)
       } else {
         console.error(object)
-        applogger.trace(object)
+        applogger.error(object)
       }
     },
     fatal (object, message) {
       if (message) {
         console.error(message, object)
-        applogger.trace(object, message)
+        applogger.fatal(object, message)
       } else {
         console.error(object)
-        applogger.trace(object)
+        applogger.fatal(object)
       }
     }
   }
