@@ -1,5 +1,3 @@
-
-
 # MobistudyAPI
 
 This is the back-end REST API of MobiStudy.
