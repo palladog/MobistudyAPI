@@ -55,7 +55,7 @@ export default async function () {
 
   router.get('/participants/:participant_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
-      if (req.user.role === 'participant' && req.params.participant_key !== req.user_key) return res.sendStatus(403)
+      if (req.user.role === 'participant' && req.params.participant_key !== req.user._key) return res.sendStatus(403)
       else if (req.user.role === 'researcher') {
         let parts = await db.getParticipantsByResearcher(req.user._key)
         if (!parts.includes(req.params.participant_key)) return res.sendStatus(403)
@@ -183,6 +183,87 @@ export default async function () {
       res.sendStatus(500)
     }
   })
+
+  // Participant by userkey
+  router.get('/participants/byuserkey/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    try {
+      if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
+      else if (req.user.role === 'researcher') {
+        let parts = await db.getParticipantsByResearcher(req.user._key)
+        if (!parts.includes(req.params.user)) return res.sendStatus(403)
+      } else {
+        let participant = await db.getParticipantByUserKey(req.params.userKey)
+        res.send(participant)
+      }
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot retrieve participant with userKey ' + req.params.userKey)
+      res.sendStatus(500)
+    }
+  })
+
+  router.put('/participants/byuserkey/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    let newparticipant = req.body
+    try {
+      if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
+      else {
+        let participant = await db.getParticipantByUserKey(req.params.userKey)
+        newparticipant = await db.replaceParticipant(participant._key, newparticipant)
+        res.send(newparticipant)
+      }
+      if (req.user.role === 'researcher') return res.status(403)
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot replace participant with userKey ' + req.params.userKey)
+      res.sendStatus(500)
+    }
+  })
+
+  router.patch('/participants/byuserkey/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    let newparticipant = req.body
+    newparticipant.updatedTS = new Date()
+    try {
+      if (req.user.role === 'participant') {
+        let part = await db.getParticipantByUserKey(req.params.userKey)
+        if (part.userKey !== req.user._key) return res.status(403)
+      }
+      if (req.user.role === 'researcher') return res.status(403)
+
+      newparticipant = await db.updateParticipant(part._key, newparticipant)
+      res.send(newparticipant)
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot update participant with _key ' + req.params.participant_key)
+      res.sendStatus(500)
+    }
+  })
+
+  router.delete('/participants/byuserkey/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    try {
+      let partKey = await db.getParticipantByUserKey(req.params.userKey)
+      partKey = partKey._key
+      // Participant can remove only itself from Participant and Users DB
+      if (partKey !== null) {
+        let participant = await db.getOneParticipant(partKey)
+        if (participant !== null) {
+          if (req.user.role === 'admin') {
+              // Get User Key of participant first. Then remove participant and then user.
+              await db.removeParticipant(partKey)
+              await db.removeUser(req.params.userKey)
+              res.sendStatus(200)
+          } else if (req.user.role === 'participant') {
+            if (req.params.userKey !== null && req.user._key === req.params.userKey) {
+              await db.removeParticipant(partKey)
+              await db.removeUser(req.params.userKey)
+              res.sendStatus(200)
+            } else res.sendStatus(403)
+          } else res.sendStatus(403)
+        } else res.sendStatus(403)
+      } else res.sendStatus(403)
+    } catch (err) {
+      // respond to request with error
+      applogger.error({ error: err }, 'Cannot delete participant')
+      res.sendStatus(500)
+    }
+    })
+
 
   return router
 }
