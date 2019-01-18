@@ -18,72 +18,73 @@ export default async function () {
   router.get('/healthStoreData', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
-      let answers = await db.getAllAnswers()
-      res.send(answers)
+      let storeData = await db.getAllhealthStoreData()
+      res.send(storeData)
     } catch (err) {
-      applogger.error({ error: err }, 'Cannot retrieve answers')
+      applogger.error({ error: err }, 'Cannot retrieve healthStore data')
       res.sendStatus(500)
     }
   })
 
-  router.get('/healthStoreData/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
+  // Get health store data for a study  
+  router.get('/healthStoreData/:userKey/', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
-      let answer = await db.getOneAnswer(req.params.answer_key)
-      res.send(answer)
+      let storeData = await db.getOneHealthStoreData(req.params.healthStoreDataKey)
+      res.send(storeData)
     } catch (err) {
-      applogger.error({ error: err }, 'Cannot retrieve answer with _key ' + req.params.answer_key)
+      applogger.error({ error: err }, 'Cannot retrieve healthStore Data with _key ' + req.params.healthStoreDataKey)
       res.sendStatus(500)
     }
   })
 
   router.post('/healthStoreData', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    let newanswer = req.body
-    newanswer.created = new Date()
+    let newHealthStoreData = req.body
+    newHealthStoreData.created = new Date()
     try {
       // TODO: do some access control
-      newanswer = await db.createAnswer(newanswer)
-      res.send(newanswer)
+      newHealthStoreData = await db.createHealthStoreData(newHealthStoreData)
+      res.send(newHealthStoreData)
     } catch (err) {
-      applogger.error({ error: err }, 'Cannot store new answer')
+      applogger.error({ error: err }, 'Cannot store new HealthStore Data')
       res.sendStatus(500)
     }
   })
 
-  router.put('/healthStoreData/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    let newanswer = req.body
-    newanswer.updated = new Date()
+  router.put('/healthStoreData/:healthStoreDataKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    let newHealthStoreData = req.body
+    newHealthStoreData.updated = new Date()
     try {
       // TODO: do some access control
-      newanswer = await db.replaceAnswer(req.params.answer_key, newanswer)
-      res.send(newanswer)
+      newHealthStoreData = await db.replaceHealthStoreData(req.params.healthStoreDataKey, newHealthStoreData)
+      res.send(newHealthStoreData)
     } catch (err) {
-      applogger.error({ error: err }, 'Cannot update answer with _key ' + req.params.answer_key)
+      applogger.error({ error: err }, 'Cannot update new HealthStoreData with _key ' + req.params.healthStoreDataKey)
       res.sendStatus(500)
     }
   })
 
-  router.patch('/healthStoreData/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    let newanswer = req.body
-    newanswer.updated = new Date()
+  router.patch('/healthStoreData/:healthStoreDataKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    let newHealthStoreData = req.body
+    newHealthStoreData.updated = new Date()
     try {
       // TODO: do some access control
-      newanswer = await db.updateAnswer(req.params.answer_key, newanswer)
-      res.send(newanswer)
+      newHealthStoreData = await db.updateHealthStoreData(req.params.healthStoreDataKey, newHealthStoreData)
+      res.send(newHealthStoreData)
     } catch (err) {
-      applogger.error({ error: err }, 'Cannot patch answer with _key ' + req.params.answer_key)
+      applogger.error({ error: err }, 'Cannot patch answer with _key ' + req.params.healthStoreDataKey)
       res.sendStatus(500)
     }
   })
 
-  router.delete('/healthStoreData/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
+  router.delete('/healthStoreData/:healthStoreDataKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
-      await db.deleteAnswer(req.params.answer_key)
+      await db.deleteHealthStoreData(req.params.healthStoreDataKey)
       res.sendStatus(200)
     } catch (err) {
       console.error(err)
-      applogger.error({ error: err }, 'Cannot delete answer with _key ' + req.params.answer_key)
+      applogger.error({ error: err }, 'Cannot delete answer with _key ' + req.params.healthStoreDataKey)
       res.sendStatus(500)
     }
   })
