@@ -19,8 +19,7 @@ export default function () {
     }
     config.auth = {
       secret: (process.env.AUTH_SECRET),
-      issuer: (process.env.AUTH_ISSUER),
-      audience: (process.env.AUTH_AUDIENCE)
+      tokenExpires: (process.env.AUTH_TOKEN_EXPIRES)
     }
     config.db = {
       host: (process.env.DBHOST || 'localhost'),
@@ -30,9 +29,11 @@ export default function () {
       password: process.env.DBPASSWORD
     }
     config.gmail = {
+      email: process.env.GMAIL_EMAIL,
       client_id: process.env.GMAIL_CLIENTID,
       project_id: process.env.GMAIL_PROJECTID,
-      client_secret: process.env.GMAIL_SECRET
+      client_secret: process.env.GMAIL_SECRET,
+      refresh_token: process.env.GMAIL_REFESHTOKEN
     }
   }
 
