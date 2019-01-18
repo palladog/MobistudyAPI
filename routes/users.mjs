@@ -100,7 +100,7 @@ export default async function () {
         if (req.query.studyKey) val = await db.getAllUsersByCriteria('participant', req.query.studyKey)
         else {
           // TODO: retrieve studies where this participant is involved in
-          let studyKeys = undefined
+          let studyKeys
           val = await db.getAllUsersByCriteria('participant', undefined, studyKeys)
         }
       } else { // a participant
@@ -138,7 +138,7 @@ export default async function () {
       } else if (req.user.role === 'researcher') {
         // TODO: make sure the user Key is among the ones the researcher is allowed. i.e is part of the team key
         val = await db.getOneUser(req.params.user_key)
-        }
+      }
       res.send(val)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve user details')

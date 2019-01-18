@@ -20,7 +20,8 @@ export default async function () {
     try {
       if (req.user.role === 'participant') {
         // participants can retrieve only themselves
-        let result = await db.getOneParticipant(req.user._key)
+        let result = await db.getParticipantByUserKey(req.user._key)
+        applogger.debug(result, 'Getting profile for participant ' + req.user._key)
         res.send(result)
       } else if (req.user.role === 'researcher' || req.user.role === 'admin') {
         if (req.user.role === 'researcher') {
@@ -74,6 +75,7 @@ export default async function () {
     try {
       if (req.user.role === 'participant') {
         newparticipant = await db.createParticipant(newparticipant)
+        applogger.debug(newparticipant, 'New participant profile created')
         res.send(newparticipant)
       } else res.sendStatus(403)
     } catch (err) {
@@ -86,6 +88,10 @@ export default async function () {
     let newparticipant = req.body
     try {
       if (req.user.role === 'participant' || req.user.role === 'admin') {
+        if (req.user.role === 'participant') {
+          let part = await db.getOneParticipant(req.params.participant_key)
+          if (part.userKey !== req.user._key) return res.status(403)
+        }
         newparticipant = await db.replaceParticipant(req.params.participant_key, newparticipant)
         res.send(newparticipant)
       } else res.sendStatus(403)
@@ -121,23 +127,24 @@ export default async function () {
       if (partKey !== null) {
         let participant = await db.getOneParticipant(partKey)
         if (participant !== null) {
-          let user_Key = participant.userKey
+          let userKey = participant.userKey
           if (req.user.role === 'admin') {
-            if (user_Key !== null) {
+            if (userKey !== null) {
               // Get User Key of participant first. Then remove participant and then user.
               await db.removeParticipant(partKey)
-              await db.removeUser(user_Key)
+              await db.removeUser(userKey)
+              // TODO: also remove answers and data query results
               res.sendStatus(200)
-            } else res.sendStatus(403)
+            } else res.sendStatus(400)
           } else if (req.user.role === 'participant') {
-            if (user_Key !== null && req.user._key === user_Key) {
+            if (userKey !== null && req.user._key === userKey) {
               await db.removeParticipant(partKey)
-              await db.removeUser(user_Key)
+              await db.removeUser(userKey)
               res.sendStatus(200)
             } else res.sendStatus(403)
           } else res.sendStatus(403)
-        } else res.sendStatus(403)
-      } else res.sendStatus(403)
+        } else res.sendStatus(404)
+      } else res.sendStatus(400)
     } catch (err) {
       // respond to request with error
       applogger.error({ error: err }, 'Cannot delete participant')

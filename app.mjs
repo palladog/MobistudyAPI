@@ -49,7 +49,6 @@ export default async function () {
 
   // error handler
   app.use(function (err, req, res, next) {
-    console.error(err)
     applogger.error(err, 'General error')
 
     // set locals, only providing error in development
@@ -60,6 +59,8 @@ export default async function () {
     res.status(err.status || 500)
     res.send('<p>INTERNAL ERROR</p>')
   })
+
+  applogger.info('Starting server')
 
   return app
 }
