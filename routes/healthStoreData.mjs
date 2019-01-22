@@ -17,9 +17,28 @@ export default async function () {
   // Get all health store data
   router.get('/healthStoreData', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
-      // TODO: do some access control
-      let storeData = await db.getAllhealthStoreData()
-      res.send(storeData)
+      if (req.user.role === 'researcher') {
+        // extra check about the teams
+        if (req.query.teamKey) {
+          let team = await db.getOneTeam(req.query.teamKey)
+          if (!team.researchersKeys.includes(req.user._key)) return res.sendStatus(403)
+          else {
+            let storeData = await db.getAllHealthStoreData()
+            res.send(storeData)
+          }
+        }
+        if (req.query.studyKey) {
+          let team = await db.getAllTeams(req.user._key, req.query.studyKey)
+          if (team.length === 0) return res.sendStatus(403)
+          else {
+            let storeData = await db.getAllHealthStoreData()
+            res.send(storeData)
+          }
+        } 
+      } else if (req.user.role === 'participant') {
+        let storeData = await db.getHealthStoreDataByUser(req.user._key)
+        res.send(storeData)
+      }
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve healthStore data')
       res.sendStatus(500)
@@ -29,8 +48,7 @@ export default async function () {
   // Get health store data for a user
   router.get('/healthStoreData/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
-      // TODO: do some access control
-      let storeData = await db.getAllhealthStoreDataByUser(req.params.userKey)
+      let storeData = await db.getHealthStoreDataByUser(req.params.userKey)
       res.send(storeData)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve healthStore data')
@@ -41,8 +59,7 @@ export default async function () {
   // Get health store data for a study for a user
   router.get('/healthStoreData/:userKey/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
-      // TODO: do some access control
-      let storeData = await db.getAllhealthStoreDataByUser(req.params.userKey, req.params.studyKey)
+      let storeData = await db.getHealthStoreDataByUserAndStudy(req.params.userKey, req.params.studyKey)
       res.send(storeData)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve healthStore Data ')
@@ -54,7 +71,6 @@ export default async function () {
     let newHealthStoreData = req.body
     newHealthStoreData.created = new Date()
     try {
-      // TODO: do some access control
       newHealthStoreData = await db.createHealthStoreData(newHealthStoreData)
       res.send(newHealthStoreData)
     } catch (err) {

@@ -11,25 +11,24 @@ export default async function (db, logger) {
   let collection = await utils.getCollection(db, 'healthStoreData')
 
   return {
-    async getAllhealthStoreData () {
+    async getAllHealthStoreData () {
       let filter = ''
-
-      let query = 'FOR data in healthStoreData ' + filter + ' RETURN data'
+      let query = 'FOR data IN healthStoreData ' + filter + ' RETURN data'
       applogger.trace('Querying "' + query + '"')
       let cursor = await db.query(query)
       return cursor.all()
     },
 
-    async getAllhealthStoreDataByUser (userKey) {
-     var query = 'FOR data in healthStoreData FILTER data.userKey == @userKey RETURN data'
+    async getHealthStoreDataByUser (userKey) {
+     var query = 'FOR data IN healthStoreData FILTER data.userKey == @userKey RETURN data'
      let bindings = { userKey: userKey }
      applogger.trace(bindings, 'Querying "' + query + '"')
      let cursor = await db.query(query, bindings)
      return cursor.all()
     },
 
-    async getAllhealthStoreDataByUser (userKey, studyKey) {
-      var query = 'FOR data in healthStoreData FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
+    async getHealthStoreDataByUserAndStudy (userKey, studyKey) {
+      var query = 'FOR data IN healthStoreData FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
       let bindings = { userKey: userKey,
       studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
