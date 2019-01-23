@@ -8,10 +8,10 @@
   "dateOfBirth": "ISO STRING",
   "gender": "male",
   "diseases": [
-    { "name": "Heart Failure", "conceptID": "121212" }
+    { "name": "Heart Failure", "conceptId": "121212" }
   ],
   "medications": [
-    { "name": "Aspirin", "conceptID": "555544" }
+    { "name": "Aspirin", "conceptId": "555544" }
   ],
   "lifestyle": {
     "active": true,

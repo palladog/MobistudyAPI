@@ -42,12 +42,8 @@
             "answer":"yes"
          }
       ],
-      "diseases":{
-         "COPD":"123123123"
-      },
-      "medications":{
-         "Aspirin":"13123123"
-      }
+      "diseases": [ { "name": "COPD", "conceptId": "123123123" } ],
+      "medications":[ { "name": "Aspirin", "conceptId": "12222" } ],
    },
    "tasks":[
       {

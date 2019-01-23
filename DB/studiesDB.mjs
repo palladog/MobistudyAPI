@@ -60,14 +60,14 @@ export default async function (db, logger) {
 
     // udpates a study, we assume the _key is the correct one
     async replaceStudy (_key, study) {
-      let meta = await collection.replace(_key, study)
+      const meta = await collection.replace(_key, study)
       study._key = meta._key
       return study
     },
 
     // udpates a study, we assume the _key is the correct one
     async udpateStudy (_key, study) {
-      let newval = await collection.update(_key, study, { keepNull: false, mergeObjects: true, returnNew: true })
+      const newval = await collection.update(_key, study, { keepNull: false, mergeObjects: true, returnNew: true })
       return newval
     },
 
@@ -76,6 +76,27 @@ export default async function (db, logger) {
       // TODO: delete study design and all the associated data
       await collection.remove(_key)
       return true
+    },
+
+    // gets all the studies that match inclusion criteria
+    async getMatchedNewStudies (userKey) {
+      const query = `FOR study IN studies
+      FOR participant IN participants
+      LET age = DATE_DIFF(participant.dateOfBirth, DATE_NOW(), "year")
+      FILTER participant.userKey == @userKey
+      AND study._key NOT IN participant.studies[*].studyKey
+      AND age >= study.inclusionCriteria.minAge AND age <= study.inclusionCriteria.maxAge
+      AND participant.gender IN study.inclusionCriteria.gender
+      AND participant.gender IN study.inclusionCriteria.gender
+      AND (study.inclusionCriteria.lifestyle.active == 'notrequired'? TRUE : study.inclusionCriteria.lifestyle.active == participant.lifestyle.active)
+      AND (study.inclusionCriteria.lifestyle.smoker == 'notrequired'? TRUE : study.inclusionCriteria.lifestyle.smoker == participant.lifestyle.smoker)
+      AND study.inclusionCriteria.diseases[*].conceptId ALL IN participant.diseases[*].conceptId
+      AND study.inclusionCriteria.medications[*].conceptId ALL IN participant.medications[*].conceptId
+      RETURN study._key`
+      let bindings = { userKey: userKey }
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
     }
   }
 }

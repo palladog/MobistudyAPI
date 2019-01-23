@@ -129,5 +129,17 @@ export default async function () {
     } else res.sendStatus(403)
   })
 
+  // only called by participants, does the inclusion criteria matching too
+  router.get('/newStudies', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    try {
+      if (req.user.role !== 'participant') return res.sendStatus(403)
+      let studies = await db.getMatchedNewStudies(req.user._key)
+      res.send(studies)
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot retrieve studies')
+      res.sendStatus(500)
+    }
+  })
+
   return router
 }
