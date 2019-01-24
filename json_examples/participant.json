@@ -21,7 +21,10 @@
     {
       "studyKey": "key",
       "currentStatus": "accepted",
-      "acceptedTS": "ISO string"
+      "acceptedTS": "ISO string",
+	  "tasksStatus": [
+        { "taskId": 1, "consented": true, "lastExecuted": "ISO string" }
+      ]
     },
     {
       "studyKey": "key",
@@ -39,7 +42,10 @@
       "currentStatus": "completed",
       "acceptedTS": "ISO string",
       "criteriaAnswers": ["No", "No"],
-      "completedTS": "ISO string"
+      "completedTS": "ISO string",
+	  "tasksStatus": [
+        { "taskId": 1, "consented": true, "lastExecuted": "ISO string" }
+      ]
     },
     {
       "studyKey": "key",

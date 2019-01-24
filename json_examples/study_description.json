@@ -104,9 +104,8 @@
 	  "extraItems":[
 		 {
             "description":"I agree to answer the QoL form every day.",
-            "optional":true,
-			"taskId":2
-         },
+            "optional":true
+		},
 		 {
             "description":"I agree to do some analysis",
             "optional":false

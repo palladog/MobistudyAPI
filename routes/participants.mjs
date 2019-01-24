@@ -123,45 +123,6 @@ export default async function () {
     }
   })
 
-  // this endpoint is for the app to update the status of the participant regarding a study
-  // the data sent must contain the current status and the timestamp
-  // withdrawalReason must be added in the case of a withdrawal
-  // { currentStatus: 'withdrawn', timestamp: 'ISO string', withdrawalReason: 'quit' }
-  router.post('/participants/byuserkey/:userKey/studies/:studyKey/currentStatus', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    let userKey = req.params.userKey
-    let studyKey = req.params.studyKey
-    let status = req.params.status
-    let payload = req.body
-    if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
-    if (req.user.role === 'researcher') {
-      let allowedParts = await db.getParticipantsByResearcher(req.user._key)
-      if (!allowedParts.includes(req.params.user)) return res.sendStatus(403)
-    }
-    if (!userKey || !studyKey || !status) return res.sendStatus(400)
-    try {
-      let participant = await db.getParticipantByUserKey(req.params.userKey)
-      if (!participant) return res.status(404)
-
-      let studyIndex = participant.studies.findIndex((s) => {
-        return s.studyKey === studyKey
-      })
-      if (studyIndex === -1) {
-        participant.studies.push({
-          studyKey: studyKey
-        })
-        studyIndex = participant.studies.lenght - 1
-      }
-      participant.studies[studyIndex].currentStatus = status
-      participant.studies[studyIndex] = Object.assign(payload, participant.studies[studyIndex])
-      // Update the DB
-      await db.replaceParticipant(participant._key, participant)
-      res.sendStatus(200)
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot update participant with _key ' + req.body.withdrawnOne.partKey)
-      res.sendStatus(500)
-    }
-  })
-
   // this is meant to be used to update the info not related to the studies
   router.patch('/participants/byuserkey/:userKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newparticipant = req.body
@@ -196,6 +157,54 @@ export default async function () {
     } catch (err) {
       // respond to request with error
       applogger.error({ error: err }, 'Cannot delete participant')
+      res.sendStatus(500)
+    }
+  })
+
+  // this endpoint is for the app to update the status of the participant regarding a study
+  // the data sent must contain the current status and the timestamp
+  // withdrawalReason must be added in the case of a withdrawal
+  // criteriaAnswers must be added in case of acceptance of not eligible
+  // tasksStatus can be added, but is not mandatory
+  // { currentStatus: 'withdrawn', timestamp: 'ISO string', withdrawalReason: 'quit' }
+  router.patch('/participants/byuserkey/:userKey/studies/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    let userKey = req.params.userKey
+    let studyKey = req.params.studyKey
+    let payload = req.body
+    let currentStatus = payload.currentStatus
+    try {
+      if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
+      if (req.user.role === 'researcher') {
+        let allowedParts = await db.getParticipantsByResearcher(req.user._key)
+        if (!allowedParts.includes(req.params.user)) return res.sendStatus(403)
+      }
+      if (!userKey || !studyKey || !currentStatus) return res.sendStatus(400)
+
+      let participant = await db.getParticipantByUserKey(req.params.userKey)
+      if (!participant) return res.status(404)
+
+      let studyIndex = -1
+      if (participant.studies) {
+        studyIndex = participant.studies.findIndex((s) => {
+          return s.studyKey === studyKey
+        })
+      } else {
+        participant.studies = []
+      }
+      if (studyIndex === -1) {
+        participant.studies.push({
+          studyKey: studyKey
+        })
+        studyIndex = participant.studies.length - 1
+      }
+      participant.studies[studyIndex].currentStatus = currentStatus
+      participant.studies[studyIndex] = Object.assign(payload, participant.studies[studyIndex])
+      // Update the DB
+      await db.replaceParticipant(participant._key, participant)
+      res.sendStatus(200)
+    } catch (err) {
+      console.error(err)
+      applogger.error({ error: err }, 'Cannot update participant with user key ' + userKey)
       res.sendStatus(500)
     }
   })
