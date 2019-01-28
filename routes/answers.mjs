@@ -38,10 +38,25 @@ export default async function () {
 
   router.post('/answers', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newanswer = req.body
-    newanswer.created = new Date()
+    if (req.user.role !== 'participant') return res.sendStatus(403)
+    if (!newanswer.generatedTS) return res.sendStatus(400)
+    newanswer.userKey = req.user._key
+    newanswer.createdTS = new Date()
     try {
-      // TODO: do some access control
       newanswer = await db.createAnswer(newanswer)
+      // also update task status
+      let participant = await db.getParticipantByUserKey(req.params.userKey)
+      if (!participant) return res.status(404)
+
+      let study = participant.studies.find((s) => {
+        return s.studyKey === newanswer.studyKey
+      })
+      if (!study) return res.status(400)
+      let taskItem = study.taskItemsConsent.find(ti => ti.taskId === newanswer.taskId)
+      if (!taskItem) return res.status(400)
+      taskItem.lastExecuted = newanswer.generatedTS
+      // update the participant
+      await db.replaceParticipant(participant._key, participant)
       res.send(newanswer)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new answer')
@@ -51,7 +66,7 @@ export default async function () {
 
   router.put('/answers/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newanswer = req.body
-    newanswer.updated = new Date()
+    newanswer.updatedTS = new Date()
     try {
       // TODO: do some access control
       newanswer = await db.replaceAnswer(req.params.answer_key, newanswer)
@@ -64,7 +79,7 @@ export default async function () {
 
   router.patch('/answers/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newanswer = req.body
-    newanswer.updated = new Date()
+    newanswer.updatedTS = new Date()
     try {
       // TODO: do some access control
       newanswer = await db.updateAnswer(req.params.answer_key, newanswer)

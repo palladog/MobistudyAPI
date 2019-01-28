@@ -69,9 +69,24 @@ export default async function () {
 
   router.post('/healthStoreData', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newHealthStoreData = req.body
-    newHealthStoreData.created = new Date()
+    if (req.user.role !== 'participant') return res.sendStatus(403)
+    newHealthStoreData.userKey = req.user._key
+    newHealthStoreData.createdTS = new Date()
     try {
       newHealthStoreData = await db.createHealthStoreData(newHealthStoreData)
+      // also update task status
+      let participant = await db.getParticipantByUserKey(req.params.userKey)
+      if (!participant) return res.status(404)
+
+      let study = participant.studies.find((s) => {
+        return s.studyKey === newHealthStoreData.studyKey
+      })
+      if (!study) return res.status(400)
+      let taskItem = study.taskItemsConsent.find(ti => ti.taskId === newHealthStoreData.taskId)
+      if (!taskItem) return res.status(400)
+      taskItem.lastExecuted = newHealthStoreData.generatedTS
+      // update the participant
+      await db.replaceParticipant(participant._key, participant)
       res.send(newHealthStoreData)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new HealthStore Data')
