@@ -1,10 +1,10 @@
 {
   "userKey": "key",
   "createdTS": "ISO STRING",
+  "updatedTS": "ISO STRING",
   "name": "Dario",
   "surname": "Salvi",
   "gender": "male",
-  "updatedTS": "ISO STRING",
   "dateOfBirth": "ISO STRING",
   "gender": "male",
   "diseases": [

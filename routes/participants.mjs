@@ -166,7 +166,7 @@ export default async function () {
   // withdrawalReason must be added in the case of a withdrawal
   // criteriaAnswers must be added in case of acceptance of not eligible
   // taskItemsConsent and extraItemsConsent can be added, but is not mandatory
-  // { currentStatus: 'withdrawn', timestamp: 'ISO string', withdrawalReason: 'quit' }
+  // example: { currentStatus: 'withdrawn', timestamp: 'ISO string', withdrawalReason: 'quit' }
   router.patch('/participants/byuserkey/:userKey/studies/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let userKey = req.params.userKey
     let studyKey = req.params.studyKey
@@ -183,13 +183,15 @@ export default async function () {
       let participant = await db.getParticipantByUserKey(req.params.userKey)
       if (!participant) return res.status(404)
 
+      participant.updatedTS = new Date()
+
       let studyIndex = -1
-      if (participant.studies) {
+      if (!participant.studies) {
+        participant.studies = []
+      } else {
         studyIndex = participant.studies.findIndex((s) => {
           return s.studyKey === studyKey
         })
-      } else {
-        participant.studies = []
       }
       if (studyIndex === -1) {
         participant.studies.push({
@@ -197,13 +199,11 @@ export default async function () {
         })
         studyIndex = participant.studies.length - 1
       }
-      participant.studies[studyIndex].currentStatus = currentStatus
-      participant.studies[studyIndex] = Object.assign(payload, participant.studies[studyIndex])
+      participant.studies[studyIndex] = payload
       // Update the DB
-      await db.replaceParticipant(participant._key, participant)
+      await db.updateParticipant(participant._key, participant)
       res.sendStatus(200)
     } catch (err) {
-      console.error(err)
       applogger.error({ error: err }, 'Cannot update participant with user key ' + userKey)
       res.sendStatus(500)
     }
