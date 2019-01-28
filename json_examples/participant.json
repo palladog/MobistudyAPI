@@ -22,9 +22,12 @@
       "studyKey": "key",
       "currentStatus": "accepted",
       "acceptedTS": "ISO string",
-	  "tasksStatus": [
-        { "taskId": 1, "consented": true, "lastExecuted": "ISO string" }
-      ]
+	  "taskItemsConsent": [
+			{ "taskId": 1, "consented": true, "lastExecuted": "ISO string" }
+		],
+	  "extraItemsConsent": [
+		{ "consented": true }
+	  ]
     },
     {
       "studyKey": "key",
@@ -33,9 +36,13 @@
       "criteriaAnswers": ["Yes", "No"],
       "withdrawalTS": "ISO string",
       "withdrawalReason": "string",
-      "tasksStatus": [
+      "taskItemsConsent": [
         { "taskId": 1, "consented": true, "lastExecuted": "ISO string" }
-      ]
+      ],
+	  "extraItemsConsent": [
+		{ "consented": true },
+		{ "consented": false }
+	  ]
     },
     {
       "studyKey": "key",
@@ -43,7 +50,7 @@
       "acceptedTS": "ISO string",
       "criteriaAnswers": ["No", "No"],
       "completedTS": "ISO string",
-	  "tasksStatus": [
+	  "taskItemsConsent": [
         { "taskId": 1, "consented": true, "lastExecuted": "ISO string" }
       ]
     },

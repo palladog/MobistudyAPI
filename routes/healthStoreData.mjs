@@ -34,7 +34,7 @@ export default async function () {
             let storeData = await db.getAllHealthStoreData()
             res.send(storeData)
           }
-        } 
+        }
       } else if (req.user.role === 'participant') {
         let storeData = await db.getHealthStoreDataByUser(req.user._key)
         res.send(storeData)

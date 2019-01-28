@@ -165,7 +165,7 @@ export default async function () {
   // the data sent must contain the current status and the timestamp
   // withdrawalReason must be added in the case of a withdrawal
   // criteriaAnswers must be added in case of acceptance of not eligible
-  // tasksStatus can be added, but is not mandatory
+  // taskItemsConsent and extraItemsConsent can be added, but is not mandatory
   // { currentStatus: 'withdrawn', timestamp: 'ISO string', withdrawalReason: 'quit' }
   router.patch('/participants/byuserkey/:userKey/studies/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let userKey = req.params.userKey
