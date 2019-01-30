@@ -102,9 +102,26 @@ export default async function () {
   })
 
   router.delete('/studies/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    if (req.user.role === 'admin') {
+    // If the user is a researcher, ensure that researcher has the same teamKey as the study
+    let permissionToDelete = false
+    let studykey = req.params.study_key
+    if (req.user.role === 'researcher') {
       try {
-        let studykey = req.params.study_key
+        // Get Team Key of Study 
+        let study = await db.getOneStudy(studykey)
+        let teamKeyOfStudy = study.teamKey
+        // Get Team Key of User
+        let userKey = req.user._key
+        let team = await db.getAllTeams(userKey, studykey)
+        // Validate they are the same
+        if (teamKeyOfStudy === team[0]._key) permissionToDelete = true
+      } catch (error) {
+        applogger.error({ error: err }, 'Cannot confirm researcher has same teamKey as study ' + studykey)
+        res.sendStatus(500)
+      }
+    }
+    if (req.user.role === 'admin' || (req.user.role === 'researcher' && permissionToDelete === true)) {
+      try {
         if (studykey !== null) {
           await db.deleteStudy(studykey)
           // Search participants for study
