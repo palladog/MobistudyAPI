@@ -96,8 +96,19 @@ export default async function () {
         if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
         await db.removeParticipant(partKey)
         await db.removeUser(userKey)
-        // TODO: also remove answers and data query results
-        res.sendStatus(200)
+        // Remove Answers
+        let answers = await db.getAllAnswersByUser(userKey)
+        for (let i = 0; i < answers.length; i++) {
+          let answerKey = answers[i]._key
+          await db.deleteAnswer(answerKey)  
+        }
+        // Remove Health Store Data
+        let healthData = await db.getHealthStoreDataByUser(userKey)
+        for (let j = 0; j < healthData.length; j++) {
+          let healthDataKey = healthData[i]._key
+          await db.deleteHealthStoreData(healthDataKey)  
+        }
+      res.sendStatus(200)
       }
     } catch (err) {
       // respond to request with error
@@ -150,9 +161,20 @@ export default async function () {
     try {
       let participant = await db.getParticipantByUserKey(req.params.userKey)
       if (!participant) return res.status(404)
-      // TODO: need to remove also answers and healthstore data
       await db.removeParticipant(participant._key)
       await db.removeUser(req.params.userKey)
+      // Remove Answers
+      let answers = await db.getAllAnswersByUser(req.params.userKey)
+      for (let i = 0; i < answers.length; i++) {
+        let answerKey = answers[i]._key
+        await db.deleteAnswer(answerKey)  
+      }
+      // Remove Health Store Data
+      let healthData = await db.getHealthStoreDataByUser(req.params.userKey)
+      for (let j = 0; j < healthData.length; j++) {
+        let healthDataKey = healthData[i]._key
+        await db.deleteHealthStoreData(healthDataKey)  
+      }
       res.sendStatus(200)
     } catch (err) {
       // respond to request with error

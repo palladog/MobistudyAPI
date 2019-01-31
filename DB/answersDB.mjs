@@ -22,6 +22,24 @@ export default async function (db, logger) {
       return cursor.all()
     },
 
+    async getAllAnswersByUser (userKey) {
+      var filter = 'FILTER data.userKey == @ userKey'
+      var query = 'FOR answer IN answers ' + filter + ' RETURN answer'
+      let bindings = { userKey: userKey }
+      applogger.trace('Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      console.log('Query Answ --> ', cursor.all())
+      return cursor.all()
+    },
+
+    async getAnswerByUserAndStudy (userKey, studyKey) {
+      var query = 'FOR answer IN answers FILTER answer.userKey == @userKey AND answer.studyKey == @studyKey RETURN data'
+      let bindings = { userKey: userKey, studyKey: studyKey }
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
+    },
+
     async createAnswer (newanswer) {
       let meta = await collection.save(newanswer)
       newanswer._key = meta._key
