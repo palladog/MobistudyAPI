@@ -23,12 +23,11 @@ export default async function (db, logger) {
     },
 
     async getAllAnswersByUser (userKey) {
-      var filter = 'FILTER data.userKey == @ userKey'
+      var filter = 'FILTER answer.userKey == @userKey'
       var query = 'FOR answer IN answers ' + filter + ' RETURN answer'
       let bindings = { userKey: userKey }
       applogger.trace('Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
-      console.log('Query Answ --> ', cursor.all())
       return cursor.all()
     },
 

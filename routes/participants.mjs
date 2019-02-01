@@ -105,7 +105,7 @@ export default async function () {
         // Remove Health Store Data
         let healthData = await db.getHealthStoreDataByUser(userKey)
         for (let j = 0; j < healthData.length; j++) {
-          let healthDataKey = healthData[i]._key
+          let healthDataKey = healthData[j]._key
           await db.deleteHealthStoreData(healthDataKey)  
         }
       res.sendStatus(200)
@@ -172,7 +172,7 @@ export default async function () {
       // Remove Health Store Data
       let healthData = await db.getHealthStoreDataByUser(req.params.userKey)
       for (let j = 0; j < healthData.length; j++) {
-        let healthDataKey = healthData[i]._key
+        let healthDataKey = healthData[j]._key
         await db.deleteHealthStoreData(healthDataKey)  
       }
       res.sendStatus(200)
