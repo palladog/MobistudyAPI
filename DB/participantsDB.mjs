@@ -105,6 +105,7 @@ export default async function (db, logger) {
     // udpates a participant, we assume the _key is the correct one
     async replaceParticipant (_key, participant) {
       let meta = await collection.replace(_key, participant)
+      applogger.trace(participant, 'Replacing participant "' + _key + '"')
       participant._key = meta._key
       return participant
     },
@@ -112,12 +113,14 @@ export default async function (db, logger) {
     // udpates a participant, we assume the _key is the correct one
     async updateParticipant (_key, participant) {
       let newval = await collection.update(_key, participant, { keepNull: false, mergeObjects: true, returnNew: true })
+      applogger.trace(participant, 'Updating participant "' + _key + '"')
       return newval
     },
 
     // deletes an participant
     async removeParticipant (_key) {
       await collection.remove(_key)
+      applogger.trace('Removing participant "' + _key + '"')
       return true
     }
   }

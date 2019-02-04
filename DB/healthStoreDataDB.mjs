@@ -20,24 +20,23 @@ export default async function (db, logger) {
     },
 
     async getHealthStoreDataByUser (userKey) {
-     var query = 'FOR data IN healthStoreData FILTER data.userKey == @userKey RETURN data'
-     let bindings = { userKey: userKey }
-     applogger.trace(bindings, 'Querying "' + query + '"')
-     let cursor = await db.query(query, bindings)
-     return cursor.all()
+      var query = 'FOR data IN healthStoreData FILTER data.userKey == @userKey RETURN data'
+      let bindings = { userKey: userKey }
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
     },
 
     async getHealthStoreDataByUserAndStudy (userKey, studyKey) {
       var query = 'FOR data IN healthStoreData FILTER data.userKey == @userKey AND data.studyKey == @studyKey RETURN data'
-      let bindings = { userKey: userKey,
-      studyKey: studyKey }
+      let bindings = { userKey: userKey, studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       return cursor.all()
-     },
+    },
 
     async createHealthStoreData (newHealthStoreData) {
-      let meta = await collection.save(newhealthStoreData)
+      let meta = await collection.save(newHealthStoreData)
       newHealthStoreData._key = meta._key
       return newHealthStoreData
     },

@@ -23,6 +23,16 @@ export default async function () {
     res.send(req.user)
   })
 
+  router.post('/sendConfirmationEmail', async function (req, res) {
+    if (req.body.email) {
+      let email = req.body.email
+      let existing = await db.findUser(email)
+      if (!existing) return res.sendStatus(400)
+      sendEmail(email, 'Mobistudy Registration Confirmation', `<p>You have been successfully registered on Mobistudy.</p>`)
+      res.sendStatus(200)
+    } else res.sendStatus(400)
+  })
+
   router.post('/sendResetPasswordEmail', async function (req, res) {
     if (req.body.email) {
       let email = req.body.email
@@ -41,7 +51,7 @@ export default async function () {
       <p>Or use the following code if required: ${token}</p>
       <p>This code will expire after 24 hours.</p>`)
       res.sendStatus(200)
-    } else res.sendStatus(200)
+    } else res.sendStatus(400)
   })
 
   router.post('/resetPassword', async function (req, res) {

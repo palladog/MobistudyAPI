@@ -1,7 +1,9 @@
 {
 	"userKey": "asdasd",
 	"studyKey": "asdasd",
-	"taskId": "qwqw",
+	"taskId": 3,
+   "createdTS": "timestamp on the server",
+   "generatedTS": "date as generated on the app",
 	"healthData": [
 		{
           "startDate": "ISO STRING",
