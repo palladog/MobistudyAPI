@@ -1,7 +1,7 @@
 'use strict'
 
 /**
-* This provides the API endpoints for the study answers.
+* This provides the API endpoints for the study answers of the participants.
 */
 
 import express from 'express'

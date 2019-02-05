@@ -1,0 +1,13 @@
+{ 
+    "timestamp": "ISO string", 
+    "event": "userRegistered",
+    "userKey": "12123132",
+    "userEmail": "dario@asass.as", 
+    "message": "A new user has registered",
+    "refData": "user", 
+    "refKey": "12123132", 
+    "data": 
+        { 
+            "email": "dario@asass.as"
+        } 
+}

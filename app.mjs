@@ -20,6 +20,7 @@ import participantsRouter from './routes/participants'
 import teamsRouter from './routes/teams'
 import answersRouter from './routes/answers'
 import healthStoreDataRouter from './routes/healthStoreData'
+import auditLogRouter from './routes/auditLog'
 
 export default async function () {
   authConfig()
@@ -46,6 +47,7 @@ export default async function () {
   app.use('/api', await teamsRouter())
   app.use('/api', await answersRouter())
   app.use('/api', await healthStoreDataRouter())
+  app.use('/api', await auditLogRouter())
 
   // error handler
   app.use(function (err, req, res, next) {
