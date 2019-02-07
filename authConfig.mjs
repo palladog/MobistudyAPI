@@ -29,7 +29,7 @@ export default async function () {
       var dbHashedPwd = user.hashedPassword
       if (bcrypt.compareSync(password, dbHashedPwd)) {
         // OK!
-        applogger.info(email + ' logged in')
+        applogger.info({ email: email }, 'User has logged in')
         delete user.hashedPassword
         delete user._rev
         delete user._id

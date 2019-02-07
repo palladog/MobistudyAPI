@@ -8,7 +8,7 @@ import express from 'express'
 import passport from 'passport'
 import getDB from '../DB/DB'
 import { applogger } from '../logger'
-import jwt from 'jsonwebtoken'
+import auditLogger from '../auditLogger'
 
 const router = express.Router()
 
@@ -48,9 +48,11 @@ export default async function () {
     let newform = req.body
     newform.created = new Date()
     try {
-      // TODO: do some access control
+      // TODO: do some access control, same as study, only researchers, any team
       newform = await db.createForm(newform)
       res.send(newform)
+      applogger.info(newform, 'New form created')
+      auditLogger.log('formCreated', req.user._key, undefined, undefined, 'New form created ' + newform.name, 'forms', newform._key, newform)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new form')
       res.sendStatus(500)
@@ -63,8 +65,10 @@ export default async function () {
       // TODO: do some access control
       newform = await db.replaceForm(req.params.form_key, newform)
       res.send(newform)
+      applogger.info(newform, 'Form has been replaced')
+      auditLogger.log('formReplaced', req.user._key, undefined, undefined, 'Form ' + newform.name + ' has been replaced', 'forms', newform._key, newform)
     } catch (err) {
-      applogger.error({ error: err }, 'Cannot update form with _key ' + req.params.form_key)
+      applogger.error({ error: err }, 'Cannot replace form with _key ' + req.params.form_key)
       res.sendStatus(500)
     }
   })
@@ -75,8 +79,10 @@ export default async function () {
       // TODO: do some access control
       newform = await db.updateForm(req.params.form_key, newform)
       res.send(newform)
+      applogger.info(newform, 'Form has been updated')
+      auditLogger.log('formUpdate', req.user._key, undefined, undefined, 'Form ' + newform.name + ' has been updated', 'forms', newform._key, newform)
     } catch (err) {
-      applogger.error({ error: err }, 'Cannot patch form with _key ' + req.params.form_key)
+      applogger.error({ error: err }, 'Cannot update form with _key ' + req.params.form_key)
       res.sendStatus(500)
     }
   })
@@ -86,6 +92,8 @@ export default async function () {
       // TODO: do some access control
       await db.deleteForm(req.params.form_key)
       res.sendStatus(200)
+      applogger.info({ formKey: req.params.form_key }, 'Form has been deleted')
+      auditLogger.log('formUpdate', req.user._key, undefined, undefined, 'Form with key ' + req.params.form_key + ' has been deleted', 'forms', req.params.form_key, undefined)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot delete form with _key ' + req.params.form_key)
       res.sendStatus(500)

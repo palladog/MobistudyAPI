@@ -10,6 +10,7 @@ import jwt from 'jsonwebtoken'
 import getDB from '../DB/DB'
 import getConfig from '../config'
 import { applogger } from '../logger'
+import auditLogger from '../auditLogger'
 import { sendEmail } from '../mailSender'
 
 const router = express.Router()
@@ -21,16 +22,7 @@ export default async function () {
 
   router.post('/login', passport.authenticate('local', { session: false }), function (req, res, next) {
     res.send(req.user)
-  })
-
-  router.post('/sendConfirmationEmail', async function (req, res) {
-    if (req.body.email) {
-      let email = req.body.email
-      let existing = await db.findUser(email)
-      if (!existing) return res.sendStatus(400)
-      sendEmail(email, 'Mobistudy Registration Confirmation', `<p>You have been successfully registered on Mobistudy.</p>`)
-      res.sendStatus(200)
-    } else res.sendStatus(400)
+    auditLogger.log('login', req.user._key, undefined, undefined, 'User ' + req.user.email + ' has logged in', 'users', req.user._key, undefined)
   })
 
   router.post('/sendResetPasswordEmail', async function (req, res) {
@@ -51,6 +43,8 @@ export default async function () {
       <p>Or use the following code if required: ${token}</p>
       <p>This code will expire after 24 hours.</p>`)
       res.sendStatus(200)
+      applogger.info({ email: req.user.email }, 'Resest password email sent')
+      auditLogger.log('resetPasswordEmail', existing._key, undefined, undefined, 'User ' + email + ' has requested a reset password email', 'users', existing._key, undefined)
     } else res.sendStatus(400)
   })
 
@@ -60,22 +54,26 @@ export default async function () {
         var decoded = jwt.verify(req.body.token, config.auth.secret)
       } catch (err) {
         applogger.error(err, 'Resetting password, cannot parse token')
-        console.error(err)
         return res.sendStatus(500)
       }
       if (new Date().getTime() >= (decoded.exp * 1000)) {
-        applogger.error('Resetting password, token has expired')
+        applogger.info('Resetting password, token has expired')
         res.sendStatus(400)
       } else {
         let email = decoded.email
         let newpasssword = req.body.password
         let hashedPassword = bcrypt.hashSync(newpasssword, 8)
         let existing = await db.findUser(email)
-        if (!existing) return res.status(409).send('This email is not registered')
+        if (!existing) {
+          applogger.info('Resetting password, email ' + email + ' not registered')
+          return res.status(409).send('This email is not registered')
+        }
         await db.updateUser(existing._key, {
           hashedPassword: hashedPassword
         })
         res.sendStatus(200)
+        applogger.info({ email: req.user.email }, 'User has changed the password')
+        auditLogger.log('resetPassword', existing._key, undefined, undefined, 'User ' + email + ' has changed the password', 'users', existing._key, undefined)
       }
     } else res.sendStatus(400)
   })
@@ -90,8 +88,11 @@ export default async function () {
       if (existing) return res.status(409).send('This email is already registered')
       if (user.role === 'admin') return res.sendStatus(403)
       // if (user.role === 'researcher' && user.invitationCode !== '827363423') return res.status(400).send('Bad invitation code')
-      await db.createUser(user)
+      let newuser = await db.createUser(user)
       res.sendStatus(200)
+      applogger.info({ email: newuser.email }, 'New user created')
+      auditLogger.log('userCreated', newuser._key, undefined, undefined, 'New user created with email ' + newuser.email, 'users', newuser._key, undefined)
+      sendEmail(newuser.email, 'Mobistudy Registration Confirmation', `<p>You have been successfully registered on Mobistudy.</p>`)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new user')
       res.sendStatus(500)
@@ -176,8 +177,12 @@ export default async function () {
           await db.updateTeam(teamKeyOfUser, selTeam)
         }
         // Then, FINALLY, remove user from db
+        let user = await db.findUser(userKey)
         await db.removeUser(userKey)
         res.sendStatus(200)
+
+        applogger.info({ email: user.email }, 'User deleted')
+        auditLogger.log('userCreated', userKey, undefined, undefined, 'User with email ' + user.email + ' deleted', 'users', userKey, undefined)
       } else res.sendStatus(403)
     } catch (err) {
       // respond to request with error
