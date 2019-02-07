@@ -8,6 +8,7 @@ import express from 'express'
 import passport from 'passport'
 import getDB from '../DB/DB'
 import { applogger } from '../logger'
+import auditLogger from '../auditLogger'
 
 const router = express.Router()
 
@@ -50,6 +51,7 @@ export default async function () {
     }
   })
 
+  // get one speficic study by its key
   router.get('/studies/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       // TODO: do some access control
@@ -62,19 +64,24 @@ export default async function () {
     }
   })
 
+  // add a new study
   router.post('/studies', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newstudy = req.body
     newstudy.created = new Date()
     try {
-      // TODO: do some access control
+      // TODO: do some access control, check the user is a researcher and that he belongs to the team
       newstudy = await db.createStudy(newstudy)
       res.send(newstudy)
+
+      applogger.info(newstudy, 'New study description added')
+      auditLogger.log('studyDescriptionAdded', req.user._key, newstudy._key, undefined, 'New study description added ' + newstudy.generalities.title, 'studies', newstudy._key, newstudy)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new study')
       res.sendStatus(500)
     }
   })
 
+  // update a study
   router.put('/studies/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newstudy = req.body
     newstudy.updated = new Date()
@@ -82,12 +89,15 @@ export default async function () {
       // TODO: do some access control
       newstudy = await db.replaceStudy(req.params.study_key, newstudy)
       res.send(newstudy)
+      applogger.info(newstudy, 'Study replaced')
+      auditLogger.log('studyDescriptionReplaced', req.user._key, newstudy._key, undefined, 'Study description replaced ' + newstudy.generalities.title, 'studies', newstudy._key, newstudy)
     } catch (err) {
-      applogger.error({ error: err }, 'Cannot update study with _key ' + req.params.study_key)
+      applogger.error({ error: err }, 'Cannot replace study with _key ' + req.params.study_key)
       res.sendStatus(500)
     }
   })
 
+  // patch a study
   router.patch('/studies/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newstudy = req.body
     newstudy.updated = new Date()
@@ -95,19 +105,23 @@ export default async function () {
       // TODO: do some access control
       newstudy = await db.updateStudy(req.params.study_key, newstudy)
       res.send(newstudy)
+      applogger.info(newstudy, 'Study updated')
+      auditLogger.log('studyDescriptionUpdated', req.user._key, newstudy._key, undefined, 'Study description updated ' + newstudy.generalities.title, 'studies', newstudy._key, newstudy)
     } catch (err) {
-      applogger.error({ error: err }, 'Cannot patch study with _key ' + req.params.study_key)
+      applogger.error({ error: err }, 'Cannot update study with _key ' + req.params.study_key)
       res.sendStatus(500)
     }
   })
 
+  // delete a study
   router.delete('/studies/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     // If the user is a researcher, ensure that researcher has the same teamKey as the study
     let permissionToDelete = false
     let studykey = req.params.study_key
+    if (!studykey) return res.sendStatus(400)
     if (req.user.role === 'researcher') {
       try {
-        // Get Team Key of Study 
+        // Get Team Key of Study
         let study = await db.getOneStudy(studykey)
         let teamKeyOfStudy = study.teamKey
         // Get Team Key of User
@@ -116,29 +130,29 @@ export default async function () {
         // Validate they are the same
         if (teamKeyOfStudy === team[0]._key) permissionToDelete = true
       } catch (error) {
-        applogger.error({ error: err }, 'Cannot confirm researcher has same teamKey as study ' + studykey)
+        applogger.error({ error: error }, 'Cannot confirm researcher has same teamKey as study ' + studykey)
         res.sendStatus(500)
       }
     }
     if (req.user.role === 'admin' || (req.user.role === 'researcher' && permissionToDelete === true)) {
       try {
-        if (studykey !== null) {
-          await db.deleteStudy(studykey)
-          // Search participants for study
-          let parts = await db.getParticipantsByStudy(studykey)
-          if (parts !== null) {
-            for (let i = 0; i < parts.length; i++) {
-              let partKey = parts[i]
-              // For Each participant, delete the study key from accepted studies
-              let participant = await db.getOneParticipant(partKey)
-              let studyArray = participant.studies
-              studyArray = studyArray.filter(study => study.studyKey !== studykey)
-              participant.studies = studyArray
-              await db.replaceParticipant(partKey, participant)
-            }
-            res.sendStatus(200)
-          } else res.sendStatus(403)
-        } else res.sendStatus(403)
+        // Search participants for study
+        let parts = await db.getParticipantsByStudy(studykey)
+        if (parts) {
+          for (let i = 0; i < parts.length; i++) {
+            let partKey = parts[i]
+            // For Each participant, delete the study key from accepted studies
+            let participant = await db.getOneParticipant(partKey)
+            let studyArray = participant.studies
+            studyArray = studyArray.filter(study => study.studyKey !== studykey)
+            participant.studies = studyArray
+            await db.replaceParticipant(partKey, participant)
+          }
+        }
+        await db.deleteStudy(studykey)
+        res.sendStatus(200)
+        applogger.info({ studyKey: studykey }, 'Study deleted')
+        auditLogger.log('studyDescriptionDeleted', req.user._key, studykey, undefined, 'Study description with key ' + studykey + ' deleted', 'studies', studykey, undefined)
       } catch (err) {
         applogger.error({ error: err }, 'Cannot delete study with _key ' + req.params.study_key)
         res.sendStatus(500)

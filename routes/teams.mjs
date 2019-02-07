@@ -11,6 +11,7 @@ import jwt from 'jsonwebtoken'
 
 import getConfig from '../config'
 import { applogger } from '../logger'
+import auditLogger from '../auditLogger'
 
 const router = express.Router()
 
@@ -50,6 +51,7 @@ export default async function () {
     }
   })
 
+  // create a new team
   router.post('/teams', passport.authenticate('jwt', { session: false }), async function (req, res) {
     if (req.user.role === 'admin') {
       let newteam = req.body
@@ -60,6 +62,8 @@ export default async function () {
         if (existingTeam) return res.sendStatus(409)
         newteam = await db.createTeam(newteam)
         res.send(newteam)
+        applogger.info(newteam, 'New team created')
+        auditLogger.log('teamCreated', req.user._key, undefined, undefined, 'New team created ' + newteam.name, 'teams', newteam._key, newteam)
       } catch (err) {
         applogger.error({ error: err }, 'Cannot store new study')
         res.sendStatus(500)
@@ -92,6 +96,7 @@ export default async function () {
     } else res.sendStatus(403)
   })
 
+  // add a researcher to a team
   router.post('/teams/researcher/add', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let researcherKeyUpdt = req.user._key
     let JToken = req.body.invitationCode
@@ -111,7 +116,9 @@ export default async function () {
           } else {
             selTeam.researchersKeys.push(researcherKeyUpdt)
             await db.replaceTeam(decodedTeamKey, selTeam)
-            return res.json({ teamName: selTeam.name })
+            res.json({ teamName: selTeam.name })
+            applogger.info(selTeam, 'Reseacher added to a team')
+            auditLogger.log('researcherAddedToTeam', req.user._key, undefined, undefined, 'Researcher with key ' + researcherKeyUpdt + ' added to team ' + selTeam.name, 'teams', selTeam._key, selTeam)
           }
         } else {
           applogger.error('Adding researcher to team, team with key ' + decodedTeamKey + ' does not exist')
@@ -138,6 +145,8 @@ export default async function () {
         }
         await db.replaceTeam(teamKey, selTeam)
         res.sendStatus(200)
+        applogger.info(selTeam, 'Reseacher removed from team')
+        auditLogger.log('researcherRemovedFromTeam', req.user._key, undefined, undefined, 'Researcher with key ' + userKey + ' removed from team ' + selTeam.name, 'teams', selTeam._key, selTeam)
       } catch (err) {
         applogger.error({ error: err }, 'Cannot remove user from study')
         res.sendStatus(400)
@@ -154,22 +163,25 @@ export default async function () {
         // look for studies of that team
         let teamStudies = await db.getAllTeamStudies(teamkey)
         let participantsByStudy = []
-          // Get list of participants per study. Then delete each study.
-          for (let i = 0; i < teamStudies.length; i++) {
-            participantsByStudy = await db.getParticipantsByStudy(teamStudies[i]._key, null)
-            await db.deleteStudy(teamStudies[i]._key)
-            for (let j = 0; j < participantsByStudy.length; j++) {
-              // Per participant, remove the study
-              let partKey = participantsByStudy[j]._key
-              let participant = await db.getOneParticipant(partKey)
-              let studyArray = participant.studies
-              studyArray = studyArray.filter(study => study.studyKey !== teamStudies[i]._key)
-              participant.studies = studyArray
-              await db.replaceParticipant(partKey, participant)
-            }
+        // Get list of participants per study. Then delete each study.
+        for (let i = 0; i < teamStudies.length; i++) {
+          participantsByStudy = await db.getParticipantsByStudy(teamStudies[i]._key, null)
+          await db.deleteStudy(teamStudies[i]._key)
+          for (let j = 0; j < participantsByStudy.length; j++) {
+            // Per participant, remove the study
+            let partKey = participantsByStudy[j]._key
+            let participant = await db.getOneParticipant(partKey)
+            let studyArray = participant.studies
+            studyArray = studyArray.filter(study => study.studyKey !== teamStudies[i]._key)
+            participant.studies = studyArray
+            await db.replaceParticipant(partKey, participant)
+            // TODO: remove also data of the studies the team is involved in
           }
+        }
         await db.removeTeam(teamkey)
         res.sendStatus(200)
+        applogger.info({ teamKey: teamkey }, 'Team deleted')
+        auditLogger.log('teamDeleted', req.user._key, undefined, undefined, 'Team with key ' + teamkey + ' deleted', 'teams', teamkey, undefined)
       } else res.sendStatus(403)
     } catch (err) {
       // respond to request with error

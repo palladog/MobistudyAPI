@@ -22,8 +22,7 @@ export default async function () {
 
   router.post('/login', passport.authenticate('local', { session: false }), function (req, res, next) {
     res.send(req.user)
-    applogger.info({ email: req.user.email }, 'User has logged in')
-    auditLogger.log('login', req.user._key, undefined, 'User ' + req.user.email + ' has logged in', 'users', req.user._key, undefined)
+    auditLogger.log('login', req.user._key, undefined, undefined, 'User ' + req.user.email + ' has logged in', 'users', req.user._key, undefined)
   })
 
   router.post('/sendResetPasswordEmail', async function (req, res) {
@@ -45,7 +44,7 @@ export default async function () {
       <p>This code will expire after 24 hours.</p>`)
       res.sendStatus(200)
       applogger.info({ email: req.user.email }, 'Resest password email sent')
-      auditLogger.log('resetPasswordEmail', existing._key, undefined, 'User ' + email + ' has requested a reset password email', 'users', existing._key, undefined)
+      auditLogger.log('resetPasswordEmail', existing._key, undefined, undefined, 'User ' + email + ' has requested a reset password email', 'users', existing._key, undefined)
     } else res.sendStatus(400)
   })
 
@@ -74,7 +73,7 @@ export default async function () {
         })
         res.sendStatus(200)
         applogger.info({ email: req.user.email }, 'User has changed the password')
-        auditLogger.log('resetPassword', existing._key, undefined, 'User ' + email + ' has changed the password', 'users', existing._key, undefined)
+        auditLogger.log('resetPassword', existing._key, undefined, undefined, 'User ' + email + ' has changed the password', 'users', existing._key, undefined)
       }
     } else res.sendStatus(400)
   })
@@ -92,7 +91,7 @@ export default async function () {
       let newuser = await db.createUser(user)
       res.sendStatus(200)
       applogger.info({ email: newuser.email }, 'New user created')
-      auditLogger.log('userCreated', newuser._key, undefined, 'New user created with email ' + newuser.email, 'users', newuser._key, undefined)
+      auditLogger.log('userCreated', newuser._key, undefined, undefined, 'New user created with email ' + newuser.email, 'users', newuser._key, undefined)
       sendEmail(newuser.email, 'Mobistudy Registration Confirmation', `<p>You have been successfully registered on Mobistudy.</p>`)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new user')
@@ -183,7 +182,7 @@ export default async function () {
         res.sendStatus(200)
 
         applogger.info({ email: user.email }, 'User deleted')
-        auditLogger.log('userCreated', userKey, undefined, 'User with email ' + user.email + ' deleted', 'users', userKey, undefined)
+        auditLogger.log('userCreated', userKey, undefined, undefined, 'User with email ' + user.email + ' deleted', 'users', userKey, undefined)
       } else res.sendStatus(403)
     } catch (err) {
       // respond to request with error

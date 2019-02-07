@@ -7,8 +7,16 @@ import getDB from './DB/DB'
 
 export default {
   db: undefined,
-  log: async (event, userKey, studyKey, message, refData, refKey, data) => {
+  async log (event, userKey, studyKey, taskId, message, refData, refKey, data) {
     if (!this.db) this.db = await getDB()
-    this.db.addAuditLog(event, userKey, studyKey, message, refData, refKey, data)
+    this.db.addAuditLog({ timestamp: new Date(),
+      event,
+      userKey,
+      studyKey,
+      taskId,
+      message,
+      refData,
+      refKey,
+      data })
   }
 }

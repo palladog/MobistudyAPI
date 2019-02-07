@@ -8,6 +8,7 @@ import express from 'express'
 import passport from 'passport'
 import getDB from '../DB/DB'
 import { applogger } from '../logger'
+import auditLogger from '../auditLogger'
 
 const router = express.Router()
 
@@ -58,46 +59,11 @@ export default async function () {
       // update the participant
       await db.replaceParticipant(participant._key, participant)
       res.send(newanswer)
+
+      applogger.info({ userKey: req.user._key, taskId: newanswer.taskId, studyKey: newanswer.studyKey }, 'Participant has sent answers to a form')
+      auditLogger.log('healthStoreDataCreated', req.user._key, newanswer.studyKey, newanswer.taskId, 'Form answers created by participant with key ' + participant._key + ' for study with key ' + newanswer.studyKey, 'answers', newanswer._key, newanswer)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new answer')
-      res.sendStatus(500)
-    }
-  })
-
-  router.put('/answers/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    let newanswer = req.body
-    newanswer.updatedTS = new Date()
-    try {
-      // TODO: do some access control
-      newanswer = await db.replaceAnswer(req.params.answer_key, newanswer)
-      res.send(newanswer)
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot update answer with _key ' + req.params.answer_key)
-      res.sendStatus(500)
-    }
-  })
-
-  router.patch('/answers/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    let newanswer = req.body
-    newanswer.updatedTS = new Date()
-    try {
-      // TODO: do some access control
-      newanswer = await db.updateAnswer(req.params.answer_key, newanswer)
-      res.send(newanswer)
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot patch answer with _key ' + req.params.answer_key)
-      res.sendStatus(500)
-    }
-  })
-
-  router.delete('/answers/:answer_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    try {
-      // TODO: do some access control
-      await db.deleteAnswer(req.params.answer_key)
-      res.sendStatus(200)
-    } catch (err) {
-      console.error(err)
-      applogger.error({ error: err }, 'Cannot delete answer with _key ' + req.params.answer_key)
       res.sendStatus(500)
     }
   })

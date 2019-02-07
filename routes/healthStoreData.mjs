@@ -8,6 +8,7 @@ import express from 'express'
 import passport from 'passport'
 import getDB from '../DB/DB'
 import { applogger } from '../logger'
+import auditLogger from '../auditLogger'
 
 const router = express.Router()
 
@@ -87,7 +88,9 @@ export default async function () {
       taskItem.lastExecuted = newHealthStoreData.generatedTS
       // update the participant
       await db.replaceParticipant(participant._key, participant)
-      res.send(newHealthStoreData)
+      res.sendStatus(200)
+      applogger.info({ userKey: req.user._key, taskId: newHealthStoreData.taskId, studyKey: newHealthStoreData.studyKey }, 'Participant has sent health store data')
+      auditLogger.log('healthStoreDataCreated', req.user._key, newHealthStoreData.studyKey, newHealthStoreData.taskId, 'HealthStore data created by participant with key ' + participant._key + ' for study with key ' + newHealthStoreData.studyKey, 'healthStoreData', newHealthStoreData._key, newHealthStoreData)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new HealthStore Data')
       res.sendStatus(500)

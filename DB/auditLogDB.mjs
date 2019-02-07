@@ -9,17 +9,7 @@ export default async function (db, logger) {
   let collection = await utils.getCollection(db, 'auditlogs')
 
   return {
-    async addAuditLog (event, userKey, studyKey, message, refData, refKey, data) {
-      let newLog = {
-        timestamp: new Date(),
-        event,
-        userKey,
-        studyKey,
-        message,
-        refData,
-        refKey,
-        data
-      }
+    async addAuditLog (newLog) {
       let meta = await collection.save(newLog)
       newLog._key = meta._key
       return newLog
