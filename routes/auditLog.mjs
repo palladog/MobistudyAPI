@@ -14,30 +14,73 @@ const router = express.Router()
 export default async function () {
   var db = await getDB()
 
-  // 1. Get all logs of a user --> Admin can retrieve all audit logs
-  // 2. Delete log of user
-  // 3. User posts a new log for each event
-  // 4. User can query via params
-  // from: ISO string
-  // to: ISO string
-  // filterBy: user / study/ event type
-  // filter: value of the filter (the ID)
-  // limit: used for paging
-  // count: used for paging
-  // sortBy: timestamp, study, event type
-  // sortDirection: asc / desc
-
-  // query parameters:
-  router.get('/auditlog', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    try {
-      console.log('in log GET >> ', req.query)
-      if (req.user.role === 'admin') {
-        let result = await db.getAllLogs(req.query)
+  router.get('/auditlog/eventTypes', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role !== 'admin' && req.user.role !== 'researcher') {
+      res.sendStatus(403)
+    } else {
+      try {
+        let result = await db.getLogEventTypes(req.query)
         res.send(result)
-      } else res.sendStatus(403)
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot retrieve audit log')
-      res.sendStatus(500)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot retrieve audit log')
+        res.sendStatus(500)
+      }
+    }
+  })
+
+  // query parameters (optional):
+  // after: ISO timeStamp
+  // before: ISO timeStamp
+  // eventType: type of event
+  // studyKey
+  // taskId
+  // userEmail
+  // sortDirection: ASC or DESC
+  // offset: for pagination
+  // count: for pagination
+  router.get('/auditlog', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role !== 'admin' && req.user.role !== 'researcher') {
+      res.sendStatus(403)
+    } else {
+      try {
+        let result = await db.getAuditLogs(false,
+          req.query.after,
+          req.query.before,
+          req.query.eventType,
+          req.query.studyKey,
+          req.query.taskId,
+          req.query.userEmail,
+          req.query.sortDirection,
+          req.query.offset,
+          req.query.count)
+        res.send(result)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot retrieve audit log')
+        res.sendStatus(500)
+      }
+    }
+  })
+
+  router.get('/auditlog/count', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role !== 'admin' && req.user.role !== 'researcher') {
+      res.sendStatus(403)
+    } else {
+      try {
+        let result = await db.getAuditLogs(true,
+          req.query.after,
+          req.query.before,
+          req.query.eventType,
+          req.query.studyKey,
+          req.query.taskId,
+          req.query.userEmail,
+          req.query.sortDirection,
+          req.query.offset,
+          req.query.count)
+        res.send(result)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot retrieve audit log')
+        res.sendStatus(500)
+      }
     }
   })
 
