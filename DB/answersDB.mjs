@@ -32,8 +32,16 @@ export default async function (db, logger) {
     },
 
     async getAnswerByUserAndStudy (userKey, studyKey) {
-      var query = 'FOR answer IN answers FILTER answer.userKey == @userKey AND answer.studyKey == @studyKey RETURN data'
+      var query = 'FOR answer IN answers FILTER answer.userKey == @userKey AND answer.studyKey == @studyKey RETURN answer'
       let bindings = { userKey: userKey, studyKey: studyKey }
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
+    },
+
+    async getAnswerByStudy (studyKey) {
+      var query = 'FOR answer IN answers FILTER answer.studyKey == @studyKey RETURN answer'
+      let bindings = { studyKey: studyKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       return cursor.all()

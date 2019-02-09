@@ -35,6 +35,14 @@ export default async function (db, logger) {
       return cursor.all()
     },
 
+    async getHealthStoreDataByStudy (studyKey) {
+      var query = 'FOR data IN healthStoreData FILTER data.studyKey == @studyKey RETURN data'
+      let bindings = { studyKey: studyKey }
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
+    },
+
     async createHealthStoreData (newHealthStoreData) {
       let meta = await collection.save(newHealthStoreData)
       newHealthStoreData._key = meta._key
