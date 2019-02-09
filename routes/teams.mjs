@@ -166,7 +166,6 @@ export default async function () {
         // Get list of participants per study. Then delete each study.
         for (let i = 0; i < teamStudies.length; i++) {
           participantsByStudy = await db.getParticipantsByStudy(teamStudies[i]._key, null)
-          await db.deleteStudy(teamStudies[i]._key)
           for (let j = 0; j < participantsByStudy.length; j++) {
             // Per participant, remove the study
             let partKey = participantsByStudy[j]._key
@@ -175,8 +174,19 @@ export default async function () {
             studyArray = studyArray.filter(study => study.studyKey !== teamStudies[i]._key)
             participant.studies = studyArray
             await db.replaceParticipant(partKey, participant)
-            // TODO: remove also data of the studies the team is involved in
           }
+          // Delete store health data associated with study
+          let healthStoreData = await db.getHealthStoreDataByStudy(teamStudies[i]._key)
+          for (let k = 0; k < healthStoreData.length; k++) {
+            await db.deleteHealthStoreData(healthStoreData[k]._key)
+          }
+          // Delete answers associated with study
+          let answers = await db.getAnswerByStudy(teamStudies[i]._key)
+          for (let l = 0; l < answers.length; l++) {
+            await db.deleteAnswer(answers[l]._key)
+          }
+          // Delete the study
+          await db.deleteStudy(teamStudies[i]._key) 
         }
         await db.removeTeam(teamkey)
         res.sendStatus(200)
