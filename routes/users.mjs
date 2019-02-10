@@ -166,8 +166,7 @@ export default async function () {
         // Remove user from all teams
         let teamsOfUser = await db.getAllTeams(userKey)
         // For each team, find the user key in the researcher keys and remove
-        let i = 0
-        for (i = 0; i < teamsOfUser.length; i++) {
+        for (let i = 0; i < teamsOfUser.length; i++) {
           let teamKeyOfUser = teamsOfUser[i]._key
           let selTeam = await db.getOneTeam(teamKeyOfUser)
           let index = selTeam.researchersKeys.indexOf(userKey)
@@ -177,12 +176,12 @@ export default async function () {
           await db.updateTeam(teamKeyOfUser, selTeam)
         }
         // Then, FINALLY, remove user from db
-        let user = await db.findUser(userKey)
+        let user = await db.getOneUser(userKey)
         await db.removeUser(userKey)
         res.sendStatus(200)
 
         applogger.info({ email: user.email }, 'User deleted')
-        auditLogger.log('userCreated', userKey, undefined, undefined, 'User with email ' + user.email + ' deleted', 'users', userKey, undefined)
+        auditLogger.log('userDeleted', userKey, undefined, undefined, 'User with email ' + user.email + ' deleted', 'users', userKey, undefined)
       } else res.sendStatus(403)
     } catch (err) {
       // respond to request with error

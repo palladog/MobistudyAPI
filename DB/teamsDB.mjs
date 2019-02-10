@@ -80,7 +80,6 @@ export default async function (db, logger) {
     async removeTeam (teamKey) {
       let bindings = { 'tKey' : teamKey}
       let query = 'REMOVE { _key:@tKey } IN teams'
-      // TODO: delete also study data
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       return cursor.all()

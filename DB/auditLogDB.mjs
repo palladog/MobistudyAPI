@@ -34,8 +34,6 @@ export default async function (db, logger) {
         queryString += `FILTER DATE_DIFF(log.timestamp, @after, 's') <=0 AND DATE_DIFF(log.timestamp, @before, 's') >=0 `
         bindings.after = after
         bindings.before = before
-        console.log('after', after)
-        console.log('before', before)
       }
       if (eventType) {
         queryString += `FILTER log.event == @eventType `
@@ -82,6 +80,18 @@ export default async function (db, logger) {
         if (counts.length) return '' + counts[0]
         else return undefined
       } else return cursor.all()
+    },
+    async getLogsByUser (userKey) {
+      let bindings = { 'userKey' : userKey }
+      let query = 'FOR log IN auditlogs FILTER log.userKey == @userKey RETURN log'
+      applogger.trace('Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
+    },
+    // deletes a log
+    async deleteLog (_key) {
+      await collection.remove(_key)
+      return true
     }
   }
 }
