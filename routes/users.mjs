@@ -13,6 +13,7 @@ import { applogger } from '../logger'
 import auditLogger from '../auditLogger'
 import { sendEmail } from '../mailSender'
 import owasp from 'owasp-password-strength-test'
+import mellt from 'mellt'
 
 const router = express.Router()
 
@@ -82,15 +83,18 @@ export default async function () {
   router.post('/users', async (req, res) => {
     let user = req.body
     let userName = user.email.substring(0, user.email.indexOf('@'))
+    let password = user.password
+    let daysToCrack = mellt.CheckPassword(password)
+    console.log('DAYS ---> ', daysToCrack)
     // Check if password includes spaces or includes name in email
-    if (user.password.indexOf(' ') >= 0 || (user.password.toUpperCase().includes(userName.toUpperCase()))) {
+    if (password.indexOf(' ') >= 0 || (password.toUpperCase().includes(userName.toUpperCase())) || (daysToCrack < 365)) {
       res.sendStatus(400)
     } else {
-      let result = owasp.test(user.password)
+      let result = owasp.test(password)
       if (!result.strong) {
         res.sendStatus(400)
       } else {
-        let hashedPassword = bcrypt.hashSync(user.password, 8)
+        let hashedPassword = bcrypt.hashSync(password, 8)
         delete user.password
         user.hashedPassword = hashedPassword
         try {
