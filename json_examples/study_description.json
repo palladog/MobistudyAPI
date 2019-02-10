@@ -32,6 +32,7 @@
          "female",
          "other"
       ],
+      "numberOfParticipants": 5,
       "lifestyle":{
          "active":"yes",
          "smoker":"notrequired"
