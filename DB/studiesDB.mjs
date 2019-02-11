@@ -80,6 +80,7 @@ export default async function (db, logger) {
     // gets all the studies that match inclusion criteria
     async getMatchedNewStudies (userKey) {
       const query = `FOR study IN studies
+      FILTER !!study.publishedTS
       FOR participant IN participants
       LET age = DATE_DIFF(participant.dateOfBirth, DATE_NOW(), "year")
       FILTER participant.userKey == @userKey
