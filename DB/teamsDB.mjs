@@ -76,7 +76,7 @@ export default async function (db, logger) {
       return team
     },
 
-    //remove a team (Assumption: teamKey is the correct one)
+    // remove a team (Assumption: teamKey is the correct one)
     async removeTeam (teamKey) {
       let bindings = { 'tKey' : teamKey}
       let query = 'REMOVE { _key:@tKey } IN teams'
