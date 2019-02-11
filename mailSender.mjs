@@ -5,6 +5,8 @@ import { applogger } from './logger'
 
 const config = getConfig()
 
+// sends emails from a gmail account.
+// See this guide: https://medium.com/@RistaSB/use-expressjs-to-send-mails-with-gmail-oauth-2-0-and-nodemailer-d585bba71343
 export async function sendEmail (contact, subject, message) {
   const oAuth2Client = new googleAPIs.google.auth.OAuth2(
     config.gmail.client_id,
