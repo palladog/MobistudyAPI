@@ -188,7 +188,7 @@ export default async function () {
           if (index !== null) {
             selTeam.researchersKeys.splice(index, 1)
           }
-          await db.updateTeam(teamKeyOfUser, selTeam)
+          await db.replaceTeam(teamKeyOfUser, selTeam)
         }
         // Then, FINALLY, remove user from db
         let user = await db.getOneUser(userKey)
@@ -200,7 +200,7 @@ export default async function () {
       } else res.sendStatus(403)
     } catch (err) {
       // respond to request with error
-      applogger.error({ error: err }, 'Cannot delete team ')
+      applogger.error({ error: err }, 'Cannot delete user with key ' + req.params.user_key)
       res.sendStatus(500)
     }
   })
