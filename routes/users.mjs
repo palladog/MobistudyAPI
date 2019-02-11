@@ -37,7 +37,7 @@ export default async function () {
       }, config.auth.secret, {
         expiresIn: daysecs
       })
-      let serverlink = req.protocol + '://' + req.headers.host + '/resetPassword?email=' + email + '&token=' + token
+      let serverlink = req.protocol + '://' + req.headers.host + '/#/resetPassword?email=' + email + '&token=' + token
       sendEmail(email, 'Mobistudy Password recovery', `<p>You have requested to reset your password on Mobistudy.</p>
       <p>Please go to <a href="${serverlink}">this webpage</a> to set another password.</p>
       <p>Or use the following code if required: ${token}</p>
