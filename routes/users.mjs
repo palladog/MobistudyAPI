@@ -15,6 +15,14 @@ import { sendEmail } from '../mailSender'
 import owasp from 'owasp-password-strength-test'
 import mellt from 'mellt'
 
+owasp.config({
+  allowPassphrases: true,
+  maxLength: 70,
+  minLength: 8,
+  minPhraseLength: 10,
+  minOptionalTestsToPass: 3
+})
+
 const router = express.Router()
 
 const config = getConfig()
@@ -85,7 +93,6 @@ export default async function () {
     let userName = user.email.substring(0, user.email.indexOf('@'))
     let password = user.password
     let daysToCrack = mellt.CheckPassword(password)
-    console.log('DAYS ---> ', daysToCrack)
     // Check if password includes spaces or includes name in email
     if (password.indexOf(' ') >= 0 || (password.toUpperCase().includes(userName.toUpperCase())) || (daysToCrack < 365)) {
       res.sendStatus(400)
