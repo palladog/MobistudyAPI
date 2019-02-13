@@ -13,7 +13,7 @@ import { applogger } from '../logger'
 import auditLogger from '../auditLogger'
 import { sendEmail } from '../mailSender'
 import owasp from 'owasp-password-strength-test'
-import mellt from 'mellt'
+import zxcvbn from 'zxcvbn'
 
 owasp.config({
   allowPassphrases: true,
@@ -71,20 +71,32 @@ export default async function () {
         res.sendStatus(400)
       } else {
         let email = decoded.email
-        let newpasssword = req.body.password
-        let hashedPassword = bcrypt.hashSync(newpasssword, 8)
-        let existing = await db.findUser(email)
-        if (!existing) {
-          applogger.info('Resetting password, email ' + email + ' not registered')
-          return res.status(409).send('This email is not registered')
+        let userName = email.substring(0, user.email.indexOf('@'))
+        let newPasssword = req.body.password
+        let strengthCheck = zxcvbn(newPasssword)
+        // Check if password includes spaces or includes name in email
+        if (newPasssword.indexOf(' ') >= 0 || (newPasssword.toUpperCase().includes(userName.toUpperCase())) || strengthCheck.score < 1) {
+          res.sendStatus(400)
+        } else {
+          let result = owasp.test(newPasssword)
+          if (!result.strong) {
+            res.sendStatus(400)
+          } else {
+            let hashedPassword = bcrypt.hashSync(newPasssword, 8)
+            let existing = await db.findUser(email)
+            if (!existing) {
+              applogger.info('Resetting password, email ' + email + ' not registered')
+              return res.status(409).send('This email is not registered')
+            }
+            await db.updateUser(existing._key, {
+              hashedPassword: hashedPassword
+            })
+            res.sendStatus(200)
+            applogger.info({ email: req.user.email }, 'User has changed the password')
+            auditLogger.log('resetPassword', existing._key, undefined, undefined, 'User ' + email + ' has changed the password', 'users', existing._key, undefined)
+            }      
+          }   
         }
-        await db.updateUser(existing._key, {
-          hashedPassword: hashedPassword
-        })
-        res.sendStatus(200)
-        applogger.info({ email: req.user.email }, 'User has changed the password')
-        auditLogger.log('resetPassword', existing._key, undefined, undefined, 'User ' + email + ' has changed the password', 'users', existing._key, undefined)
-      }
     } else res.sendStatus(400)
   })
 
@@ -92,9 +104,9 @@ export default async function () {
     let user = req.body
     let userName = user.email.substring(0, user.email.indexOf('@'))
     let password = user.password
-    let daysToCrack = mellt.CheckPassword(password)
+    let strengthCheck = zxcvbn(password)
     // Check if password includes spaces or includes name in email
-    if (password.indexOf(' ') >= 0 || (password.toUpperCase().includes(userName.toUpperCase())) || (daysToCrack < 365)) {
+    if (password.indexOf(' ') >= 0 || (password.toUpperCase().includes(userName.toUpperCase())) || strengthCheck.score < 1) {
       res.sendStatus(400)
     } else {
       let result = owasp.test(password)
