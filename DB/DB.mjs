@@ -13,6 +13,7 @@ import getTeamsDB from './teamsDB'
 import getParticipantsDB from './participantsDB'
 import getHealthStoreDataDB from './healthStoreDataDB'
 import getAuditLogDB from './auditLogDB'
+import getStudyStatsDB from './studyStatsDB'
 
 import getConfig from '../config'
 
@@ -42,6 +43,8 @@ export default async function (logger) {
     dao = Object.assign(healthStoreData, dao)
     let auditLog = await getAuditLogDB(db)
     dao = Object.assign(auditLog, dao)
+    let studyStats = await getStudyStatsDB(db)
+    dao = Object.assign(studyStats, dao)
 
     // TODO: add new collections here
     return dao

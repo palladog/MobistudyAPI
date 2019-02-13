@@ -12,6 +12,16 @@ import getConfig from '../config'
 import { applogger } from '../logger'
 import auditLogger from '../auditLogger'
 import { sendEmail } from '../mailSender'
+import owasp from 'owasp-password-strength-test'
+import mellt from 'mellt'
+
+owasp.config({
+  allowPassphrases: true,
+  maxLength: 70,
+  minLength: 8,
+  minPhraseLength: 10,
+  minOptionalTestsToPass: 3
+})
 
 const router = express.Router()
 
@@ -80,22 +90,34 @@ export default async function () {
 
   router.post('/users', async (req, res) => {
     let user = req.body
-    let hashedPassword = bcrypt.hashSync(user.password, 8)
-    delete user.password
-    user.hashedPassword = hashedPassword
-    try {
-      let existing = await db.findUser(user.email)
-      if (existing) return res.status(409).send('This email is already registered')
-      if (user.role === 'admin') return res.sendStatus(403)
-      // if (user.role === 'researcher' && user.invitationCode !== '827363423') return res.status(400).send('Bad invitation code')
-      let newuser = await db.createUser(user)
-      res.sendStatus(200)
-      applogger.info({ email: newuser.email }, 'New user created')
-      auditLogger.log('userCreated', newuser._key, undefined, undefined, 'New user created with email ' + newuser.email, 'users', newuser._key, undefined)
-      sendEmail(newuser.email, 'Mobistudy Registration Confirmation', `<p>You have been successfully registered on Mobistudy.</p>`)
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot store new user')
-      res.sendStatus(500)
+    let userName = user.email.substring(0, user.email.indexOf('@'))
+    let password = user.password
+    let daysToCrack = mellt.CheckPassword(password)
+    // Check if password includes spaces or includes name in email
+    if (password.indexOf(' ') >= 0 || (password.toUpperCase().includes(userName.toUpperCase())) || (daysToCrack < 365)) {
+      res.sendStatus(400)
+    } else {
+      let result = owasp.test(password)
+      if (!result.strong) {
+        res.sendStatus(400)
+      } else {
+        let hashedPassword = bcrypt.hashSync(password, 8)
+        delete user.password
+        user.hashedPassword = hashedPassword
+        try {
+          let existing = await db.findUser(user.email)
+          if (existing) return res.status(409).send('This email is already registered')
+          if (user.role === 'admin') return res.sendStatus(403)
+          let newuser = await db.createUser(user)
+          res.sendStatus(200)
+          applogger.info({ email: newuser.email }, 'New user created')
+          auditLogger.log('userCreated', newuser._key, undefined, undefined, 'New user created with email ' + newuser.email, 'users', newuser._key, undefined)
+          sendEmail(newuser.email, 'Mobistudy Registration Confirmation', `<p>You have been successfully registered on Mobistudy.</p>`)
+        } catch (err) {
+          applogger.error({ error: err }, 'Cannot store new user')
+          res.sendStatus(500)
+        }
+      }
     }
   })
 
