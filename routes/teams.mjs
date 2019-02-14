@@ -102,7 +102,13 @@ export default async function () {
     let JToken = req.body.invitationCode
     // Verify the JWT
     try {
-      var decoded = jwt.verify(JToken, config.auth.secret)
+      try {
+        var decoded = jwt.verify(JToken, config.auth.secret)
+      } catch (err) {
+        applogger.warn({ token: JToken }, 'An invitaiton code for a team has wrong format')
+        res.sendStatus(400)
+        return
+      }
       if (new Date().getTime() >= (decoded.exp * 1000)) {
         applogger.error('Adding researcher to team, token has expired')
         res.sendStatus(400)
@@ -186,7 +192,7 @@ export default async function () {
             await db.deleteAnswer(answers[l]._key)
           }
           // Delete the study
-          await db.deleteStudy(teamStudies[i]._key) 
+          await db.deleteStudy(teamStudies[i]._key)
         }
         await db.removeTeam(teamkey)
         res.sendStatus(200)
