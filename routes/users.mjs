@@ -71,7 +71,7 @@ export default async function () {
         res.sendStatus(400)
       } else {
         let email = decoded.email
-        let userName = email.substring(0, user.email.indexOf('@'))
+        let userName = email.substring(0, email.indexOf('@'))
         let newPasssword = req.body.password
         let strengthCheck = zxcvbn(newPasssword)
         // Check if password includes spaces or includes name in email
@@ -92,7 +92,7 @@ export default async function () {
               hashedPassword: hashedPassword
             })
             res.sendStatus(200)
-            applogger.info({ email: req.user.email }, 'User has changed the password')
+            applogger.info({ email: email }, 'User has changed the password')
             auditLogger.log('resetPassword', existing._key, undefined, undefined, 'User ' + email + ' has changed the password', 'users', existing._key, undefined)
             }      
           }   
