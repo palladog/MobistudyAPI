@@ -42,6 +42,8 @@ export default async function () {
     if (req.user.role !== 'admin' && req.user.role !== 'researcher') {
       res.sendStatus(403)
     } else {
+      // TODO: in the case of a researcher a study must be specified and the
+      // researcher has to be allowed to see that study
       try {
         let result = await db.getAuditLogs(false,
           req.query.after,
