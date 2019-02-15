@@ -27,9 +27,11 @@ export default async function (db, logger) {
         queryString = 'RETURN COUNT ( '
       }
       let bindings = { }
-      queryString += `FOR log IN auditlogs
-      FOR user IN users
-      FILTER user._key == log.userKey `
+      queryString += `FOR log IN auditlogs `
+      if (!countOnly) {
+        queryString += ` FOR user IN users
+        FILTER user._key == log.userKey `
+      }
       if (after && before) {
         queryString += `FILTER DATE_DIFF(log.timestamp, @after, 's') <=0 AND DATE_DIFF(log.timestamp, @before, 's') >=0 `
         bindings.after = after
@@ -73,6 +75,8 @@ export default async function (db, logger) {
           event: log.event,
           userEmail: user.email,
           message: log.message,
+          refData: log.refData,
+          refKey: log.refKey,
           data: log.data
         }`
       }
