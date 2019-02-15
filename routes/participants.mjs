@@ -41,9 +41,17 @@ export default async function () {
         } else if (req.query.teamKey) {
           participants = await db.getParticipantsByTeam(req.query.teamKey, req.query.currentStatus)
         } else if (req.query.currentStatus) {
-          participants = await db.getParticipantsByCurrentStatus(req.query.currentStatus)
+          if (req.user.role === 'researcher') {
+            participants = await db.getParticipantsByResearcher(req.user._key, req.query.currentStatus)
+          } else { // admin
+            participants = await db.getParticipantsByCurrentStatus(req.query.currentStatus)
+          }
         } else {
-          participants = await db.getAllParticipants()
+          if (req.user.role === 'researcher') {
+            participants = await db.getParticipantsByResearcher(req.user._key)
+          } else {
+            participants = await db.getAllParticipants()
+          }
         }
         res.json(participants)
       } else res.sendStatus(403)

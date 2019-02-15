@@ -89,7 +89,7 @@ export default async function (db, logger) {
       } else return cursor.all()
     },
     async getLogsByUser (userKey) {
-      let bindings = { 'userKey' : userKey }
+      let bindings = { 'userKey': userKey }
       let query = 'FOR log IN auditlogs FILTER log.userKey == @userKey RETURN log'
       applogger.trace('Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
