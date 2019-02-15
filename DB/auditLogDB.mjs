@@ -72,7 +72,8 @@ export default async function (db, logger) {
           timestamp: log.timestamp,
           event: log.event,
           userEmail: user.email,
-          message: log.message
+          message: log.message,
+          data: log.data
         }`
       }
       applogger.trace(bindings, 'Querying "' + queryString + '"')
