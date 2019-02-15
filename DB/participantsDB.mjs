@@ -74,7 +74,18 @@ export default async function (db, logger) {
       return cursor.all()
     },
 
-    async getParticipantsByStudyCurrentStatus (currentStatus) {
+    async getParticipantsStatusCountByStudy (studykey) {
+      let bindings = { 'studyKey': studykey }
+      var query = `FOR participant IN participants
+      FILTER @studyKey IN participant.studies[*].studyKey
+      COLLECT statuses = participant.studies[* FILTER CURRENT.studyKey == @studyKey].currentStatus WITH COUNT INTO statuesLen      
+      RETURN { status: FIRST(statuses), count: statuesLen }`
+      applogger.trace(bindings, 'Querying "' + query + '"')
+      let cursor = await db.query(query, bindings)
+      return cursor.all()
+    },
+
+    async getParticipantsByCurrentStatus (currentStatus) {
       let bindings = { 'currentStatus': currentStatus }
       var query = 'FOR participant IN participants FILTER @currentStatus IN participant.studies[*].currentStatus RETURN participant'
       applogger.trace(bindings, 'Querying "' + query + '"')

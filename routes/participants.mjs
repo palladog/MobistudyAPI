@@ -41,7 +41,7 @@ export default async function () {
         } else if (req.query.teamKey) {
           participants = await db.getParticipantsByTeam(req.query.teamKey, req.query.currentStatus)
         } else if (req.query.currentStatus) {
-          participants = await db.getParticipantsByStudyCurrentStatus(req.query.currentStatus)
+          participants = await db.getParticipantsByCurrentStatus(req.query.currentStatus)
         } else {
           participants = await db.getAllParticipants()
         }
@@ -253,6 +253,24 @@ export default async function () {
       auditLogger.log('participantStudyUpdate', req.user._key, payload.studyKey, undefined, 'Participant with key ' + participant._key + ' has changed studies status', 'participants', participant._key, payload)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot update participant with user key ' + userKey)
+      res.sendStatus(500)
+    }
+  })
+
+  router.get('/participants/statusStats/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    try {
+      if (req.user.role === 'participant') {
+        res.sendStatus(403)
+      } else if (req.user.role === 'researcher') {
+        if (req.user.role === 'researcher') {
+          let team = await db.getAllTeams(req.user._key, req.params.studyKey)
+          if (team.length === 0) return res.sendStatus(403)
+        }
+        let participants = await db.getParticipantsStatusCountByStudy(req.params.studyKey)
+        res.json(participants)
+      }
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot retrieve participants')
       res.sendStatus(500)
     }
   })

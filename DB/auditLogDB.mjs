@@ -51,15 +51,17 @@ export default async function (db, logger) {
         queryString += `FILTER user.email == @userEmail `
         bindings.userEmail = userEmail
       }
-      if (!sortDirection) {
-        sortDirection = 'DESC'
-      }
-      queryString += `SORT log.timestamp @sortDirection `
-      bindings.sortDirection = sortDirection
-      if (!countOnly && !!offset && !!count) {
-        queryString += `LIMIT @offset, @count `
-        bindings.offset = offset
-        bindings.count = count
+      if (!countOnly) {
+        if (!sortDirection) {
+          sortDirection = 'DESC'
+        }
+        queryString += `SORT log.timestamp @sortDirection `
+        bindings.sortDirection = sortDirection
+        if (!!offset && !!count) {
+          queryString += `LIMIT @offset, @count `
+          bindings.offset = parseInt(offset)
+          bindings.count = parseInt(count)
+        }
       }
 
       if (countOnly) {
