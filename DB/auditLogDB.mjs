@@ -48,7 +48,7 @@ export default async function (db, logger) {
         bindings.taskId = taskId
       }
       if (userEmail) {
-        queryString += `FILTER user.email == @userEmail `
+        queryString += ` FILTER LIKE(user.email, CONCAT('%', @userEmail, '%'), true) `
         bindings.userEmail = userEmail
       }
       if (!countOnly) {
