@@ -48,27 +48,37 @@ export default async function (db, logger) {
 
     // currentStatus is optional
     async getParticipantsByStudy (studykey, currentStatus) {
-      let filter = ' FILTER @studyKey IN participant.studies[*].studyKey '
       let bindings = { 'studyKey': studykey }
+
+      let query = 'FOR participant IN participants '
+      query += ' FILTER @studyKey IN participant.studies[*].studyKey '
       if (currentStatus) {
         bindings.currentStatus = currentStatus
-        filter += ' AND @currentStatus IN participant.studies[*].currentStatus  '
+        query += ' AND @currentStatus IN participant.studies[*].currentStatus  '
       }
-      var query = 'FOR participant IN participants ' + filter + ' RETURN participant'
+      query += `LET filteredStudies = participant.studies[* FILTER CURRENT.studyKey == @studyKey]
+      LET retval = UNSET(participant, 'studies')`
+      query += ` RETURN MERGE_RECURSIVE(retval, { studies: filteredStudies })`
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       return cursor.all()
     },
 
-    async getParticipantsByResearcher (researcherKey) {
+    async getParticipantsByResearcher (researcherKey, currentStatus) {
+      let bindings = { 'researcherKey': researcherKey }
       let query = `FOR team IN teams
       FILTER @researcherKey IN team.researchersKeys
       FOR study IN studies
       FILTER study.teamKey == team._key
-      FOR participant IN participants
-      FILTER study._key IN participant.studies[*].studyKey
-      RETURN participant._key`
-      let bindings = { 'researcherKey': researcherKey }
+      FOR participant IN participants`
+      if (currentStatus) {
+        bindings.currentStatus = currentStatus
+        query += ` FILTER @currentStatus IN participant.studies[* FILTER CURRENT.studyKey == study._key].currentStatus `
+      }
+      query += `FILTER study._key IN participant.studies[*].studyKey
+      LET filteredStudies = participant.studies[* FILTER CURRENT.studyKey == study._key]
+      LET retval = UNSET(participant, 'studies')
+      RETURN MERGE_RECURSIVE(retval, { studies: filteredStudies })`
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       return cursor.all()
@@ -78,7 +88,7 @@ export default async function (db, logger) {
       let bindings = { 'studyKey': studykey }
       var query = `FOR participant IN participants
       FILTER @studyKey IN participant.studies[*].studyKey
-      COLLECT statuses = participant.studies[* FILTER CURRENT.studyKey == @studyKey].currentStatus WITH COUNT INTO statuesLen      
+      COLLECT statuses = participant.studies[* FILTER CURRENT.studyKey == @studyKey].currentStatus WITH COUNT INTO statuesLen
       RETURN { status: FIRST(statuses), count: statuesLen }`
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)

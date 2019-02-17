@@ -27,9 +27,11 @@ export default async function (db, logger) {
         queryString = 'RETURN COUNT ( '
       }
       let bindings = { }
-      queryString += `FOR log IN auditlogs
-      FOR user IN users
-      FILTER user._key == log.userKey `
+      queryString += `FOR log IN auditlogs `
+      if (!countOnly) {
+        queryString += ` FOR user IN users
+        FILTER user._key == log.userKey `
+      }
       if (after && before) {
         queryString += `FILTER DATE_DIFF(log.timestamp, @after, 's') <=0 AND DATE_DIFF(log.timestamp, @before, 's') >=0 `
         bindings.after = after
@@ -48,7 +50,7 @@ export default async function (db, logger) {
         bindings.taskId = taskId
       }
       if (userEmail) {
-        queryString += `FILTER user.email == @userEmail `
+        queryString += ` FILTER LIKE(user.email, CONCAT('%', @userEmail, '%'), true) `
         bindings.userEmail = userEmail
       }
       if (!countOnly) {
@@ -72,7 +74,10 @@ export default async function (db, logger) {
           timestamp: log.timestamp,
           event: log.event,
           userEmail: user.email,
-          message: log.message
+          message: log.message,
+          refData: log.refData,
+          refKey: log.refKey,
+          data: log.data
         }`
       }
       applogger.trace(bindings, 'Querying "' + queryString + '"')
@@ -84,7 +89,7 @@ export default async function (db, logger) {
       } else return cursor.all()
     },
     async getLogsByUser (userKey) {
-      let bindings = { 'userKey' : userKey }
+      let bindings = { 'userKey': userKey }
       let query = 'FOR log IN auditlogs FILTER log.userKey == @userKey RETURN log'
       applogger.trace('Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
