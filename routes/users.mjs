@@ -13,7 +13,7 @@ import { applogger } from '../logger'
 import auditLogger from '../auditLogger'
 import { sendEmail } from '../mailSender'
 import owasp from 'owasp-password-strength-test'
-import mellt from 'mellt'
+import zxcvbn from 'zxcvbn'
 
 owasp.config({
   allowPassphrases: true,
@@ -26,6 +26,21 @@ owasp.config({
 const router = express.Router()
 
 const config = getConfig()
+
+const pwdCheck = function (email, password) {
+  let userName = email.substring(0, email.indexOf('@'))
+  let strengthCheck = zxcvbn(password)
+  // Check if password includes spaces or includes name in email
+  if (password.indexOf(' ') >= 0 || (password.toUpperCase().includes(userName.toUpperCase())) || strengthCheck.score < 1) {
+    return false
+  } else {
+    let result = owasp.test(password)
+    if (!result.strong) {
+      return false
+    }
+  }
+  return true
+}
 
 export default async function () {
   const db = await getDB()
@@ -71,8 +86,9 @@ export default async function () {
         res.sendStatus(400)
       } else {
         let email = decoded.email
-        let newpasssword = req.body.password
-        let hashedPassword = bcrypt.hashSync(newpasssword, 8)
+        let newPasssword = req.body.password
+        if (!pwdCheck(email, newPasssword)) return res.status(400).send('Password too weak')
+        let hashedPassword = bcrypt.hashSync(newPasssword, 8)
         let existing = await db.findUser(email)
         if (!existing) {
           applogger.info('Resetting password, email ' + email + ' not registered')
@@ -82,7 +98,7 @@ export default async function () {
           hashedPassword: hashedPassword
         })
         res.sendStatus(200)
-        applogger.info({ email: req.user.email }, 'User has changed the password')
+        applogger.info({ email: email }, 'User has changed the password')
         auditLogger.log('resetPassword', existing._key, undefined, undefined, 'User ' + email + ' has changed the password', 'users', existing._key, undefined)
       }
     } else res.sendStatus(400)
@@ -90,34 +106,23 @@ export default async function () {
 
   router.post('/users', async (req, res) => {
     let user = req.body
-    let userName = user.email.substring(0, user.email.indexOf('@'))
     let password = user.password
-    let daysToCrack = mellt.CheckPassword(password)
-    // Check if password includes spaces or includes name in email
-    if (password.indexOf(' ') >= 0 || (password.toUpperCase().includes(userName.toUpperCase())) || (daysToCrack < 365)) {
-      res.sendStatus(400)
-    } else {
-      let result = owasp.test(password)
-      if (!result.strong) {
-        res.sendStatus(400)
-      } else {
-        let hashedPassword = bcrypt.hashSync(password, 8)
-        delete user.password
-        user.hashedPassword = hashedPassword
-        try {
-          let existing = await db.findUser(user.email)
-          if (existing) return res.status(409).send('This email is already registered')
-          if (user.role === 'admin') return res.sendStatus(403)
-          let newuser = await db.createUser(user)
-          res.sendStatus(200)
-          applogger.info({ email: newuser.email }, 'New user created')
-          auditLogger.log('userCreated', newuser._key, undefined, undefined, 'New user created with email ' + newuser.email, 'users', newuser._key, undefined)
-          sendEmail(newuser.email, 'Mobistudy Registration Confirmation', `<p>You have been successfully registered on Mobistudy.</p>`)
-        } catch (err) {
-          applogger.error({ error: err }, 'Cannot store new user')
-          res.sendStatus(500)
-        }
-      }
+    if (!pwdCheck(user.email, password)) return res.status(400).send('Password too weak')
+    let hashedPassword = bcrypt.hashSync(password, 8)
+    delete user.password
+    user.hashedPassword = hashedPassword
+    try {
+      let existing = await db.findUser(user.email)
+      if (existing) return res.status(409).send('This email is already registered')
+      if (user.role === 'admin') return res.sendStatus(403)
+      let newuser = await db.createUser(user)
+      res.sendStatus(200)
+      applogger.info({ email: newuser.email }, 'New user created')
+      auditLogger.log('userCreated', newuser._key, undefined, undefined, 'New user created with email ' + newuser.email, 'users', newuser._key, undefined)
+      sendEmail(newuser.email, 'Mobistudy Registration Confirmation', `<p>You have been successfully registered on Mobistudy.</p>`)
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot store new user')
+      res.sendStatus(500)
     }
   })
 

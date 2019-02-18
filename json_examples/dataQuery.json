@@ -2,6 +2,7 @@
 	"userKey": "asdasd",
 	"studyKey": "asdasd",
 	"taskId": 3,
+	"dataType": "steps",
    "createdTS": "timestamp on the server",
    "generatedTS": "date as generated on the app",
 	"healthData": [
