@@ -13,13 +13,17 @@ This is the MVC version of Mobistudy, it includes:
 - create and manage users, teams, participants
 - security and access control
 
+
 ## Version 0.2.x
 
 It will include some improvements to version 0.1.x:
 
-- add pictures and markdown text in questions and some study description fields
+- forms can be drafted and kept local to the research team
+- add pictures and markdown text in questions and some fields
 - Docker project for the server
-- new activities like 6mwt, snap a picture
+- educational content, with markdown, pictures and links
+- new activities like 6mwt, snap a picture, propose educational content
+
 
 ## Version 1.0.x
 
