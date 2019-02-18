@@ -10,7 +10,7 @@ This is the back-end REST API of MobiStudy.
 
 ## How to start it
 
-The code is written using ES6 module, which are still experimental in nojdejs.
+The code is written using ES6 module, which are still experimental in nodejs.
 To start it:
 
     node --experimental-modules .\bin\www.mjs
