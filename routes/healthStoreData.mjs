@@ -32,7 +32,7 @@ export default async function () {
           let team = await db.getAllTeams(req.user._key, req.query.studyKey)
           if (team.length === 0) return res.sendStatus(403)
           else {
-            let storeData = await db.getAllHealthStoreData()
+            let storeData = await db.getHealthStoreDataByStudy(req.query.studyKey)
             res.send(storeData)
           }
         }
