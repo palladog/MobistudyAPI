@@ -16,6 +16,7 @@ export default async function () {
   var db = await getDB()
 
   // Get all health store data
+  // query params: studyKey to filter by study
   router.get('/healthStoreData', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       if (req.user.role === 'researcher') {
