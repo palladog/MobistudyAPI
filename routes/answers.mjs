@@ -17,9 +17,25 @@ export default async function () {
 
   router.get('/answers', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
-      // TODO: do some access control
-      let answers = await db.getAllAnswers()
-      res.send(answers)
+      if (req.user.role === 'researcher') {
+        // extra check about the teams
+        if (req.query.teamKey) {
+          let team = await db.getOneTeam(req.query.teamKey)
+          if (!team.researchersKeys.includes(req.user._key)) return res.sendStatus(403)
+          else {
+            let answers = await db.getAllAnswers()
+            res.send(answers)
+          }
+        }
+        if (req.query.studyKey) {
+          let team = await db.getAllTeams(req.user._key, req.query.studyKey)
+          if (team.length === 0) return res.sendStatus(403)
+          else {
+            let answers = await db.getAnswerByStudy(req.query.studyKey)
+            res.send(answers)
+          }
+        }
+      }
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve answers')
       res.sendStatus(500)
@@ -30,16 +46,6 @@ export default async function () {
     try {
       // TODO: do some access control
       let answer = await db.getOneAnswer(req.params.answer_key)
-      res.send(answer)
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot retrieve answer with _key ' + req.params.answer_key)
-      res.sendStatus(500)
-    }
-  })
-
-  router.get('/answers/byStudy/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    try {
-      let answer = await db.getAnswerByStudy(req.params.study_key)
       res.send(answer)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve answer with _key ' + req.params.answer_key)

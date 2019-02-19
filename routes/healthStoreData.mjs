@@ -32,7 +32,7 @@ export default async function () {
           let team = await db.getAllTeams(req.user._key, req.query.studyKey)
           if (team.length === 0) return res.sendStatus(403)
           else {
-            let storeData = await db.getAllHealthStoreData()
+            let storeData = await db.getHealthStoreDataByStudy(req.query.studyKey)
             res.send(storeData)
           }
         }
@@ -61,17 +61,6 @@ export default async function () {
   router.get('/healthStoreData/:userKey/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       let storeData = await db.getHealthStoreDataByUserAndStudy(req.params.userKey, req.params.studyKey)
-      res.send(storeData)
-    } catch (err) {
-      applogger.error({ error: err }, 'Cannot retrieve healthStore Data ')
-      res.sendStatus(500)
-    }
-  })
-
-   // Get health store data for a study
-   router.get('/healthStoreData/byStudy/s/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    try {
-      let storeData = await db.getHealthStoreDataByStudy(req.params.studyKey)
       res.send(storeData)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot retrieve healthStore Data ')
