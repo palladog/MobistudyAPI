@@ -68,6 +68,17 @@ export default async function () {
     }
   })
 
+   // Get health store data for a study
+   router.get('/healthStoreData/byStudy/s/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    try {
+      let storeData = await db.getHealthStoreDataByStudy(req.params.studyKey)
+      res.send(storeData)
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot retrieve healthStore Data ')
+      res.sendStatus(500)
+    }
+  })
+
   router.post('/healthStoreData', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newHealthStoreData = req.body
     if (req.user.role !== 'participant') return res.sendStatus(403)

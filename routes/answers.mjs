@@ -37,6 +37,16 @@ export default async function () {
     }
   })
 
+  router.get('/answers/byStudy/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    try {
+      let answer = await db.getAnswerByStudy(req.params.study_key)
+      res.send(answer)
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot retrieve answer with _key ' + req.params.answer_key)
+      res.sendStatus(500)
+    }
+  })
+
   router.post('/answers', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newanswer = req.body
     if (req.user.role !== 'participant') return res.sendStatus(403)
