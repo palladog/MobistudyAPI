@@ -34,6 +34,7 @@
       "acceptedTS": "2019-02-27T12:46:07.294Z",
       "criteriaAnswers": ["Yes", "No"],
       "withdrawalTS": "2019-02-27T12:46:07.294Z",
+	  "reminders": true,
       "withdrawalReason": "string",
       "taskItemsConsent": [
         { "taskId": 1, "consented": true, "lastExecuted": "2019-02-27T12:46:07.294Z" }
@@ -47,6 +48,7 @@
       "studyKey": "key",
       "currentStatus": "completed",
       "acceptedTS": "2019-02-27T12:46:07.294Z",
+	  "reminders": true,
       "criteriaAnswers": ["No", "No"],
       "completedTS": "2019-02-27T12:46:07.294Z",
       "taskItemsConsent": [

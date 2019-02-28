@@ -42,9 +42,16 @@ export default async function () {
     if (req.user.role !== 'admin' && req.user.role !== 'researcher') {
       res.sendStatus(403)
     } else {
-      // TODO: in the case of a researcher a study must be specified and the
-      // researcher has to be allowed to see that study
       try {
+        // Researcher: a study must be specified and the researcher has to be allowed to see that study
+        if (req.user.role === 'researcher') {
+          if (req.query.teamKey && req.query.studyKey) {
+            let teamRes = await db.getOneTeam(req.query.teamKey)
+            if (!teamRes.researchersKeys.includes(req.user._key)) return res.sendStatus(403)
+            let team = await db.getAllTeams(req.user._key, req.query.studyKey)
+            if (team.length === 0) return res.sendStatus(403)
+        } return res.sendStatus(403)
+      }
         let result = await db.getAuditLogs(false,
           req.query.after,
           req.query.before,
