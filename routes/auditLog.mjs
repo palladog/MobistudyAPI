@@ -50,8 +50,8 @@ export default async function () {
             if (!teamRes.researchersKeys.includes(req.user._key)) return res.sendStatus(403)
             let team = await db.getAllTeams(req.user._key, req.query.studyKey)
             if (team.length === 0) return res.sendStatus(403)
-        } return res.sendStatus(403)
-      }
+          } return res.sendStatus(403)
+        }
         let result = await db.getAuditLogs(false,
           req.query.after,
           req.query.before,
@@ -61,7 +61,8 @@ export default async function () {
           req.query.userEmail,
           req.query.sortDirection,
           req.query.offset,
-          req.query.count)
+          req.query.count
+        )
         res.send(result)
       } catch (err) {
         applogger.error({ error: err }, 'Cannot retrieve audit log')
@@ -84,7 +85,8 @@ export default async function () {
           req.query.userEmail,
           req.query.sortDirection,
           req.query.offset,
-          req.query.count)
+          req.query.count
+        )
         res.send(result)
       } catch (err) {
         applogger.error({ error: err }, 'Cannot retrieve audit log')
