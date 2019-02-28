@@ -69,6 +69,7 @@ export default async function () {
       <p>This code will expire after 24 hours.</p>`)
       res.sendStatus(200)
       applogger.info({ email: req.user.email }, 'Resest password email sent')
+      applogger.info({ email: req.body.email }, 'Reset password email sent')
       auditLogger.log('resetPasswordEmail', existing._key, undefined, undefined, 'User ' + email + ' has requested a reset password email', 'users', existing._key, undefined)
     } else res.sendStatus(400)
   })
