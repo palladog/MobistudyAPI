@@ -3,14 +3,14 @@
 	"studyKey": "asdasd",
 	"taskId": 3,
 	"dataType": "steps",
-   "createdTS": "timestamp on the server",
-   "generatedTS": "date as generated on the app",
+	"createdTS": "timestamp on the server",
+	"generatedTS": "date as generated on the app",
 	"healthData": [
 		{
-          "startDate": "ISO STRING",
-          "endDate": "ISO STRING",
-          "unit": 'count',
-          "value": 150
-        }
+			"startDate": "2019-02-27T12:46:07.294Z",
+			"endDate": "2019-02-27T12:46:07.294Z",
+			"unit": "count",
+			"value": 150
+		}
 	]
 }
