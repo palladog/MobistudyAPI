@@ -1,12 +1,11 @@
 {
   "userKey": "key",
-  "createdTS": "ISO STRING",
-  "updatedTS": "ISO STRING",
+  "createdTS": "2019-02-27T12:46:07.294Z",
+  "updatedTS": "2019-02-27T12:46:07.294Z",
   "name": "Dario",
   "surname": "Salvi",
   "gender": "male",
-  "dateOfBirth": "ISO STRING",
-  "gender": "male",
+  "dateOfBirth": "2019-02-27T12:46:07.294Z",
   "diseases": [
     { "name": "Heart Failure", "conceptId": "121212" }
   ],
@@ -21,52 +20,51 @@
     {
       "studyKey": "key",
       "currentStatus": "accepted",
-      "acceptedTS": "ISO string",
-	  "reminders": true,
-	  "taskItemsConsent": [
-			{ "taskId": 1, "consented": true, "lastExecuted": "ISO string" }
-		],
-	  "extraItemsConsent": [
-		{ "consented": true }
-	  ]
+      "acceptedTS": "2019-02-27T12:46:07.294Z",
+      "taskItemsConsent": [
+        { "taskId": 1, "consented": true, "lastExecuted": "2019-02-27T12:46:07.294Z" }
+      ],
+      "extraItemsConsent": [
+        { "consented": true }
+      ]
     },
     {
       "studyKey": "key",
       "currentStatus": "withdrawn",
-      "acceptedTS": "ISO string",
+      "acceptedTS": "2019-02-27T12:46:07.294Z",
       "criteriaAnswers": ["Yes", "No"],
+      "withdrawalTS": "2019-02-27T12:46:07.294Z",
 	  "reminders": true,
-      "withdrawalTS": "ISO string",
       "withdrawalReason": "string",
       "taskItemsConsent": [
-        { "taskId": 1, "consented": true, "lastExecuted": "ISO string" }
+        { "taskId": 1, "consented": true, "lastExecuted": "2019-02-27T12:46:07.294Z" }
       ],
-	  "extraItemsConsent": [
-		{ "consented": true },
-		{ "consented": false }
-	  ]
+      "extraItemsConsent": [
+        { "consented": true },
+        { "consented": false }
+      ]
     },
     {
       "studyKey": "key",
       "currentStatus": "completed",
-      "acceptedTS": "ISO string",
+      "acceptedTS": "2019-02-27T12:46:07.294Z",
 	  "reminders": true,
       "criteriaAnswers": ["No", "No"],
-      "completedTS": "ISO string",
-	  "taskItemsConsent": [
-        { "taskId": 1, "consented": true, "lastExecuted": "ISO string" }
+      "completedTS": "2019-02-27T12:46:07.294Z",
+      "taskItemsConsent": [
+        { "taskId": 1, "consented": true, "lastExecuted": "2019-02-27T12:46:07.294Z" }
       ]
     },
     {
       "studyKey": "key",
       "currentStatus": "excluded",
       "criteriaAnswers": ["No", "No"],
-      "excludedTS": "ISO string"
+      "excludedTS": "2019-02-27T12:46:07.294Z"
     },
     {
       "studyKey": "key",
       "currentStatus": "rejected",
-      "rejectedTS": "ISO string"
+      "rejectedTS": "2019-02-27T12:46:07.294Z"
     }
   ]
 }
