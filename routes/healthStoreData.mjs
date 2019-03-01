@@ -77,7 +77,7 @@ export default async function () {
     try {
       newHealthStoreData = await db.createHealthStoreData(newHealthStoreData)
       // also update task status
-      let participant = await db.getParticipantByUserKey(req.params.userKey)
+      let participant = await db.getParticipantByUserKey(req.user._key)
       if (!participant) return res.status(404)
 
       let study = participant.studies.find((s) => {
