@@ -19,7 +19,7 @@ export default async function () {
     } else {
       console.log(req.body)
       try {
-        sendEmail(req.body.address, 'Mobistudy Test Email', req.body.content)
+        sendEmail(req.body.address, req.body.subject, req.body.content)
         applogger.info(req.body, 'Test email sent')
         res.sendStatus(200)
       } catch (error) {
