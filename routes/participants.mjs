@@ -264,7 +264,7 @@ export default async function () {
       res.sendStatus(500)
     }
   })
-
+  // gets simple statistics about the study
   router.get('/participants/statusStats/:studyKey', passport.authenticate('jwt', { session: false }), async function (req, res) {
     try {
       if (req.user.role === 'participant') {
