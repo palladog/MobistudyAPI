@@ -18,7 +18,8 @@ export default async function (db, logger) {
 
   return {
     async findUser (email) {
-      var query = 'FOR user in users FILTER user.email == \'' + email + '\' RETURN user'
+      // Email string is set to lowercase
+      var query = 'FOR user in users FILTER LOWER(user.email) == \'' + email + '\' RETURN user'
       applogger.trace('Querying "' + query + '"')
       let cursor = await db.query(query)
       let users = await cursor.all()
