@@ -9,7 +9,7 @@ import passport from 'passport'
 import getDB from '../DB/DB'
 import { applogger } from '../logger'
 import auditLogger from '../auditLogger'
-// import { sendEmail } from '../mailSender'
+import { sendEmail } from '../mailSender'
 
 const router = express.Router()
 
@@ -226,7 +226,6 @@ export default async function () {
     let studyKey = req.params.studyKey
     let payload = req.body
     payload.studyKey = studyKey
-    let studies = payload.studies
     let currentStatus = undefined
     let updatedCurrentStatus = undefined
     try {
@@ -238,42 +237,41 @@ export default async function () {
       if (!userKey || !studyKey) return res.sendStatus(400)
       // Get study status before patch update
       let participant = await db.getParticipantByUserKey(userKey)
+      let pStu = participant.studies
       if (!participant) return res.status(404)
-      for (let i = 0; i < participant.studies.length; i++) {
+      for (let i = 0; i < pStu.length; i++) {
         // Before a participant accepts a study, there will be no current status in the participant
-        if (participant.studies[i].studyKey === studyKey && participant.studies[i].currentStatus !== undefined) {
-          currentStatus = participant.studies[i].currentStatus
+        if (pStu[i].studyKey === studyKey && pStu[i].currentStatus !== undefined) {
+          currentStatus = pStu[i].currentStatus
         }
       }
       // Updated Time Stamp
       participant.updatedTS = new Date()
 
       let studyIndex = -1
-      if (!participant.studies) {
-        participant.studies = []
+      if (!pStu) {
+        pStu = []
       } else {
-        studyIndex = participant.studies.findIndex((s) => {
+        studyIndex = pStu.findIndex((s) => {
           return s.studyKey === studyKey
         })
       }
       if (studyIndex === -1) {
-        participant.studies.push({
+        pStu.push({
           studyKey: studyKey
         })
-        studyIndex = participant.studies.length - 1
+        studyIndex = pStu.length - 1
       }
       // TODO: use [deepmerge](https://github.com/TehShrike/deepmerge) instead
-      participant.studies[studyIndex] = payload
+      pStu[studyIndex] = payload
       // Update the DB
       await db.updateParticipant(participant._key, participant)
-      res.sendStatus(200)
       // Get Updated study status
-      for (let i = 0; i < studies.length; i++) {
-        if (studies[i].studyKey === studyKey) {
-          updatedCurrentStatus = studies[i].currentStatus
+      for (let i = 0; i < pStu.length; i++) {
+        if (pStu[i].studyKey === studyKey) {
+          updatedCurrentStatus = pStu[i].currentStatus
         }
       }
-      // console.log('UPDT: ', updatedCurrentStatus)
       // if there is a change in status, then send email reflecting updated status change
       if (updatedCurrentStatus !== currentStatus) {
         let study = await db.getOneStudy(studyKey)
@@ -292,13 +290,11 @@ export default async function () {
           emailTitle = 'Withdrawal from study ' + title
           emailContent = 'You have withdrawn from the study ' + title + '. Thank you for your time.'
         }
-        console.log(emailTitle)
-        console.log(emailContent)
-        // let user = await db.getOneUser(userKey)
+        let user = await db.getOneUser(userKey)
         // Send User Email
-        // sendEmail(user.email, emailTitle, emailContent)
+        sendEmail(user.email, emailTitle, emailContent)
       }
-      // res.sendStatus(200)
+      res.sendStatus(200)
       applogger.info({ participantKey: participant._key, study: payload }, 'Participant has changed studies status')
       auditLogger.log('participantStudyUpdate', req.user._key, payload.studyKey, undefined, 'Participant with key ' + participant._key + ' has changed studies status', 'participants', participant._key, payload)
     } catch (err) {
