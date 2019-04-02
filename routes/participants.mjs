@@ -235,41 +235,42 @@ export default async function () {
         if (!allowedParts.includes(req.params.user)) return res.sendStatus(403)
       }
       if (!userKey || !studyKey) return res.sendStatus(400)
-      // Get study status before patch update
       let participant = await db.getParticipantByUserKey(userKey)
-      let pStu = participant.studies
-      if (!participant) return res.status(404)
-      for (let i = 0; i < pStu.length; i++) {
-        // Before a participant accepts a study, there will be no current status in the participant
-        if (pStu[i].studyKey === studyKey && pStu[i].currentStatus !== undefined) {
-          currentStatus = pStu[i].currentStatus
-        }
-      }
+      if (!participant) return res.status(404)   
+     
       // Updated Time Stamp
       participant.updatedTS = new Date()
 
+      // Create studies array if none exist, else find existing one
       let studyIndex = -1
-      if (!pStu) {
-        pStu = []
+      if (!participant.studies) {
+        participant.studies = []
       } else {
-        studyIndex = pStu.findIndex((s) => {
+        studyIndex = participant.studies.findIndex((s) => {
           return s.studyKey === studyKey
         })
       }
       if (studyIndex === -1) {
-        pStu.push({
+        participant.studies.push({
           studyKey: studyKey
         })
-        studyIndex = pStu.length - 1
+        studyIndex = participant.studies.length - 1
+      }
+      // Get study status before patch update
+      for (let i = 0; i < participant.studies.length; i++) {
+        // Before a participant accepts a study, there will be no current status in the participant
+        if (participant.studies[i].studyKey === studyKey && participant.studies[i].currentStatus !== undefined) {
+          currentStatus = participant.studies[i].currentStatus
+        }
       }
       // TODO: use [deepmerge](https://github.com/TehShrike/deepmerge) instead
-      pStu[studyIndex] = payload
+      participant.studies[studyIndex] = payload
       // Update the DB
       await db.updateParticipant(participant._key, participant)
       // Get Updated study status
-      for (let i = 0; i < pStu.length; i++) {
-        if (pStu[i].studyKey === studyKey) {
-          updatedCurrentStatus = pStu[i].currentStatus
+      for (let i = 0; i < participant.studies.length; i++) {
+        if (participant.studies[i].studyKey === studyKey) {
+          updatedCurrentStatus = participant.studies[i].currentStatus
         }
       }
       // if there is a change in status, then send email reflecting updated status change
@@ -281,18 +282,21 @@ export default async function () {
         if (updatedCurrentStatus === 'accepted') {
           emailTitle = 'Confirmation of Acceptance of Study ' + title
           emailContent = 'Thank you for accepting to take part in the study ' + title + '.'
+          let user = await db.getOneUser(userKey)
+          sendEmail(user.email, emailTitle, emailContent)
         }
         if (updatedCurrentStatus === 'completed') {
           emailTitle = 'Completion of study ' + title
           emailContent = 'The study ' + title + ' has now been completed. Thank you for your participation.'
+          let user = await db.getOneUser(userKey)
+          sendEmail(user.email, emailTitle, emailContent)
         }
         if (updatedCurrentStatus === 'withdrawn') {
           emailTitle = 'Withdrawal from study ' + title
           emailContent = 'You have withdrawn from the study ' + title + '. Thank you for your time.'
+          let user = await db.getOneUser(userKey)
+          sendEmail(user.email, emailTitle, emailContent)
         }
-        let user = await db.getOneUser(userKey)
-        // Send User Email
-        sendEmail(user.email, emailTitle, emailContent)
       }
       res.sendStatus(200)
       applogger.info({ participantKey: participant._key, study: payload }, 'Participant has changed studies status')
