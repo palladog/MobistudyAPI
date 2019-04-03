@@ -1,6 +1,7 @@
 {
   "web": {
-    "port" : 3000
+    "port" : 3000,
+    "cluster" : true
   },
   "cert": {
     "key" : "https certificate pem file",
