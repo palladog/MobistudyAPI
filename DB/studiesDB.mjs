@@ -91,11 +91,11 @@ export default async function (db, logger) {
       )
       FILTER !study.numberOfParticipants || study.numberOfParticipants > partsN
       FOR participant IN participants
+      LET age = DATE_DIFF(participant.dateOfBirth, DATE_NOW(), "year")
       FILTER participant.userKey == @userKey
       AND study._key NOT IN participant.studies[*].studyKey
+      AND age >= study.inclusionCriteria.minAge AND age <= study.inclusionCriteria.maxAge
       AND participant.gender IN study.inclusionCriteria.gender
-      AND (study.inclusionCriteria.lifestyle.active == 'notrequired'? TRUE : study.inclusionCriteria.lifestyle.active == participant.lifestyle.active)
-      AND (study.inclusionCriteria.lifestyle.smoker == 'notrequired'? TRUE : study.inclusionCriteria.lifestyle.smoker == participant.lifestyle.smoker)
       RETURN study._key`
       // Commented out for 4YP ---> To replace above query with the one below
       // --> Search originally done wrt diseases, meds, age
