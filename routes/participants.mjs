@@ -228,6 +228,8 @@ export default async function () {
     payload.studyKey = studyKey
     let currentStatus = undefined
     let updatedCurrentStatus = undefined
+    let taskItemsCons = []
+    let extraItemsCons = []
     try {
       if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
       if (req.user.role === 'researcher') {
@@ -271,11 +273,13 @@ export default async function () {
       for (let i = 0; i < participant.studies.length; i++) {
         if (participant.studies[i].studyKey === studyKey) {
           updatedCurrentStatus = participant.studies[i].currentStatus
+          taskItemsCons = participant.studies[i].taskItemsConsent
+          extraItemsCons = participant.studies[i].extraItems
         }
       }
-      // if there is a change in status, then send email reflecting updated status change
+        // if there is a change in status, then send email reflecting updated status change
       if (updatedCurrentStatus !== currentStatus) {
-        emailStudy(studyKey, userKey, updatedCurrentStatus)
+        emailStudy(studyKey, userKey, updatedCurrentStatus, taskItemsCons, extraItemsCons)
       }
       res.sendStatus(200)
       applogger.info({ participantKey: participant._key, study: payload }, 'Participant has changed studies status')
