@@ -40,17 +40,15 @@ export default async function () {
   // count: for pagination
   router.get('/auditlog', passport.authenticate('jwt', { session: false }), async function (req, res) {
     if (req.user.role !== 'admin' && req.user.role !== 'researcher') {
+      console.log(`not a researcher`)
       res.sendStatus(403)
     } else {
       try {
         // Researcher: a study must be specified and the researcher has to be allowed to see that study
         if (req.user.role === 'researcher') {
-          if (req.query.teamKey && req.query.studyKey) {
-            let teamRes = await db.getOneTeam(req.query.teamKey)
-            if (!teamRes.researchersKeys.includes(req.user._key)) return res.sendStatus(403)
-            let team = await db.getAllTeams(req.user._key, req.query.studyKey)
-            if (team.length === 0) return res.sendStatus(403)
-          } return res.sendStatus(403)
+          if (! req.query.studyKey) return res.sendStatus(400)
+          let teams = await db.getAllTeams(req.user._key, req.query.studyKey)
+          if (teams.length === 0) return res.sendStatus(403)
         }
         let result = await db.getAuditLogs(false,
           req.query.after,
