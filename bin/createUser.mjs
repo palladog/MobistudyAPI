@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt'
-import getDB from './DB/DB'
+import getDB from '../DB/DB'
 
 (async () => {
   if (process.argv.length > 3) {

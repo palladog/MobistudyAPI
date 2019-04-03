@@ -13,6 +13,12 @@ export default function () {
     const configfile = fs.readFileSync('config.json', 'utf8')
     config = JSON.parse(configfile)
   } catch (err) {
+    console.log('No config file was specified, using environmental variables or defaults')
+
+    config.web = {
+      port: (process.env.WEBPORT || 8080),
+      cluster: (process.env.WEBCLUSTER || true),
+    },
     config.logs = {
       folder: (process.env.LOGSFOLDER || 'logs'),
       rotationsize: (process.env.LOGSROTATIONSIZE || '1M')

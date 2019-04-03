@@ -6,6 +6,7 @@
 */
 
 import fs from 'fs'
+import getConfig from '../config'
 import getApp from '../app'
 import http from 'http'
 import https from 'https'
@@ -16,28 +17,13 @@ import os from 'os'
   const numCPUs = os.cpus().length
   const app = await getApp()
 
-  var config = {}
-  try {
-    const configfile = fs.readFileSync('config.json', 'utf8')
-    config = JSON.parse(configfile)
-  } catch (err) {
-    console.log('No config file specified, using environment variables')
-    config.web = {
-      port: parseInt(process.env.PORT || '3000')
-    }
-    if (process.env.CERTKEYFILE) {
-      config.cert = {
-        key: process.env.CERTKEYFILE,
-        file: process.env.CERTFILE
-      }
-    }
-  }
+  var config = getConfig()
 
   // pass parameters down the application
   app.set('port', config.web.port)
 
-  if (cluster.isMaster) {
-    console.log(`Master ${process.pid} is running`)
+  if (config.cluster && cluster.isMaster) {
+    console.log(`Master process ${process.pid} is running`)
 
     // Fork workers.
     for (let i = 0; i < numCPUs; i++) {
@@ -68,7 +54,7 @@ import os from 'os'
     server.on('error', onError)
     server.on('listening', onListening)
 
-    console.log(`Worker ${process.pid} started`)
+    console.log(`Listening process ${process.pid} started`)
   }
 
   /**
