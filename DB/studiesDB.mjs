@@ -97,8 +97,17 @@ export default async function (db, logger) {
       AND age >= study.inclusionCriteria.minAge AND age <= study.inclusionCriteria.maxAge
       AND participant.gender IN study.inclusionCriteria.gender
       RETURN study._key`
-      // Commented out for 4YP ---> To replace above query with the one below
-      // --> Search originally done wrt diseases, meds, age
+      // Commented out for 4YP
+      // const query = `FOR study IN studies
+      // FILTER !!study.publishedTS
+      // LET partsN = FIRST (
+      //   RETURN COUNT(
+      //     FOR part IN participants
+      //     FILTER !!part.studies
+      //     FILTER study._key IN part.studies[* FILTER !!CURRENT.acceptedTS].studyKey
+      //     RETURN 1
+      //   )
+      // )
       // FILTER !study.numberOfParticipants || study.numberOfParticipants > partsN
       // FOR participant IN participants
       // LET age = DATE_DIFF(participant.dateOfBirth, DATE_NOW(), "year")
@@ -111,6 +120,7 @@ export default async function (db, logger) {
       // AND study.inclusionCriteria.diseases[*].conceptId ALL IN participant.diseases[*].conceptId
       // AND study.inclusionCriteria.medications[*].conceptId ALL IN participant.medications[*].conceptId
       // RETURN study._key`
+
       let bindings = { userKey: userKey }
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
