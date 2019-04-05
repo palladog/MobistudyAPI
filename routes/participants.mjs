@@ -9,7 +9,7 @@ import passport from 'passport'
 import getDB from '../DB/DB'
 import { applogger } from '../logger'
 import auditLogger from '../auditLogger'
-import { sendEmail } from '../mailSender'
+import emailStudy from '../studyEmail.mjs'
 
 const router = express.Router()
 
@@ -228,6 +228,8 @@ export default async function () {
     payload.studyKey = studyKey
     let currentStatus = undefined
     let updatedCurrentStatus = undefined
+    let taskItemsCons = []
+    let extraItemsCons = []
     try {
       if (req.user.role === 'participant' && req.params.userKey !== req.user._key) return res.sendStatus(403)
       if (req.user.role === 'researcher') {
@@ -271,32 +273,13 @@ export default async function () {
       for (let i = 0; i < participant.studies.length; i++) {
         if (participant.studies[i].studyKey === studyKey) {
           updatedCurrentStatus = participant.studies[i].currentStatus
+          taskItemsCons = participant.studies[i].taskItemsConsent
+          extraItemsCons = participant.studies[i].extraItems
         }
       }
-      // if there is a change in status, then send email reflecting updated status change
+        // if there is a change in status, then send email reflecting updated status change
       if (updatedCurrentStatus !== currentStatus) {
-        let study = await db.getOneStudy(studyKey)
-        let title = study.generalities.title
-        let emailTitle = ''
-        let emailContent = ''
-        if (updatedCurrentStatus === 'accepted') {
-          emailTitle = 'Confirmation of Acceptance of Study ' + title
-          emailContent = 'Thank you for accepting to take part in the study ' + title + '.'
-          let user = await db.getOneUser(userKey)
-          sendEmail(user.email, emailTitle, emailContent)
-        }
-        if (updatedCurrentStatus === 'completed') {
-          emailTitle = 'Completion of study ' + title
-          emailContent = 'The study ' + title + ' has now been completed. Thank you for your participation.'
-          let user = await db.getOneUser(userKey)
-          sendEmail(user.email, emailTitle, emailContent)
-        }
-        if (updatedCurrentStatus === 'withdrawn') {
-          emailTitle = 'Withdrawal from study ' + title
-          emailContent = 'You have withdrawn from the study ' + title + '. Thank you for your time.'
-          let user = await db.getOneUser(userKey)
-          sendEmail(user.email, emailTitle, emailContent)
-        }
+        emailStudy(studyKey, userKey, updatedCurrentStatus, taskItemsCons, extraItemsCons)
       }
       res.sendStatus(200)
       applogger.info({ participantKey: participant._key, study: payload }, 'Participant has changed studies status')
