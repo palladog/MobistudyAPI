@@ -6,6 +6,7 @@
 */
 
 import express from 'express'
+import helmet from 'helmet'
 import bodyParser from 'body-parser'
 import passport from 'passport'
 
@@ -28,6 +29,7 @@ export default async function () {
 
   var app = express()
 
+  app.use(helmet())
   app.use(httplogger)
   // setup body parser
   // default limit is 100kb, so we need to extend the limit
