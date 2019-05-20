@@ -16,23 +16,24 @@ export default function () {
     console.log('No config file was specified, using environmental variables or defaults')
 
     config.web = {
-      port: (process.env.WEBPORT || 8080),
-      cluster: (process.env.WEBCLUSTER || true),
+      port: (process.env.WEB_PORT || 8080),
+      cluster: (process.env.WEB_CLUSTER || true),
     },
     config.logs = {
-      folder: (process.env.LOGSFOLDER || 'logs'),
-      rotationsize: (process.env.LOGSROTATIONSIZE || '1M')
+      folder: (process.env.LOGS_FOLDER || 'logs'),
+      rotationsize: (process.env.LOGS_ROTATIONSIZE || '1M'),
+      console: (process.env.LOGS_CONSOLE || false)
     }
     config.auth = {
       secret: (process.env.AUTH_SECRET),
       tokenExpires: (process.env.AUTH_TOKEN_EXPIRES)
     }
     config.db = {
-      host: (process.env.DBHOST || 'localhost'),
-      port: parseInt(process.env.DBPORT || '8529'),
-      name: process.env.DBNAME,
-      user: process.env.DBUSER,
-      password: process.env.DBPASSWORD
+      host: (process.env.DB_HOST || 'localhost'),
+      port: parseInt(process.env.DB_PORT || '8529'),
+      name: process.env.DB_NAME,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD
     }
     config.gmail = {
       email: process.env.GMAIL_EMAIL,
