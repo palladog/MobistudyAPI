@@ -5,8 +5,8 @@
   "description": "The REST API of Mobistudy",
   "main": "bin/www.js",
   "scripts": {
-    "start": "node ./bin/www.js",
-    "devstart": "nodemon ./bin/www.js"
+    "start": "node --experimental-modules ./bin/www.mjs",
+    "devstart": "nodemon --experimental-modules ./bin/www.js"
   },
   "dependencies": {
     "arangojs": "^6.6.0",
