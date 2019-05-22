@@ -17,6 +17,17 @@ export default async function () {
   var db = await getDB()
   var config = getConfig()
 
+  // generate admin user from config if non existing
+  let admin = await db.findUser(config.auth.adminEmail)
+  if (!admin) {
+    await db.createUser({
+      email: config.auth.adminEmail,
+      hashedPassword: bcrypt.hashSync(config.auth.adminPassword, 8),
+      role: 'admin'
+    })
+    applogger.info('Admin user created')
+  }
+
   // This is used for authenticating with a post
   passport.use(new PassportLocal({
     usernameField: 'email',

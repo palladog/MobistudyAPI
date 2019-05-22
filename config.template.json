@@ -21,7 +21,9 @@
   },
   "auth": {
     "secret": "mysecret",
-    "tokenExpires": "30 days"
+    "tokenExpires": "30 days",
+    "adminEmail": "admin@mobistudy.org",
+    "adminPassword": "password"
   },
   "gmail": {
     "email": "xxx@gmail.com",

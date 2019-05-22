@@ -38,20 +38,20 @@ export default async function () {
   app.use(bodyParser.json({ limit: '20mb' }))
   app.use(bodyParser.text({ limit: '20mb' }))
 
-  app.use(express.static('./public'))
-
   app.use(passport.initialize())
 
-  app.use('/api', await indexRouter())
-  app.use('/api', await studiesRouter())
-  app.use('/api', await formsRouter())
-  app.use('/api', await usersRouter())
-  app.use('/api', await participantsRouter())
-  app.use('/api', await teamsRouter())
-  app.use('/api', await answersRouter())
-  app.use('/api', await healthStoreDataRouter())
-  app.use('/api', await auditLogRouter())
-  app.use('/api', await testerRouter())
+  const route_prefix = '/api'
+
+  app.use('/', await indexRouter())
+  app.use(route_prefix, await studiesRouter())
+  app.use(route_prefix, await formsRouter())
+  app.use(route_prefix, await usersRouter())
+  app.use(route_prefix, await participantsRouter())
+  app.use(route_prefix, await teamsRouter())
+  app.use(route_prefix, await answersRouter())
+  app.use(route_prefix, await healthStoreDataRouter())
+  app.use(route_prefix, await auditLogRouter())
+  app.use(route_prefix, await testerRouter())
 
   // error handler
   app.use(function (err, req, res, next) {
