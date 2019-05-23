@@ -6,6 +6,7 @@
 */
 
 import express from 'express'
+import cors from 'cors'
 import helmet from 'helmet'
 import bodyParser from 'body-parser'
 import passport from 'passport'
@@ -28,6 +29,7 @@ export default async function () {
   authConfig()
 
   var app = express()
+  app.use(cors())
 
   app.use(helmet())
   app.use(httplogger)
