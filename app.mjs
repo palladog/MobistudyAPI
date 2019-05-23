@@ -6,7 +6,6 @@
 */
 
 import express from 'express'
-import cors from 'cors'
 import helmet from 'helmet'
 import bodyParser from 'body-parser'
 import passport from 'passport'
@@ -29,7 +28,9 @@ export default async function () {
   authConfig()
 
   var app = express()
-  app.use(cors())
+
+  // serve the web interface from the public subfolder
+  app.use(express.static('./public'));
 
   app.use(helmet())
   app.use(httplogger)
@@ -42,18 +43,18 @@ export default async function () {
 
   app.use(passport.initialize())
 
-  const route_prefix = '/api'
+  const api_prefix = '/api'
 
-  app.use('/', await indexRouter())
-  app.use(route_prefix, await studiesRouter())
-  app.use(route_prefix, await formsRouter())
-  app.use(route_prefix, await usersRouter())
-  app.use(route_prefix, await participantsRouter())
-  app.use(route_prefix, await teamsRouter())
-  app.use(route_prefix, await answersRouter())
-  app.use(route_prefix, await healthStoreDataRouter())
-  app.use(route_prefix, await auditLogRouter())
-  app.use(route_prefix, await testerRouter())
+  app.use(api_prefix, await indexRouter())
+  app.use(api_prefix, await studiesRouter())
+  app.use(api_prefix, await formsRouter())
+  app.use(api_prefix, await usersRouter())
+  app.use(api_prefix, await participantsRouter())
+  app.use(api_prefix, await teamsRouter())
+  app.use(api_prefix, await answersRouter())
+  app.use(api_prefix, await healthStoreDataRouter())
+  app.use(api_prefix, await auditLogRouter())
+  app.use(api_prefix, await testerRouter())
 
   // error handler
   app.use(function (err, req, res, next) {
