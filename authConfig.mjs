@@ -17,20 +17,23 @@ export default async function () {
   var db = await getDB()
   var config = getConfig()
 
-  // generate admin user from config if non existing
-  try {
-    let admin = await db.findUser(config.auth.adminEmail)
-    if (!admin) {
-      await db.createUser({
-        email: config.auth.adminEmail,
-        hashedPassword: bcrypt.hashSync(config.auth.adminPassword, 8),
-        role: 'admin'
-      })
-      applogger.info('Admin user created')
+  if (config.auth.adminEmail) {
+    // generate admin user from config if not already existing
+    try {
+      let admin = await db.findUser(config.auth.adminEmail)
+      if (!admin) {
+        await db.createUser({
+          email: config.auth.adminEmail,
+          hashedPassword: bcrypt.hashSync(config.auth.adminPassword, 8),
+          role: 'admin'
+        })
+        applogger.info('Admin user created')
+      }
+      applogger.debug('Admin user already exists')
+    } catch(err) {
+      applogger.fatal(err, 'Cannot create admin user')
+      process.exit(1)
     }
-  } catch(err) {
-    applogger.fatal(err, 'Cannot create admin user')
-    process.exit(1)
   }
 
   // This is used for authenticating with a post
