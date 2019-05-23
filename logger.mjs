@@ -33,8 +33,8 @@ applogstream.on('warning', console.error)
 const httppino = expresspino(httplogstream)
 const applogger = pino(applogstream)
 
-httppino.level = 10
-applogger.level = 10
+httppino.level = config.logs.level
+applogger.level = config.logs.level
 
 let applogger_
 

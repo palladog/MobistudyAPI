@@ -32,6 +32,7 @@ variables. Some variables can be also provided as Docker secrets:
 | LOGS_FOLDER        | string  | 'logs'      | NO     |
 | LOGS_ROTATIONSIZE  | string  | '1M'        | NO     |
 | LOGS_CONSOLE       | boolean | false       | NO     |
+| LOGS_LEVEL         | integer | 30          | NO     |
 | AUTH_SECRET        | string  | NA          | YES    |
 | AUTH_TOKEN_EXPIRES | string  | '30 days'   | NO     |
 | AUTH_ADMIN_EMAIL   | string  | NA          | YES    |
