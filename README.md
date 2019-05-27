@@ -70,11 +70,12 @@ Then run it with the environment variables:
 
 ```
 docker run -d \
-    -p 8080:80 \
+    -p 80:8080 \
     -v /local/path/to/logs:/usr/src/app/logs \
     -e WEB_CLUSTER=true \
     -e LOGS_FOLDER=logs \
     -e LOGS_ROTATIONSIZE=5M \
+    -e LOGS_LEVEL=30
     -e AUTH_SECRET=xxxxx \
     -e AUTH_TOKEN_EXPIRES="30 days" \
     -e DB_HOST=localhost \
@@ -91,8 +92,9 @@ docker run -d \
     mobistudyapi
 ```
 
-Notice that the WEB_PORT environment variables should not be passed, it is fixed
-to 8080.
+Notice that the WEB_PORT environment variables should not be passed when using Docker,
+it is fixed to 8080.
 
 This also needs Arango to be running according to the specified configuration.
-Check the Wiki for tips on how to setup a complete server instance with Docker.
+Check the [Wiki](https://github.com/Mobistudy/MobistudyAPI/wiki/Docker-setup)
+for tips on how to setup a complete server instance with Docker.

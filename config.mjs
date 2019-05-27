@@ -26,7 +26,7 @@ export default function () {
         folder: (process.env.LOGS_FOLDER || 'logs'),
         rotationsize: (process.env.LOGS_ROTATIONSIZE || '1M'),
         console: (process.env.LOGS_CONSOLE || false),
-        level: (process.env.LOGS_LEVEL || 10)
+        level: (parseInt(process.env.LOGS_LEVEL) || 30)
       }
       config.auth = {
         secret: (secrets.get('AUTH_SECRET') || process.env.AUTH_SECRET),
