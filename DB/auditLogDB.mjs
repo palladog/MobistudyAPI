@@ -28,7 +28,7 @@ export default async function (db, logger) {
       }
       let bindings = { }
       queryString += `FOR log IN auditlogs `
-      if (!countOnly) {
+      if (!countOnly || userEmail) {
         queryString += ` FOR user IN users
         FILTER user._key == log.userKey `
       }
