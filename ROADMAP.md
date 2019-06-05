@@ -18,24 +18,25 @@ This is the MVC version of Mobistudy, it includes:
 
 It will include some improvements to version 0.1.x:
 
+- Docker image for the server
 - migrate to quasar 1.0.0
-- automated tests
-- use encrypted db on the app
-- new activities like 6MWT
-- migrate from moment to [Luxon](https://github.com/moment/luxon)
 - adopt [simple JSON notation](https://github.com/mpnally/Terrifically-Simple-JSON) and [use links instead of IDs](https://cloud.google.com/blog/products/application-development/api-design-why-you-should-use-links-not-keys-to-represent-relationships-in-apis), get rid of `_key`
+- automated tests
 - forms can be drafted and kept local to the research team
 - invite only studies
 - internationalisation
-- Docker image for the server
+- use encrypted db on the app
+- new activities like 6MWT
+- migrate from moment to [Luxon](https://github.com/moment/luxon)
 - external integrations through a well-defined API (?)
-- demo accounts (?)
 
 
 ## Version 1.0.x (LAUNCH)
 
 Includes major changes like:
 
+- researchers added to studies (1 group per study)
+- test studies
 - audit log should not store results from tasks, just a link to where the data is
 - add pictures and markdown text in questions and some fields
 - educational content, with markdown, pictures and links
@@ -52,4 +53,4 @@ Further cool staff:
 
 - booking of appointments like with [GPs](https://developer.nhs.uk/gp-connect-specification-versions/) or with [commercial software](https://www.scheduleonce.com/integrations)
 - generalised scoring for forms/questionnaires (a function that generates an array of scores + their names)
--
+- anonymised export of data
