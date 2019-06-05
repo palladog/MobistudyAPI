@@ -29,15 +29,14 @@ const config = getConfig()
 
 const pwdCheck = function (email, password) {
   let userName = email.substring(0, email.indexOf('@'))
+  if ((password.toUpperCase().includes(userName.toUpperCase()))) return false
+
   let strengthCheck = zxcvbn(password)
-  // Check if password includes spaces or includes name in email
-  if (password.indexOf(' ') >= 0 || (password.toUpperCase().includes(userName.toUpperCase())) || strengthCheck.score < 1) {
+  if (strengthCheck.score < 2) return false
+
+  let result = owasp.test(password)
+  if (!result.strong) {
     return false
-  } else {
-    let result = owasp.test(password)
-    if (!result.strong) {
-      return false
-    }
   }
   return true
 }
