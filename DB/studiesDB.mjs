@@ -12,11 +12,9 @@ export default async function (db, logger) {
 
   return {
     async getAllStudies () {
-      var filter = ''
-
       // TODO: use LIMIT @offset, @count in the query for pagination
 
-      var query = 'FOR study in studies ' + filter + ' RETURN study'
+      var query = 'FOR study in studies RETURN study'
       applogger.trace('Querying "' + query + '"')
       let cursor = await db.query(query)
       return cursor.all()
@@ -43,7 +41,6 @@ export default async function (db, logger) {
     },
 
     async createStudy (newstudy) {
-      // TODO: use the filter for access control later
       let meta = await collection.save(newstudy)
       newstudy._key = meta._key
       return newstudy
