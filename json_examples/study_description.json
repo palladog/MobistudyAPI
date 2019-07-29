@@ -21,7 +21,8 @@
       {
         "name":"University of Oxford",
         "contact":"asdasd",
-        "dataAccess":"full"
+        "dataAccess":"full",
+		"reasonForDataAccess": "Because we need to analyse the data."
       }
     ]
   },
