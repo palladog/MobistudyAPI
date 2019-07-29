@@ -67,7 +67,7 @@ export default async function () {
   // add a new study
   router.post('/studies', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newstudy = req.body
-    newstudy.created = new Date()
+    newstudy.createdTS = new Date()
     try {
       // TODO: do some access control, check the user is a researcher and that he belongs to the team
       newstudy = await db.createStudy(newstudy)
@@ -84,7 +84,7 @@ export default async function () {
   // update a study
   router.put('/studies/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newstudy = req.body
-    newstudy.updated = new Date()
+    newstudy.updatedTS = new Date()
     try {
       // TODO: do some access control
       newstudy = await db.replaceStudy(req.params.study_key, newstudy)
@@ -100,7 +100,7 @@ export default async function () {
   // patch a study
   router.patch('/studies/:study_key', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newstudy = req.body
-    newstudy.updated = new Date()
+    newstudy.updatedTS = new Date()
     try {
       // TODO: do some access control
       newstudy = await db.updateStudy(req.params.study_key, newstudy)
