@@ -92,31 +92,12 @@ export default async function (db, logger) {
       FILTER participant.userKey == @userKey
       AND study._key NOT IN participant.studies[*].studyKey
       AND age >= study.inclusionCriteria.minAge AND age <= study.inclusionCriteria.maxAge
-      AND participant.gender IN study.inclusionCriteria.gender
+      AND participant.sex IN study.inclusionCriteria.sex
+      AND (study.inclusionCriteria.lifestyle.active == 'notrequired'? TRUE : study.inclusionCriteria.lifestyle.active == participant.lifestyle.active)
+      AND (study.inclusionCriteria.lifestyle.smoker == 'notrequired'? TRUE : study.inclusionCriteria.lifestyle.smoker == participant.lifestyle.smoker)
+      AND study.inclusionCriteria.diseases[*].conceptId ALL IN participant.diseases[*].conceptId
+      AND study.inclusionCriteria.medications[*].conceptId ALL IN participant.medications[*].conceptId
       RETURN study._key`
-      // Commented out for 4YP
-      // const query = `FOR study IN studies
-      // FILTER !!study.publishedTS
-      // LET partsN = FIRST (
-      //   RETURN COUNT(
-      //     FOR part IN participants
-      //     FILTER !!part.studies
-      //     FILTER study._key IN part.studies[* FILTER !!CURRENT.acceptedTS].studyKey
-      //     RETURN 1
-      //   )
-      // )
-      // FILTER !study.numberOfParticipants || study.numberOfParticipants > partsN
-      // FOR participant IN participants
-      // LET age = DATE_DIFF(participant.dateOfBirth, DATE_NOW(), "year")
-      // FILTER participant.userKey == @userKey
-      // AND study._key NOT IN participant.studies[*].studyKey
-      // AND age >= study.inclusionCriteria.minAge AND age <= study.inclusionCriteria.maxAge
-      // AND participant.gender IN study.inclusionCriteria.gender
-      // AND (study.inclusionCriteria.lifestyle.active == 'notrequired'? TRUE : study.inclusionCriteria.lifestyle.active == participant.lifestyle.active)
-      // AND (study.inclusionCriteria.lifestyle.smoker == 'notrequired'? TRUE : study.inclusionCriteria.lifestyle.smoker == participant.lifestyle.smoker)
-      // AND study.inclusionCriteria.diseases[*].conceptId ALL IN participant.diseases[*].conceptId
-      // AND study.inclusionCriteria.medications[*].conceptId ALL IN participant.medications[*].conceptId
-      // RETURN study._key`
 
       let bindings = { userKey: userKey }
       applogger.trace(bindings, 'Querying "' + query + '"')

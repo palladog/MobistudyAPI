@@ -4,7 +4,7 @@
   "updatedTS": "2019-02-27T12:46:07.294Z",
   "name": "Dario",
   "surname": "Salvi",
-  "gender": "male",
+  "sex": "male",
   "dateOfBirth": "2019-02-27T12:46:07.294Z",
   "diseases": [
     { "name": "Heart Failure", "conceptId": "121212" }
