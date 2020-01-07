@@ -20,10 +20,10 @@ It will include some improvements to version 0.1.x:
 
 - Docker image for the server
 - migrate to quasar 1.0.0
-- adopt [simple JSON notation](https://github.com/mpnally/Terrifically-Simple-JSON) and [use links instead of IDs](https://cloud.google.com/blog/products/application-development/api-design-why-you-should-use-links-not-keys-to-represent-relationships-in-apis), get rid of `_key`
+- adopt [simple JSON notation](https://github.com/mpnally/Terrifically-Simple-JSON), get rid of `_key`
 - automated tests
 - forms can be drafted and kept local to the research team
-- invite only studies
+- invite-only studies
 - internationalisation
 - use encrypted db on the app
 - new activities like 6MWT
