@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "arangojs": "^6.6.0",
-    "bcrypt": "^3.0.2",
+    "bcrypt": "^3.0.7",
     "body-parser": "^1.18.3",
     "express": "~4.16.0",
     "express-pino-logger": "^4.0.0",
