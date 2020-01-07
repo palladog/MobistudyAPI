@@ -3,13 +3,16 @@
 /**
 * This allows email to be structured and sent to participants wrt studies.
 */
-import { sendEmail } from './mailSender.mjs'
 import { applogger } from './logger.mjs'
 import getDB from '../DB/DB.mjs'
+// import texti8n from '../i8n/langs.mjs'
 
+// Creates the content of an email to be sent to a user when the status of a study changes
+// returns { address: 'user@email.com', title: '...', content: '...'}
 export async function studyUpdateCompose(studyKey, userKey, updatedCurrentStatus, taskItems, extraItems) {
+  let db = await getDB()
+
   try {
-    var db = await getDB()
     let study = await db.getOneStudy(studyKey)
     let title = study.generalities.title
     let emailTitle = ''
@@ -84,21 +87,17 @@ export async function studyUpdateCompose(studyKey, userKey, updatedCurrentStatus
       emailContent = 'Thank you for accepting to take part in the study ' + title + '.' + '\n'
       emailContent += taskItemConStr
       emailContent += extraItemConStr
-      let user = await db.getOneUser(userKey)
-      sendEmail(user.email, emailTitle, emailContent)
     }
     if (updatedCurrentStatus === 'completed') {
       emailTitle = 'Completion of study ' + title
       emailContent = 'The study ' + title + ' has now been completed. Thank you for your participation.'
-      let user = await db.getOneUser(userKey)
-      sendEmail(user.email, emailTitle, emailContent)
     }
     if (updatedCurrentStatus === 'withdrawn') {
       emailTitle = 'Withdrawal from study ' + title
       emailContent = 'You have withdrawn from the study ' + title + '. Thank you for your time.'
-      let user = await db.getOneUser(userKey)
-      sendEmail(user.email, emailTitle, emailContent)
     }
+    let user = await db.getOneUser(userKey)
+    return { email:user.email, title: emailTitle, content: emailContent }
   } catch (err) {
     applogger.error({ error: err }, 'Cannot send status change email for study ' + studyKey + ' for user ' + userKey)
   }

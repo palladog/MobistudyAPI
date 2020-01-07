@@ -10,6 +10,7 @@ import getDB from '../DB/DB.mjs'
 import { applogger } from '../services/logger.mjs'
 import auditLogger from '../services/auditLogger.mjs'
 import { studyUpdateCompose } from '../services/emailComposer.mjs'
+import { sendEmail } from '../services/mailSender.mjs'
 
 const router = express.Router()
 
@@ -279,7 +280,8 @@ export default async function () {
       }
         // if there is a change in status, then send email reflecting updated status change
       if (updatedCurrentStatus !== currentStatus) {
-        emailStudy(studyKey, userKey, updatedCurrentStatus, taskItemsCons, extraItemsCons)
+        let em = await studyUpdateCompose(studyKey, userKey, updatedCurrentStatus, taskItemsCons, extraItemsCons)
+        sendEmail(em.email, em.title, em.content)
       }
       res.sendStatus(200)
       applogger.info({ participantKey: participant._key, study: payload }, 'Participant has changed studies status')
