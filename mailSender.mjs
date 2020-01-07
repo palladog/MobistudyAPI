@@ -19,6 +19,7 @@ export async function sendEmail (contact, subject, message) {
         refresh_token: config.gmail.refresh_token
       })
       let res = await oAuth2Client.refreshAccessToken()
+      const {tokens} = await oauth2Client.getToken(code)
       const smtpTransport = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -27,7 +28,7 @@ export async function sendEmail (contact, subject, message) {
           clientId: config.gmail.client_id,
           clientSecret: config.gmail.client_secret,
           refreshToken: config.gmail.refresh_token,
-          accessToken: res.credentials.access_token
+          accessToken: tokens.access_token
         }
       })
 
