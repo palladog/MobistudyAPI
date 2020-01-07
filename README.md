@@ -19,7 +19,7 @@ also a dedicated user with its password.
 The code is written using ES6 module, which are still experimental in nodejs.
 To start it:
 
-    node --experimental-modules .\bin\www.mjs
+    node --experimental-modules .\src\www.mjs
 
 You also need to provide either a configuration file with the name config.json
 (see config.template.json for an example) or provide the same configuration as environment

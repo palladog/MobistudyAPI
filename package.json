@@ -5,7 +5,7 @@
   "description": "The REST API of Mobistudy",
   "main": "bin/www.js",
   "scripts": {
-    "start": "node --experimental-modules ./bin/www.mjs",
+    "start": "node --experimental-modules ./src/www.mjs",
     "devstart": "nodemon --experimental-modules ./bin/www.js"
   },
   "dependencies": {
