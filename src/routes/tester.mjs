@@ -17,7 +17,6 @@ export default async function () {
     if (req.user.role !== 'admin') {
       res.sendStatus(403)
     } else {
-      console.log(req.body)
       try {
         sendEmail(req.body.address, req.body.subject, req.body.content)
         applogger.info(req.body, 'Test email sent')

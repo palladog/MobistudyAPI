@@ -1,9 +1,18 @@
 import getDB from '../../../src/DB/DB.mjs'
-import { studyStatusUpdateCompose } from '../../../src/services/emailComposer.mjs'
+import { studyStatusUpdateCompose, passwordRecoveryCompose } from '../../../src/services/emailComposer.mjs'
 
 jest.mock('../../../src/DB/DB.mjs');
 
 describe('when composing an email', () => {
+
+  test('the email password recovery is correct', async () => {
+    let email = await passwordRecoveryCompose('link', 'token')
+    expect(email.title).toBe('Mobistudy password recovery')
+    expect(email.content).toBe(`<p>You have requested to reset your password on Mobistudy.</p>
+    <p>Please go to <a href=link>this webpage</a> to set another password.</p>
+    <p>Or use the following code if required: token</p>
+    <p>This code will expire after 24 hours.</p>`)
+  })
 
   test('the email for a completed study is correct', async () => {
     getDB.mockResolvedValue({

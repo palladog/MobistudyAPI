@@ -62,10 +62,8 @@ export default async function () {
         expiresIn: daysecs
       })
       let serverlink = req.protocol + '://' + req.headers.host + '/#/resetPassword?email=' + email + '&token=' + token
-      sendEmail(email, 'Mobistudy Password recovery', `<p>You have requested to reset your password on Mobistudy.</p>
-      <p>Please go to <a href="${serverlink}">this webpage</a> to set another password.</p>
-      <p>Or use the following code if required: ${token}</p>
-      <p>This code will expire after 24 hours.</p>`)
+      let { title, content } = passwordRecoveryCompose(serverlink, token)
+      sendEmail(email, title, content)
       res.sendStatus(200)
       applogger.info({ email: req.body.email }, 'Reset password email sent')
       auditLogger.log('resetPasswordEmail', existing._key, undefined, undefined, 'User ' + email + ' has requested a reset password email', 'users', existing._key, undefined)
