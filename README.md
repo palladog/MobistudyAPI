@@ -51,6 +51,11 @@ provide the same configuration as environment variables.
 AUTH_ADMIN_EMAIL and AUTH_ADMIN_PASSWORD are used at the first start, to generate
 an admin user that can be used to access the website the first time.
 
+## Test it
+
+Run `npm run test:unit`. If you want to have the tests run continuously (as you
+change the code), add ` -- --watch`.
+
 ## Develop it
 
 The code is written mostly in ES6 and uses ES6 modules, please be consistent.
