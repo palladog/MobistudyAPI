@@ -7,8 +7,8 @@ export default {
   sv: svSV,
   t: function(locale, id, args) {
     let text = this[locale][id]
-    for (token in args) {
-      let regex = new RegExp('{\s*' + token + '\s*}')
+    for (const token in args) {
+      let regex = new RegExp('{\\s*' + token + '\\s*}', 'g')
       text = text.replace(regex, args[token])
     }
     return text
