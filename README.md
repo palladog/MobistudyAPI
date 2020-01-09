@@ -61,6 +61,22 @@ change the code), add ` -- --watch`.
 The code is written mostly in ES6 and uses ES6 modules, please be consistent.
 
 The folder structure is vaguely inspired by [this](https://softwareontheroad.com/ideal-nodejs-project-structure).
+```
+project
+└───config        // contains the runtime configuration files
+└───models        // examples of data managed by the app, in json
+└───src           // application code
+│   └───DB        // access to the database
+│   └───i8n       // internationalised text
+│   │   └───en-gb // British english text
+│   │   └───sv    // Swedish text
+│   └───routes    // API endpoints
+│   └───services  // application logic
+│   └───services  // application logic
+└───test          // automatic tests
+│   └───jest      // unit tests
+│   └───__tests__ // test specs
+```
 
 ## Use Docker
 
