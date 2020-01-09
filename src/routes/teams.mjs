@@ -9,7 +9,7 @@ import passport from 'passport'
 import jwt from 'jsonwebtoken'
 
 import getDB from '../DB/DB.mjs'
-import getConfig from '../config/config.mjs'
+import getConfig from '../services/config.mjs'
 import { applogger } from '../services/logger.mjs'
 import auditLogger from '../services/auditLogger.mjs'
 

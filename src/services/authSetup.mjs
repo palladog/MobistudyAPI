@@ -10,7 +10,7 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import { applogger } from './logger.mjs'
 import getDB from '../DB/DB.mjs'
-import getConfig from '../config/config.mjs'
+import getConfig from './config.mjs'
 
 export default async function () {
   var db = await getDB()

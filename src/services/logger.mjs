@@ -8,7 +8,7 @@
 import rfs from 'rotating-file-stream'
 import expresspino from 'express-pino-logger'
 import pino from 'pino'
-import getConfig from '../config/config.mjs'
+import getConfig from './config.mjs'
 
 const config = getConfig()
 

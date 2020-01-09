@@ -1,6 +1,6 @@
 import googleAPIs from 'googleapis'
 import nodemailer from 'nodemailer'
-import getConfig from '../config/config.mjs'
+import getConfig from '../services/config.mjs'
 import { applogger } from './logger.mjs'
 
 const config = getConfig()

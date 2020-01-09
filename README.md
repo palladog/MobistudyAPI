@@ -22,8 +22,8 @@ To start it:
     node --experimental-modules .\src\www.mjs
 
 You also need to provide either a configuration file with the name config.json
-(see config.template.json for an example) or provide the same configuration as environment
-variables. Some variables can be also provided as Docker secrets:
+inside the /config folder (see /config/config.template.json for an example) or
+provide the same configuration as environment variables.
 
 | Variable           | Type    | Default     | Secret |
 |--------------------|---------|-------------|--------|
@@ -51,9 +51,6 @@ variables. Some variables can be also provided as Docker secrets:
 AUTH_ADMIN_EMAIL and AUTH_ADMIN_PASSWORD are used at the first start, to generate
 an admin user that can be used to access the website the first time.
 
-In a production environment, it is recommendable to use Docker secrets instead of
-environment variables when possible.
-
 ## Develop it
 
 The code is written mostly in ES6 and uses ES6 modules, please be consistent.
@@ -68,34 +65,28 @@ Build the docker instance:
 docker build -t mobistudyapi .
 ```
 
-Then run it with the environment variables:
+Then run it with:
 
 ```
 docker run -d \
     -p 80:8080 \
     -v /local/path/to/logs:/usr/src/app/logs \
-    -e WEB_CLUSTER=true \
-    -e LOGS_FOLDER=logs \
-    -e LOGS_ROTATIONSIZE=5M \
-    -e LOGS_LEVEL=30
-    -e AUTH_SECRET=xxxxx \
-    -e AUTH_TOKEN_EXPIRES="30 days" \
-    -e DB_HOST=localhost \
-    -e DB_PORT=8529 \
-    -e DB_NAME=mobistudy \
-    -e DB_USER=mobistudy \
-    -e DB_PASSWORD=yyyyy \
-    -e GMAIL_EMAIL=mobystudy@gmail.com \
-    -e GMAIL_CLIENTID=zzzzzzzzz \
-    -e GMAIL_PROJECTID=zzzzzzzzz \
-    -e GMAIL_SECRET=zzzzzzzzz \
-    -e GMAIL_REFESHTOKEN=zzzzzzzzz \
+    -v /local/path/to/config:/usr/src/app/config \
     --name mobistudyapi
     mobistudyapi
 ```
 
+Instead of leaving a config file on the server, for security reasons, you may
+also consider using environmental.
 Notice that the WEB_PORT environment variables should not be passed when using Docker,
 it is fixed to 8080.
+
+In a production environment, it is recommendable to use Docker secrets instead of
+environment variables when possible. The variables that can be passed as Docker
+secret are:
+AUTH_SECRET, AUTH_ADMIN_EMAIL, AUTH_ADMIN_PASSWORD, DB_NAME, DB_USER, DB_PASSWORD,
+GMAIL_CLIENTID, GMAIL_PROJECTID, GMAIL_SECRET, GMAIL_REFESHTOKEN
+
 
 This also needs Arango to be running according to the specified configuration.
 Check the [Wiki](https://github.com/Mobistudy/MobistudyAPI/wiki/Docker-setup)

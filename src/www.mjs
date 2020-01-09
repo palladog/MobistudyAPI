@@ -9,7 +9,7 @@ import http from 'http'
 import https from 'https'
 import cluster from 'cluster'
 import os from 'os'
-import getConfig from './config/config.mjs'
+import getConfig from './services/config.mjs'
 import getApp from './app.mjs'
 
 (async () => {

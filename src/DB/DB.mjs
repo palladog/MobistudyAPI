@@ -14,7 +14,7 @@ import getParticipantsDB from './participantsDB.mjs'
 import getHealthStoreDataDB from './healthStoreDataDB.mjs'
 import getAuditLogDB from './auditLogDB.mjs'
 
-import getConfig from '../config/config.mjs'
+import getConfig from '../services/config.mjs'
 
 export default async function (logger) {
   var config = getConfig()
