@@ -1,6 +1,6 @@
 export default {
   email: {
-    studyAcceptedTitle: 'Confirmation of Acceptance of Study { studyTitle }',
+    studyAcceptedTitle: 'Confirmation of acceptance of study { studyTitle }',
     studyAcceptedThanks: 'Thank you for accepting to take part in the study { studyTitle }.',
     studyAcceptedConsentedTasks: 'You have consented to the following:',
     studyAcceptedNotConsentedTasks: 'You have not consented to the following:',
