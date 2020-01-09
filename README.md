@@ -58,6 +58,8 @@ environment variables when possible.
 
 The code is written mostly in ES6 and uses ES6 modules, please be consistent.
 
+The folder structure is vaguely inspired by [this](https://softwareontheroad.com/ideal-nodejs-project-structure).
+
 ## Use Docker
 
 Build the docker instance:
