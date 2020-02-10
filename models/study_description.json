@@ -105,7 +105,11 @@
         "intervalType":"d",
         "interval":12
       },
-      "formKey":"12121212"
+      "formKey":"12121212",
+      "formName":{
+        "en": "Preference questionnaire",
+        "it": "Questionario sulle preferenze"
+      }
     }
   ],
   "consent":{
