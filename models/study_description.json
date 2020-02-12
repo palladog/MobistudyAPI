@@ -62,8 +62,8 @@
         "answer":"yes"
       }
     ],
-    "diseases": [ { "name": "COPD", "conceptId": "123123123" } ],
-    "medications":[ { "name": "Aspirin", "conceptId": "12222" } ],
+    "diseases": [ { "term": "COPD", "conceptId": "123123123", "vocabulary": "SNOMED" } ],
+    "medications":[ { "term": "Aspirin", "conceptId": "12222", "vocabulary": "SNOMED" } ],
   },
   "tasks":[
     {
