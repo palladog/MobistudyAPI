@@ -43,7 +43,8 @@ export default async function (db, logger) {
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)
       let parts = await cursor.all()
-      return parts[0]
+      if (parts.length == 0) return undefined
+      else return parts[0]
     },
 
     // currentStatus is optional
