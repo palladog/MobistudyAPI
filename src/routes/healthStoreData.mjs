@@ -73,7 +73,7 @@ export default async function () {
     let newHealthStoreData = req.body
     if (req.user.role !== 'participant') return res.sendStatus(403)
     newHealthStoreData.userKey = req.user._key
-    newHealthStoreData.createdTS = new Date()
+    if(!newHealthStoreData.createdTS) newHealthStoreData.createdTS = new Date()
     try {
       newHealthStoreData = await db.createHealthStoreData(newHealthStoreData)
       // also update task status
@@ -86,7 +86,7 @@ export default async function () {
       if (!study) return res.status(400)
       let taskItem = study.taskItemsConsent.find(ti => ti.taskId === newHealthStoreData.taskId)
       if (!taskItem) return res.status(400)
-      taskItem.lastExecuted = newHealthStoreData.generatedTS
+      taskItem.lastExecuted = newHealthStoreData.createdTS
       // update the participant
       await db.replaceParticipant(participant._key, participant)
       res.sendStatus(200)

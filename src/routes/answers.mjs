@@ -56,9 +56,8 @@ export default async function () {
   router.post('/answers', passport.authenticate('jwt', { session: false }), async function (req, res) {
     let newanswer = req.body
     if (req.user.role !== 'participant') return res.sendStatus(403)
-    if (!newanswer.generatedTS) return res.sendStatus(400)
     newanswer.userKey = req.user._key
-    newanswer.createdTS = new Date()
+    if (!newanswer.createdTS) newanswer.createdTS = new Date()
     try {
       newanswer = await db.createAnswer(newanswer)
       // also update task status
@@ -71,7 +70,7 @@ export default async function () {
       if (!study) return res.status(400)
       let taskItem = study.taskItemsConsent.find(ti => ti.taskId === newanswer.taskId)
       if (!taskItem) return res.status(400)
-      taskItem.lastExecuted = newanswer.generatedTS
+      taskItem.lastExecuted = newanswer.createdTS
       // update the participant
       await db.replaceParticipant(participant._key, participant)
       res.send(newanswer)
