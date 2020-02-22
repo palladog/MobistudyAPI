@@ -6,11 +6,13 @@
   "surname": "Salvi",
   "sex": "male",
   "dateOfBirth": "2019-02-27T12:46:07.294Z",
+  "country": "gb",
+  "language": "en",
   "diseases": [
-    { "name": "Heart Failure", "conceptId": "121212" }
+    { "term": "Heart Failure", "conceptId": "121212", "vocabulary": "SNOMED" }
   ],
   "medications": [
-    { "name": "Aspirin", "conceptId": "555544" }
+    { "term": "Aspirin", "conceptId": "555544" "vocabulary": "SNOMED" }
   ],
   "lifestyle": {
     "active": true,

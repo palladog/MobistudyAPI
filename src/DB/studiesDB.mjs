@@ -90,6 +90,8 @@ export default async function (db, logger) {
       LET age = DATE_DIFF(participant.dateOfBirth, DATE_NOW(), "year")
       FILTER participant.userKey == @userKey
       AND study._key NOT IN participant.studies[*].studyKey
+      AND study.generalities.languages[*] ANY IN participant.language[*]
+      AND study.inclusionCriteria.countries[*] ANY IN participant.countries[*]
       AND age >= study.inclusionCriteria.minAge AND age <= study.inclusionCriteria.maxAge
       AND participant.sex IN study.inclusionCriteria.sex
       AND (study.inclusionCriteria.lifestyle.active == 'notrequired'? TRUE : study.inclusionCriteria.lifestyle.active == participant.lifestyle.active)

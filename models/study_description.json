@@ -5,9 +5,19 @@
   "publishedTS": "2019-02-27T12:46:07.294Z",
   "teamKey": "123456",
   "generalities":{
-    "title":"My amazing study",
-    "shortDescription":"This is a study about amazing people",
-    "longDescription":"This is a study which bla bla bla",
+    "languages": ["en", "it"],
+    "title": {
+      "en": "A fantastic study",
+      "it": "Uno studio fantastico"
+    },
+    "shortDescription":{
+      "en": "This is a study about interesting people",
+      "it": "Questo e' uno studio su persone interessanti"
+    },
+    "longDescription":{
+      "en": "This is a study which bla bla bla",
+      "it": "Questo e' uno studio bla blablaba"
+    },
     "startDate":"2018-09-11",
     "endDate":"2020-10-12",
     "principalInvestigators":[
@@ -22,14 +32,18 @@
         "name":"University of Oxford",
         "contact":"asdasd",
         "dataAccess":"full",
-        "reasonForDataAccess": "Because we need to analyse the data."
+        "reasonForDataAccess":{
+          "en": "Because we need to analyse the data.",
+          "it": "Perche' dobbiamo analizzare i dati"
+        }
       }
     ]
   },
   "inclusionCriteria":{
+    "countries":["gb", "it"],
     "minAge":18,
     "maxAge":100,
-    "gender":[
+    "sex":[
       "male",
       "female",
       "other"
@@ -41,12 +55,15 @@
     },
     "criteriaQuestions":[
       {
-        "title":"Are you pregnant?",
+        "title": {
+          "en": "Are you pregnant?",
+          "it": "Sei incinta?"
+        },
         "answer":"yes"
       }
     ],
-    "diseases": [ { "name": "COPD", "conceptId": "123123123" } ],
-    "medications":[ { "name": "Aspirin", "conceptId": "12222" } ],
+    "diseases": [ { "term": "COPD", "conceptId": "123123123", "vocabulary": "SNOMED" } ],
+    "medications":[ { "term": "Aspirin", "conceptId": "12222", "vocabulary": "SNOMED" } ],
   },
   "tasks":[
     {
@@ -88,29 +105,51 @@
         "intervalType":"d",
         "interval":12
       },
-      "formKey":"12121212"
+      "formKey":"12121212",
+      "formName":{
+        "en": "Preference questionnaire",
+        "it": "Questionario sulle preferenze"
+      }
     }
   ],
   "consent":{
-    "invitation":"We would like to invite you to take part in our research study.",
-    "privacyPolicy":"This is a semi-automatically generated text.",
+    "invitation": {
+      "en": "We would like to invite you to take part in our research study.",
+      "it": "Vorremmo invitarti a partecipare al nostro studio."
+    },
+    "privacyPolicy":{
+      "en": "Our privacy policy is semi automatically generated.",
+      "it": "La nostra politica di protezione dei dati e' semi automatica."
+    },
     "taskItems":[
       {
-        "description":"I agree to send my data related to steps every week.",
+        "description": {
+          "en": "I agree to send my steps every day.",
+          "it": "Consento di mandare i miei passi ogni giorno."
+        },
         "taskId":1
       },
       {
-        "description":"I agree to answer the QoL form every day.",
+        "description": {
+          "en": "I agree to answer the questionnaire every week.",
+          "it": "Consento di rispondere il questionario ogni settimana."
+        },
         "taskId":2
       }
     ],
     "extraItems":[
       {
-        "description":"I agree to answer the QoL form every day.",
+        "description": {
+          "en": "I agree to have my blood samples taken.",
+          "it": "Consento di fornire le mie analisi del sangue."
+        },
         "optional":true
       },
       {
-        "description":"I agree to do some analysis",
+        "description": {
+          "en": "I agree to visit my doctor.",
+          "it": "Consento di visitare il mio dottore."
+        },
         "optional":false
       }
     ]
