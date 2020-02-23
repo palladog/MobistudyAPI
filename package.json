@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node --experimental-modules ./src/www.mjs",
     "devstart": "nodemon --experimental-modules",
-    "test:unit": "jest --updateSnapshot"
+    "test:unit": "jest --updateSnapshot",
+    "test:unit:watch": "jest --watch",
+    "test:unit:watchAll": "jest --watchAll"
   },
   "dependencies": {
     "arangojs": "^6.6.0",
