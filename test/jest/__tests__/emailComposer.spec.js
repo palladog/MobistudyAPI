@@ -6,7 +6,7 @@ jest.mock('../../../src/DB/DB.mjs');
 describe('when composing an email', () => {
 
   test('the email password recovery is correct', async () => {
-    let email = await passwordRecoveryCompose('link', 'token')
+    let email = await passwordRecoveryCompose('link', 'token', 'en')
     expect(email.title).toBe('Mobistudy password recovery')
     expect(email.content).toBe(`<p>You have requested to reset your password on Mobistudy.</p>
     <p>Please go to <a href=link>this webpage</a> to set another password.</p>
@@ -30,6 +30,7 @@ describe('when composing an email', () => {
     })
 
     let email = await studyStatusUpdateCompose('1', {
+      language: 'en',
       studies: [{
         studyKey: '1',
         currentStatus: "completed"
@@ -50,6 +51,7 @@ describe('when composing an email', () => {
     })
 
     let email = await studyStatusUpdateCompose('1', {
+      language: 'en',
       studies: [{
         studyKey: '1',
         currentStatus: "withdrawn"
@@ -80,6 +82,7 @@ describe('when composing an email', () => {
     })
 
     let email = await studyStatusUpdateCompose('1', {
+      language: 'en',
       studies: [{
         studyKey: '1',
         currentStatus: "accepted",

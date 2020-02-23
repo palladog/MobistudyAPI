@@ -67,8 +67,8 @@ project
 └───models        // examples of data managed by the app, in json
 └───src           // application code
 │   └───DB        // access to the database
-│   └───i8n       // internationalised text
-│   │   └───en-gb // British english text
+│   └───i18n      // internationalised text
+│   │   └───en    // English text
 │   │   └───sv    // Swedish text
 │   └───routes    // API endpoints
 │   └───services  // application logic

@@ -62,7 +62,13 @@ export default async function () {
         expiresIn: daysecs
       })
       let serverlink = req.protocol + '://' + req.headers.host + '/#/resetPassword?email=' + email + '&token=' + token
-      let { title, content } = passwordRecoveryCompose(serverlink, token)
+      let language = 'en'
+      if (existing.role === 'participant') {
+        // find language of the participant
+        let part = await db.getParticipantByUserKey(existing._key)
+        language = part.language
+      }
+      let { title, content } = passwordRecoveryCompose(serverlink, token, language)
       sendEmail(email, title, content)
       res.sendStatus(200)
       applogger.info({ email: req.body.email }, 'Reset password email sent')

@@ -1,5 +1,5 @@
-import enGBtext from './en-gb/text.mjs'
-import svSVtext from './sv/text.mjs'
+import entext from './en/text.mjs'
+import svtext from './sv/text.mjs'
 
 // extracts a property using a string, see https://stackoverflow.com/a/6491621/1097607
 let byString = function(o, s) {
@@ -19,10 +19,10 @@ let byString = function(o, s) {
 
 // API inspired by https://kazupon.github.io/vue-i18n/introduction.html
 export default {
-  locale: 'en-gb', // default locale
+  locale: 'en', // default locale
   text: {
-    'en-gb': enGBtext,
-    sv: svSVtext
+    en: entext,
+    sv: svtext
   },
   t: function(id, args) {
     let text = byString(this.text[this.locale], id)

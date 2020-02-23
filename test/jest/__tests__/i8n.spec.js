@@ -1,21 +1,21 @@
-import i8n from '../../../src/i8n/i8n.mjs'
+import i18n from '../../../src/i18n/i18n.mjs'
 
-describe('when using i8n', () => {
+describe('when using i18n', () => {
   beforeAll(() => {
-    i8n.text.testLang = {
+    i18n.text.testLang = {
       test: 'TEST',
       phrase: '{ n } times 1 is { n  }',
       phrase2: '{  name1} is cooler than { name2  }'
     }
-    i8n.locale = 'testLang'
+    i18n.locale = 'testLang'
   })
 
   test('a phrase can be easily retrieved', () => {
-    expect(i8n.text.testLang.test).toBe('TEST')
+    expect(i18n.text.testLang.test).toBe('TEST')
   })
 
   test('tokens are changed with actual content', () => {
-    expect(i8n.t('phrase', { n: 5 })).toBe('5 times 1 is 5')
-    expect(i8n.t('phrase2', { name1: 'dario', name2: 'pino' })).toBe('dario is cooler than pino')
+    expect(i18n.t('phrase', { n: 5 })).toBe('5 times 1 is 5')
+    expect(i18n.t('phrase2', { name1: 'dario', name2: 'pino' })).toBe('dario is cooler than pino')
   })
 })
