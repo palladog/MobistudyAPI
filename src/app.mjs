@@ -23,6 +23,7 @@ import answersRouter from './routes/answers.mjs'
 import healthStoreDataRouter from './routes/healthStoreData.mjs'
 import auditLogRouter from './routes/auditLog.mjs'
 import testerRouter from './routes/tester.mjs'
+import vocabularyRouter from './routes/vocabulary.mjs'
 
 export default async function () {
   authConfig()
@@ -52,6 +53,7 @@ export default async function () {
   app.use(api_prefix, await healthStoreDataRouter())
   app.use(api_prefix, await auditLogRouter())
   app.use(api_prefix, await testerRouter())
+  app.use(api_prefix, await vocabularyRouter())
 
   // error handler
   app.use(function (err, req, res, next) {
