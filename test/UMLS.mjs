@@ -9,6 +9,7 @@
 *
 * Conclusion: for now I think using SNOMED is easier
 **/
+// REMEMBER TO INSTALL THESE DEPENDENCIES !!!
 import axios from 'axios'
 import qs from 'querystring'
 import parser from 'node-html-parser'
