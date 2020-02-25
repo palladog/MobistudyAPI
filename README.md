@@ -69,12 +69,12 @@ For the full setup including database and web interface, see the
 
 To build the docker instance:
 
-```
+```bash
 docker build -t mobistudyapi .
 ```
 
 Then run it with:
-```
+```bash
 docker run -d \
     -p 80:8080 \
     -v /local/path/to/logs:/usr/src/app/logs \
