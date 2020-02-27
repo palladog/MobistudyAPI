@@ -73,6 +73,24 @@ export default async function (db, logger) {
       return true
     },
 
+    // gets an unused invitation code
+    async getNewInvitationCode () {
+      let repeat = true
+      do {
+        // generate a random 6 digits number
+        let random = ('' + Math.round( Math.random() * 999999 )).padStart(6, '0')
+        // check if the number is already used
+        var query = `FOR study IN studies FILTER study.invitationCode == @number RETURN study`
+        let bindings = { number: random }
+        applogger.trace(bindings, 'Querying "' + query + '"')
+        let cursor = await db.query(query, bindings)
+        let study = await cursor.all()
+        if (study.length) repeat = true
+        else repeat = false
+      } while (repeat)
+      return random
+    },
+
     // gets all the studies that match inclusion criteria
     async getMatchedNewStudies (userKey) {
       const query = `FOR study IN studies
