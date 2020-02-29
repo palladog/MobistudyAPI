@@ -16,7 +16,7 @@ import getAuditLogDB from './auditLogDB.mjs'
 
 import getConfig from '../services/config.mjs'
 
-export default async function (logger) {
+export default async function () {
   var config = getConfig()
 
   try {

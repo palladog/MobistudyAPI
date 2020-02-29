@@ -7,7 +7,7 @@
 import utils from './utils.mjs'
 import { applogger } from '../services/logger.mjs'
 
-export default async function (db, logger) {
+export default async function (db) {
   let collection = await utils.getCollection(db, 'participants')
 
   return {
