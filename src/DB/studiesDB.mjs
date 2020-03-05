@@ -78,7 +78,7 @@ export default async function (db, logger) {
       let repeat = true
       do {
         // generate a random 6 digits number
-        const random = ('' + Math.round( Math.random() * 999999 )).padStart(6, '0')
+        var random = ('' + Math.round( Math.random() * 999999 )).padStart(6, '0')
         // check if the number is already used
         var query = `FOR study IN studies FILTER study.invitationCode == @number RETURN study`
         let bindings = { number: random }
