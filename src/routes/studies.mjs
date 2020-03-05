@@ -172,5 +172,16 @@ export default async function () {
     }
   })
 
+  router.get('/newInvitationCode', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    try {
+      if (req.user.role !== 'participant') return res.sendStatus(403)
+      let studyCode = await db.getNewInvitationCode()
+      res.send(studyCode)
+    } catch (err) {
+      applogger.error({ error: err }, 'Cannot retrieve study code')
+      res.sendStatus(500)
+    }
+  })
+
   return router
 }
