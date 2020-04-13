@@ -24,6 +24,8 @@ import healthStoreDataRouter from './routes/healthStoreData.mjs'
 import auditLogRouter from './routes/auditLog.mjs'
 import testerRouter from './routes/tester.mjs'
 import vocabularyRouter from './routes/vocabulary.mjs'
+import SMWTRouter from './routes/SMWTData.mjs'
+import QCSTRouter from './routes/QCSTData.mjs'
 
 export default async function () {
   authConfig()
@@ -54,6 +56,8 @@ export default async function () {
   app.use(api_prefix, await auditLogRouter())
   app.use(api_prefix, await testerRouter())
   app.use(api_prefix, await vocabularyRouter())
+  app.use(api_prefix, await SMWTRouter())
+  app.use(api_prefix, await QCSTRouter())
 
   // error handler
   app.use(function (err, req, res, next) {

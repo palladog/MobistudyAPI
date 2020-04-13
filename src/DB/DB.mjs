@@ -12,6 +12,8 @@ import getAnswersDB from './answersDB.mjs'
 import getTeamsDB from './teamsDB.mjs'
 import getParticipantsDB from './participantsDB.mjs'
 import getHealthStoreDataDB from './healthStoreDataDB.mjs'
+import getSMWTDataDB from './SMWTDataDB.mjs'
+import getQCSTDataDB from './QCSTDataDB.mjs'
 import getAuditLogDB from './auditLogDB.mjs'
 
 import getConfig from '../services/config.mjs'
@@ -42,6 +44,10 @@ export default async function (logger) {
     dao = Object.assign(healthStoreData, dao)
     let auditLog = await getAuditLogDB(db)
     dao = Object.assign(auditLog, dao)
+    let SMWTData = await getSMWTDataDB(db)
+    dao = Object.assign(SMWTData, dao)
+    let QCSTData = await getQCSTDataDB(db)
+    dao = Object.assign(QCSTData, dao)
 
     // add new collections here
     return dao

@@ -1,0 +1,11 @@
+{
+	"userKey": "asdasd",
+	"studyKey": "SMWT",
+	"taskId": 1,
+	"dataType": "distance",
+	"createdTS": "timestamp on the server",
+	"positions": [],
+	"distance": "600",
+	"borgScale": 5,
+	"time": "00:00"
+}
