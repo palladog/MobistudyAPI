@@ -65,7 +65,7 @@
       }
     ],
     "diseases": [ { "term": "COPD", "conceptId": "123123123", "vocabulary": "SNOMED" } ],
-    "medications":[ { "term": "Aspirin", "conceptId": "12222", "vocabulary": "SNOMED" } ],
+    "medications":[ { "term": "Aspirin", "conceptId": "12222", "vocabulary": "SNOMED" } ]
   },
   "tasks":[
     {
@@ -112,7 +112,35 @@
         "en": "Preference questionnaire",
         "it": "Questionario sulle preferenze"
       }
-    }
+    },
+    {
+      "id": 3,
+      "type": "smwt",
+      "scheduling": {
+		  "startEvent": "consent",
+		  "intervalType": "w",
+		  "interval": 1,
+		  "occurrences": 20,
+		  "months": [],
+		  "monthDays": [],
+		  "weekDays": [1, 3, 5]
+      },
+      "dataType": "distance"
+    },
+    {
+      "id": 4,
+      "type": "qcst",
+      "scheduling": {
+		  "startEvent": "consent",
+		  "intervalType": "w",
+		  "interval": 1,
+		  "occurrences": 20,
+		  "months": [],
+		  "monthDays": [],
+		  "weekDays": [1, 3, 5]
+      },
+      "dataType": "steps"
+	  }
   ],
   "consent":{
     "invitation": {
@@ -137,6 +165,20 @@
           "it": "Consento di rispondere il questionario ogni settimana."
         },
         "taskId":2
+      },
+      {
+        "description": {
+          "en": "I agree to perform the Six Minute Walk Test once a week.",
+          "sv": "Jag accepterar att utföra Six Minute Walk Test en gång i veckan."
+        },
+        "taskId":3
+      },
+      {
+        "description": {
+          "en": "I agree to perform the Queens College Stepn Test once a week.",
+          "sv": "Jag accepterar att utföra Queens College Stepn Test en gång i veckan."
+        },
+        "taskId":4
       }
     ],
     "extraItems":[
