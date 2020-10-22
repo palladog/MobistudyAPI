@@ -14,6 +14,10 @@ Install all other dependencies with `npm install`.
 On Arango, you must have created a dedicated database for Mobistudy, and, possibly,
 also a dedicated user with its password.
 
+To start Arango, you can either [install it](https://www.arangodb.com/), or use Docker. For development, use:
+
+`docker run -e ARANGO_NO_AUTH=1 -p 8529:8529 arangodb/arangodb arangod  --server.endpoint tcp://0.0.0.0:8529`
+
 ## Run
 
 The code is written using ES6 module, which are still experimental in nodejs.
