@@ -22,6 +22,10 @@
         "en": "Choose a color",
         "it": "Scegli un colore"
       },
+      "footer": {
+        "en": "Copyright: Mobistudy",
+        "it": "Copyright: Mobistudy"
+      },
       "nextDefaultId":"Q2",
       "answerChoices":[
         {
@@ -52,6 +56,10 @@
       "helper": {
         "en": "Choose as many as you want.",
         "it": "Scegli quelli che vuoi."
+      },
+      "footer": {
+        "en": "Copyright: Mobistudy",
+        "it": "Copyright: Mobistudy"
       },
       "nextDefaultId":"ENDFORM",
       "answerChoices":[
