@@ -78,7 +78,7 @@ export default async function (db) {
       let repeat = true
       do {
         // generate a random 6 digits number
-        let random = ('' + Math.round( Math.random() * 999999 )).padStart(6, '0')
+        let random = ('' + Math.round(Math.random() * 999999)).padStart(6, '0')
         // check if the number is already used
         var query = `FOR study IN studies FILTER study.invitationCode == @number RETURN study`
         let bindings = { number: random }
@@ -112,8 +112,7 @@ export default async function (db) {
       AND study.inclusionCriteria.countries[*] ANY IN participant.countries[*]
       AND age >= study.inclusionCriteria.minAge AND age <= study.inclusionCriteria.maxAge
       AND participant.sex IN study.inclusionCriteria.sex
-      AND (study.inclusionCriteria.lifestyle.active == 'notrequired'? TRUE : study.inclusionCriteria.lifestyle.active == participant.lifestyle.active)
-      AND (study.inclusionCriteria.lifestyle.smoker == 'notrequired'? TRUE : study.inclusionCriteria.lifestyle.smoker == participant.lifestyle.smoker)
+      AND participant.studiesSuggestions == TRUE
       AND study.inclusionCriteria.diseases[*].conceptId ALL IN participant.diseases[*].conceptId
       AND study.inclusionCriteria.medications[*].conceptId ALL IN participant.medications[*].conceptId
       RETURN study._key`

@@ -9,41 +9,62 @@
   "country": "gb",
   "language": "en",
   "diseases": [
-    { "term": "Heart Failure", "conceptId": "121212", "vocabulary": "SNOMED" }
+    {
+      "term": "Heart Failure",
+      "conceptId": "121212",
+      "vocabulary": "SNOMED"
+    }
   ],
   "medications": [
-    { "term": "Aspirin", "conceptId": "555544" "vocabulary": "SNOMED" }
+    {
+      "term": "Aspirin",
+      "conceptId": "555544" "vocabulary": "SNOMED"
+    }
   ],
-  "lifestyle": {
-    "active": true,
-    "smoker": false
-  },
+  "studiesSuggestions": true,
   "studies": [
     {
       "studyKey": "key",
       "currentStatus": "accepted",
       "acceptedTS": "2019-02-27T12:46:07.294Z",
       "taskItemsConsent": [
-        { "taskId": 1, "consented": true, "lastExecuted": "2019-02-27T12:46:07.294Z" }
+        {
+          "taskId": 1,
+          "consented": true,
+          "lastExecuted": "2019-02-27T12:46:07.294Z"
+        }
       ],
       "extraItemsConsent": [
-        { "consented": true }
+        {
+          "consented": true
+        }
       ]
     },
     {
       "studyKey": "key",
       "currentStatus": "withdrawn",
       "acceptedTS": "2019-02-27T12:46:07.294Z",
-      "criteriaAnswers": ["Yes", "No"],
+      "criteriaAnswers": [
+        "Yes",
+        "No"
+      ],
       "withdrawalTS": "2019-02-27T12:46:07.294Z",
       "reminders": true,
       "withdrawalReason": "string",
       "taskItemsConsent": [
-        { "taskId": 1, "consented": true, "lastExecuted": "2019-02-27T12:46:07.294Z" }
+        {
+          "taskId": 1,
+          "consented": true,
+          "lastExecuted": "2019-02-27T12:46:07.294Z"
+        }
       ],
       "extraItemsConsent": [
-        { "consented": true },
-        { "consented": false }
+        {
+          "consented": true
+        },
+        {
+          "consented": false
+        }
       ]
     },
     {
@@ -51,16 +72,26 @@
       "currentStatus": "completed",
       "acceptedTS": "2019-02-27T12:46:07.294Z",
       "reminders": true,
-      "criteriaAnswers": ["No", "No"],
+      "criteriaAnswers": [
+        "No",
+        "No"
+      ],
       "completedTS": "2019-02-27T12:46:07.294Z",
       "taskItemsConsent": [
-        { "taskId": 1, "consented": true, "lastExecuted": "2019-02-27T12:46:07.294Z" }
+        {
+          "taskId": 1,
+          "consented": true,
+          "lastExecuted": "2019-02-27T12:46:07.294Z"
+        }
       ]
     },
     {
       "studyKey": "key",
       "currentStatus": "excluded",
-      "criteriaAnswers": ["No", "No"],
+      "criteriaAnswers": [
+        "No",
+        "No"
+      ],
       "excludedTS": "2019-02-27T12:46:07.294Z"
     },
     {
