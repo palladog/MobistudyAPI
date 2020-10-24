@@ -1,19 +1,22 @@
 {
-  "created":"2018-10-25T10:09:53.222Z",
-  "name":{
+  "created": "2018-10-25T10:09:53.222Z",
+  "name": {
     "en": "Preference questionnaire",
     "it": "Questionario sulle preferenze"
   },
-  "description":{
+  "description": {
     "en": "What do you prefer?",
     "it": "Cosa preferisci?"
   },
   "teamKey": 12345,
-  "languages": ["en", "it"],
-  "questions":[
+  "languages": [
+    "en",
+    "it"
+  ],
+  "questions": [
     {
-      "id":"Q1",
-      "type":"singleChoice",
+      "id": "Q1",
+      "type": "singleChoice",
       "text": {
         "en": "What do you prefer?",
         "it": "Cosa preferisci?"
@@ -26,29 +29,29 @@
         "en": "Copyright: Mobistudy",
         "it": "Copyright: Mobistudy"
       },
-      "nextDefaultId":"Q2",
-      "answerChoices":[
+      "nextDefaultId": "Q2",
+      "answerChoices": [
         {
-          "id":"1",
+          "id": "1",
           "text": {
             "en": "Red",
             "it": "Rosso"
           },
-          "nextQuestionId":"Q2"
+          "nextQuestionId": "Q2"
         },
         {
-          "id":"2",
-          "text":{
+          "id": "2",
+          "text": {
             "en": "Blue",
             "it": "Blu"
           },
-          "nextQuestionId":"Q2"
+          "nextQuestionId": "Q2"
         }
       ]
     },
     {
-      "id":"Q2",
-      "type":"multiChoice",
+      "id": "Q2",
+      "type": "multiChoice",
       "text": {
         "en": "What do you want in life?",
         "it": "Cosa vuoi dalla vita?"
@@ -61,23 +64,32 @@
         "en": "Copyright: Mobistudy",
         "it": "Copyright: Mobistudy"
       },
-      "nextDefaultId":"ENDFORM",
-      "answerChoices":[
+      "nextDefaultId": "Q3",
+      "answerChoices": [
         {
-          "id":"Q2A1",
+          "id": "Q2A1",
           "text": {
             "en": "Money",
             "it": "Danaro"
           }
         },
         {
-          "id":"Q2A2",
+          "id": "Q2A2",
           "text": {
             "en": "Success",
             "it": "Successo"
           }
         }
       ]
+    },
+    {
+      "id": "Q3",
+      "type": "textOnly",
+      "text": {
+        "en": "Thank you",
+        "it": "Grazie"
+      },
+      "nextDefaultId": "ENDFORM"
     }
   ]
 }
