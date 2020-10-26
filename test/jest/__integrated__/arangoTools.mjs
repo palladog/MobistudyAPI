@@ -1,8 +1,12 @@
 import {Docker} from 'node-docker-api'
+import Arango from 'arangojs'
+import utils from '../../../src/DB/utils'
+
 
 let docker = new Docker({ socketPath: '/var/run/docker.sock' })
 let image
 let container
+let db
 
 const pullImage = function (docker, image, tag) {
   return new Promise((resolve, reject) => {
@@ -77,7 +81,12 @@ export const startArango = async function () {
   })
 
   await execStart(exec)
-  console.log('init executed')
+  console.log('mobistudy db created')
+
+  db = new Arango({ url: 'http://localhost:' + ARANGOPORT })
+
+  db.useDatabase('mobistudy')
+  db.useBasicAuth('mobistudy', 'testpwd')
   return
 }
 
@@ -87,3 +96,12 @@ export const stopArango = async function () {
   // if (image) await image.remove()
   return
 }
+
+export const addDataToCollection = async function (collname, data) {
+  let collection = await utils.getCollection(db, collname)
+  let meta = await collection.save(data)
+  data._key = meta._key
+  return data
+}
+
+export { db as DB }
