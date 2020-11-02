@@ -18,7 +18,8 @@
   "medications": [
     {
       "term": "Aspirin",
-      "conceptId": "555544" "vocabulary": "SNOMED"
+      "conceptId": "555544",
+      "vocabulary": "SNOMED"
     }
   ],
   "studiesSuggestions": true,
