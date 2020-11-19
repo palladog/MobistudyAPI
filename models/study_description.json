@@ -162,6 +162,16 @@
         ]
       },
       "dataType": "steps"
+    },
+    {
+      "id": 5,
+      "type": "miband3",
+      "hrInterval": 3,
+      "scheduling": {
+        "startEvent": "consent",
+        "intervalType": "d",
+        "interval": 3
+      }
     }
   ],
   "consent": {
@@ -201,6 +211,13 @@
           "sv": "Jag accepterar att utföra Queens College Stepn Test en gång i veckan."
         },
         "taskId": 4
+      },
+      {
+        "description": {
+          "en": "I agree to provide my data collected from the MiBand3 fittness tracker.",
+          "sv": "Jag accepterar att skicka mina samladade data från MiBand3 träningsspårare."
+        },
+        "taskId": 5
       }
     ],
     "extraItems": [
