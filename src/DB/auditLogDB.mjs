@@ -37,6 +37,14 @@ export default async function (db) {
         bindings.after = after
         bindings.before = before
       }
+      if (after && !before) {
+        queryString += `FILTER DATE_DIFF(log.timestamp, @after, 's') <=0 `
+        bindings.after = after
+      }
+      if (!after && before) {
+        queryString += `FILTER DATE_DIFF(log.timestamp, @before, 's') >=0 `
+        bindings.before = before
+      }
       if (eventType) {
         queryString += `FILTER log.event == @eventType `
         bindings.eventType = eventType
