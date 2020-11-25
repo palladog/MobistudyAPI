@@ -38,7 +38,57 @@ export default async function (db) {
       applogger.trace('Searching for user "' + user._key)
       return user
     },
+    async getRoleTypes () {
+      let query = 'FOR user IN users RETURN DISTINCT user.role'
+      applogger.trace('Querying "' + query + '"')
+      let cursor = await db.query(query)
+      return cursor.all()
+    },
+    async getUsers (countOnly, roleType, userEmail, sortDirection, offset, count) {
+      if (countOnly) {
+        queryString = `RETURN COUNT ( `
+      }
+      let bindings = {}
+      queryString += `FOR user IN users `
 
+      if (roleType) {
+        queryString += `FILTER user.role == @roleType `
+        bindings.roleType = roleType
+      }
+      if (userEmail) {
+        queryString += `FILTER LIKE(user.email, CONCAT(' % ', @userEmail, ' %'), true) `
+        bindings.userEmail = userEmail
+      }
+      if (!countOnly) {
+        if (!sortDirection) {
+          sortDirection = 'DESC'
+        }
+        queryString += `SORT user.email @sortDirection `
+        bindings.sortDirection = sortDirection
+        if (!!offset && !!count) {
+          queryString += `LIMIT @offset, @count `
+          bindings.offset = parseInt(offset)
+          bindings.count = parseInt(count)
+        }
+      }
+
+      if (countOnly) {
+        queryString += ` RETURN 1 )`
+      } else {
+        queryString += ` RETURN {
+          userkey: user._key,
+          email: user.email,
+          role: user.role
+        }`
+      }
+      applogger.trace(bindings, 'Querying "' + queryString + '"')
+      let cursor = await db.query(queryString, bindings)
+      if (countOnly) {
+        let counts = await cursor.all()
+        if (counts.length) return '' + counts[0]
+        else return undefined
+      } else return cursor.all()
+    },
     async getAllUsersByCriteria (role, studyKey, studyKeys) {
       let join = ''
       let filter = ''
@@ -81,7 +131,7 @@ export default async function (db) {
 
     //remove a user (Assumption: userKey is the correct one)
     async removeUser (userKey) {
-      let bindings = { 'usrKey' : userKey}
+      let bindings = { 'usrKey': userKey }
       let query = 'REMOVE { _key:@usrKey } IN users'
       applogger.trace(bindings, 'Querying "' + query + '"')
       let cursor = await db.query(query, bindings)

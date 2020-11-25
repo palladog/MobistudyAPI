@@ -107,6 +107,20 @@ export default async function () {
     } else res.sendStatus(400)
   })
 
+  router.get('/users/roleTypes', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role !== 'admin' && req.user.role !== 'researcher') {
+      res.sendStatus(403)
+    } else {
+      try {
+        let result = await db.getRoleTypes(req.query)
+        res.send(result)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot retrieve user (roles)')
+        res.sendStatus(500)
+      }
+    }
+  })
+
   router.post('/users', async (req, res) => {
     let user = req.body
     let password = user.password
