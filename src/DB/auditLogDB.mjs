@@ -26,7 +26,7 @@ export default async function (db) {
       if (countOnly) {
         queryString = 'RETURN COUNT ( '
       }
-      let bindings = { }
+      let bindings = {}
       queryString += `FOR log IN auditlogs `
       if (!countOnly || userEmail) {
         queryString += ` FOR user IN users

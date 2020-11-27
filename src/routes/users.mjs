@@ -107,20 +107,6 @@ export default async function () {
     } else res.sendStatus(400)
   })
 
-  router.get('/users/roleTypes', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    if (req.user.role !== 'admin' && req.user.role !== 'researcher') {
-      res.sendStatus(403)
-    } else {
-      try {
-        let result = await db.getRoleTypes(req.query)
-        res.send(result)
-      } catch (err) {
-        applogger.error({ error: err }, 'Cannot retrieve user (roles)')
-        res.sendStatus(500)
-      }
-    }
-  })
-
   router.post('/users', async (req, res) => {
     let user = req.body
     let password = user.password
@@ -165,6 +151,66 @@ export default async function () {
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new user')
       res.sendStatus(500)
+    }
+  })
+
+  // NEW GET ROLE TYPES FUNCTION
+  router.get('/users/roleTypes', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role !== 'admin' && req.user.role !== 'researcher') {
+      res.sendStatus(403)
+    } else {
+      try {
+        let result = await db.getRoleTypes(req.query)
+        res.send(result)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot retrieve user (roles)')
+        res.sendStatus(500)
+      }
+    }
+  })
+
+  // NEW GET USER FUNCTION
+  router.get('/getUsers', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role !== 'admin') {
+      console.log(`not an admin`)
+      res.sendStatus(403)
+    } else {
+      try {
+        let result = await db.getUsers(false,
+          req.query.roleType,
+          req.query.userEmail,
+          req.query.sortDirection,
+          req.query.offset,
+          req.query.count
+        )
+        console.log('routes/users.mjs RESULT:', result)
+        res.send(result)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot retrieve users')
+        res.sendStatus(500)
+      }
+    }
+  })
+
+  // NEW GET USER COUNT FUNCTION
+  router.get('/getUsers/count', passport.authenticate('jwt', { session: false }), async function (req, res) {
+    if (req.user.role !== 'admin') {
+      console.log(`not an admin`)
+      res.sendStatus(403)
+    } else {
+      try {
+        let result = await db.getUsers(true,
+          req.query.roleType,
+          req.query.userEmail,
+          req.query.sortDirection,
+          req.query.offset,
+          req.query.count
+        )
+        res.send(result)
+      } catch (err) {
+        applogger.error({ error: err }, 'Cannot retrieve users count')
+        res.sendStatus(500)
+      }
     }
   })
 

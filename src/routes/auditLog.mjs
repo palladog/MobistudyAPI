@@ -46,7 +46,7 @@ export default async function () {
       try {
         // Researcher: a study must be specified and the researcher has to be allowed to see that study
         if (req.user.role === 'researcher') {
-          if (! req.query.studyKey) return res.sendStatus(400)
+          if (!req.query.studyKey) return res.sendStatus(400)
           let teams = await db.getAllTeams(req.user._key, req.query.studyKey)
           if (teams.length === 0) return res.sendStatus(403)
         }

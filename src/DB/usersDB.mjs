@@ -38,13 +38,17 @@ export default async function (db) {
       applogger.trace('Searching for user "' + user._key)
       return user
     },
+    // NEW GET ROLE TYPES FUNCTION
     async getRoleTypes () {
       let query = 'FOR user IN users RETURN DISTINCT user.role'
       applogger.trace('Querying "' + query + '"')
       let cursor = await db.query(query)
       return cursor.all()
     },
+    // NEW GET USER FUNCTION
     async getUsers (countOnly, roleType, userEmail, sortDirection, offset, count) {
+      let queryString = ''
+
       if (countOnly) {
         queryString = `RETURN COUNT ( `
       }
@@ -56,7 +60,7 @@ export default async function (db) {
         bindings.roleType = roleType
       }
       if (userEmail) {
-        queryString += `FILTER LIKE(user.email, CONCAT(' % ', @userEmail, ' %'), true) `
+        queryString += `FILTER LIKE(user.email, CONCAT('%', @userEmail, '%'), true) `
         bindings.userEmail = userEmail
       }
       if (!countOnly) {
