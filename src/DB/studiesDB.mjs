@@ -93,6 +93,7 @@ export default async function (db) {
 
     // gets all the studies that match inclusion criteria
     async getMatchedNewStudies (userKey) {
+      // TODO add BMI to query
       const query = `FOR study IN studies
       FILTER !!study.publishedTS
       LET partsN = FIRST (
