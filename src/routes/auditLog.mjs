@@ -37,7 +37,7 @@ export default async function () {
   // userEmail
   // sortDirection: ASC or DESC
   // offset: for pagination
-  // count: for pagination
+  // rowsPerPage: for pagination
   router.get('/auditlog', passport.authenticate('jwt', { session: false }), async function (req, res) {
     if (req.user.role !== 'admin' && req.user.role !== 'researcher') {
       console.log(`not a researcher`)
@@ -59,7 +59,7 @@ export default async function () {
           req.query.userEmail,
           req.query.sortDirection,
           req.query.offset,
-          req.query.count
+          req.query.rowsPerPage
         )
         res.send(result)
       } catch (err) {
@@ -83,7 +83,7 @@ export default async function () {
           req.query.userEmail,
           req.query.sortDirection,
           req.query.offset,
-          req.query.count
+          req.query.rowsPerPage
         )
         res.send(result)
       } catch (err) {
