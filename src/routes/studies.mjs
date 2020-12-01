@@ -74,7 +74,7 @@ export default async function () {
       res.send(newstudy)
 
       applogger.info(newstudy, 'New study description added')
-      auditLogger.log('studyDescriptionAdded', req.user._key, newstudy._key, undefined, 'New study description added ' + newstudy.generalities.title, 'studies', newstudy._key, newstudy)
+      auditLogger.log('studyDescriptionAdded', req.user._key, newstudy._key, undefined, 'New study description added', 'studies', newstudy._key, newstudy)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot store new study')
       res.sendStatus(500)
@@ -90,7 +90,7 @@ export default async function () {
       newstudy = await db.replaceStudy(req.params.study_key, newstudy)
       res.send(newstudy)
       applogger.info(newstudy, 'Study replaced')
-      auditLogger.log('studyDescriptionReplaced', req.user._key, newstudy._key, undefined, 'Study description replaced ' + newstudy.generalities.title, 'studies', newstudy._key, newstudy)
+      auditLogger.log('studyDescriptionReplaced', req.user._key, newstudy._key, undefined, 'Study description replaced', 'studies', newstudy._key, newstudy)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot replace study with _key ' + req.params.study_key)
       res.sendStatus(500)
@@ -106,7 +106,7 @@ export default async function () {
       newstudy = await db.updateStudy(req.params.study_key, newstudy)
       res.send(newstudy)
       applogger.info(newstudy, 'Study updated')
-      auditLogger.log('studyDescriptionUpdated', req.user._key, newstudy._key, undefined, 'Study description updated ' + newstudy.generalities.title, 'studies', newstudy._key, newstudy)
+      auditLogger.log('studyDescriptionUpdated', req.user._key, newstudy._key, undefined, 'Study description updated', 'studies', newstudy._key, newstudy)
     } catch (err) {
       applogger.error({ error: err }, 'Cannot update study with _key ' + req.params.study_key)
       res.sendStatus(500)

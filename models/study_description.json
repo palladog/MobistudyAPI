@@ -79,7 +79,9 @@
         "conceptId": "12222",
         "vocabulary": "SNOMED"
       }
-    ]
+    ],
+    "minBMI": 28,
+    "maxBMI": 30
   },
   "tasks": [
     {
