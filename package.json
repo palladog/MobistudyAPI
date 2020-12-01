@@ -36,6 +36,7 @@
   "devDependencies": {
     "jest": "^24.9.0",
     "jest-esnext": "0.0.4",
-    "node-docker-api": "^1.1.22"
+    "node-docker-api": "^1.1.22",
+    "nodemon": "^2.0.6"
   }
 }
