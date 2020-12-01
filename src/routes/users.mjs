@@ -181,7 +181,7 @@ export default async function () {
           req.query.userEmail,
           req.query.sortDirection,
           req.query.offset,
-          req.query.count
+          req.query.rowsPerPage
         )
         console.log('routes/users.mjs RESULT:', result)
         res.send(result)
@@ -204,7 +204,7 @@ export default async function () {
           req.query.userEmail,
           req.query.sortDirection,
           req.query.offset,
-          req.query.count
+          req.query.rowsPerPage
         )
         res.send(result)
       } catch (err) {

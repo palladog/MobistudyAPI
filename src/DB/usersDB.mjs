@@ -46,7 +46,7 @@ export default async function (db) {
       return cursor.all()
     },
     // NEW GET USER FUNCTION
-    async getUsers (countOnly, roleType, userEmail, sortDirection, offset, count) {
+    async getUsers (countOnly, roleType, userEmail, sortDirection, offset, rowsPerPage) {
       let queryString = ''
 
       if (countOnly) {
@@ -69,10 +69,10 @@ export default async function (db) {
         }
         queryString += `SORT user.email @sortDirection `
         bindings.sortDirection = sortDirection
-        if (!!offset && !!count) {
-          queryString += `LIMIT @offset, @count `
+        if (!!offset && !!rowsPerPage) {
+          queryString += `LIMIT @offset, @rowsPerPage `
           bindings.offset = parseInt(offset)
-          bindings.count = parseInt(count)
+          bindings.rowsPerPage = parseInt(rowsPerPage)
         }
       }
 
