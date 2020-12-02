@@ -38,13 +38,6 @@ export default async function (db) {
       applogger.trace('Searching for user "' + user._key)
       return user
     },
-    // NEW GET ROLE TYPES FUNCTION
-    async getRoleTypes () {
-      let query = 'FOR user IN users RETURN DISTINCT user.role'
-      applogger.trace('Querying "' + query + '"')
-      let cursor = await db.query(query)
-      return cursor.all()
-    },
     // NEW GET USER FUNCTION
     async getUsers (countOnly, roleType, userEmail, sortDirection, offset, rowsPerPage) {
       let queryString = ''

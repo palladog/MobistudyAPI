@@ -154,21 +154,6 @@ export default async function () {
     }
   })
 
-  // NEW GET ROLE TYPES FUNCTION
-  router.get('/users/roleTypes', passport.authenticate('jwt', { session: false }), async function (req, res) {
-    if (req.user.role !== 'admin' && req.user.role !== 'researcher') {
-      res.sendStatus(403)
-    } else {
-      try {
-        let result = await db.getRoleTypes(req.query)
-        res.send(result)
-      } catch (err) {
-        applogger.error({ error: err }, 'Cannot retrieve user (roles)')
-        res.sendStatus(500)
-      }
-    }
-  })
-
   // NEW GET USER FUNCTION
   router.get('/getUsers', passport.authenticate('jwt', { session: false }), async function (req, res) {
     if (req.user.role !== 'admin') {
