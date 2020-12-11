@@ -56,7 +56,9 @@ export default async function (db) {
           studykey: study._key,
           studytitle: study.generalities.title,
           createdTS: study.createdTS,
-          publishedTS: study.publishedTS
+          publishedTS: study.publishedTS,
+          startDate: study.generalities.startDate,
+          endDate: study.generalities.endDate
         }`
       }
       applogger.trace(bindings, 'Querying "' + queryString + '"')
