@@ -11,7 +11,7 @@ export default async function (db) {
 
   return {
     // NEW GET STUDIES FUNCTION
-    async getStudies (countOnly, studyTitle, sortDirection, offset, rowsPerPage) {
+    async getStudies (countOnly, after, before, studyTitle, sortDirection, offset, rowsPerPage) {
       let queryString = ''
 
       if (countOnly) {
@@ -19,7 +19,19 @@ export default async function (db) {
       }
       let bindings = {}
       queryString += `FOR study IN studies `
-
+      if (after && before) {
+        queryString += `FILTER DATE_DIFF(study.createdTS, @after, 's') <=0 AND DATE_DIFF(study.createdTS, @before, 's') >=0 `
+        bindings.after = after
+        bindings.before = before
+      }
+      if (after && !before) {
+        queryString += `FILTER DATE_DIFF(study.createdTS, @after, 's') <=0 `
+        bindings.after = after
+      }
+      if (!after && before) {
+        queryString += `FILTER DATE_DIFF(study.createdTS, @before, 's') >=0 `
+        bindings.before = before
+      }
       if (studyTitle) {
         queryString += `FILTER LIKE(study.generalities.title, CONCAT('%', @studyTitle, '%'), true) `
         bindings.studyTitle = studyTitle

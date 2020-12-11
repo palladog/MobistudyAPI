@@ -22,6 +22,8 @@ export default async function () {
     } else {
       try {
         let result = await db.getStudies(false,
+          req.query.after,
+          req.query.before,
           req.query.studyTitle,
           req.query.sortDirection,
           req.query.offset,
@@ -44,6 +46,8 @@ export default async function () {
     } else {
       try {
         let result = await db.getStudies(true,
+          req.query.after,
+          req.query.before,
           req.query.studyTitle,
           req.query.sortDirection,
           req.query.offset,
