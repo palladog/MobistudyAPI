@@ -19,6 +19,10 @@ export default async function (db) {
       }
       let bindings = {}
       queryString += `FOR study IN studies `
+      if (!countOnly || studyTitle) {
+        queryString += ` FOR team IN teams
+        FILTER team._key == study.teamKey `
+      }
       if (after && before) {
         queryString += `FILTER DATE_DIFF(study.createdTS, @after, 's') <=0 AND DATE_DIFF(study.createdTS, @before, 's') >=0 `
         bindings.after = after
@@ -57,6 +61,8 @@ export default async function (db) {
           studytitle: study.generalities.title,
           createdTS: study.createdTS,
           publishedTS: study.publishedTS,
+          teamkey: study.teamKey,
+          teamname: team.name,
           startDate: study.generalities.startDate,
           endDate: study.generalities.endDate
         }`
